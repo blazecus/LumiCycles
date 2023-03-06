@@ -1,0 +1,45 @@
+[gd_scene load_steps=6 format=3 uid="uid://by2lxt6065kk5"]
+
+[ext_resource type="Script" path="res://game/player/player.cs" id="1_oxyv2"]
+[ext_resource type="Script" path="res://game/player/player_camera.cs" id="2_mnuh0"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_k8vaj"]
+size = Vector3(0.5, 1, 2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_rho0k"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_gdf23"]
+size = Vector3(0.5, 1, 2)
+
+[node name="player" type="CharacterBody3D"]
+script = ExtResource("1_oxyv2")
+
+[node name="mesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.987401, 0, 0, 0, 0.987401, 0, 0, 0, 0.987401, 0, 0, 0)
+mesh = SubResource("BoxMesh_k8vaj")
+
+[node name="mesh2" type="MeshInstance3D" parent="mesh"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.50638)
+mesh = SubResource("BoxMesh_rho0k")
+skeleton = NodePath("../..")
+
+[node name="trailtop" type="Marker3D" parent="mesh"]
+transform = Transform3D(1.01276, 0, 0, 0, 1.01276, 0, 0, 0, 1.01276, 0, 0.5, 0)
+
+[node name="trailbottom" type="Marker3D" parent="mesh"]
+transform = Transform3D(1.01276, 0, 0, 0, 1.01276, 0, 0, 0, 1.01276, 0, -0.5, 0)
+
+[node name="hurtbox" type="CollisionShape3D" parent="."]
+transform = Transform3D(0.999026, 0, 0, 0, 0.999026, 0, 0, 0, 0.999026, 0, 0, 0)
+shape = SubResource("BoxShape3D_gdf23")
+
+[node name="PlayerCamera" type="Node3D" parent="."]
+script = ExtResource("2_mnuh0")
+
+[node name="h" type="Node3D" parent="PlayerCamera"]
+
+[node name="v" type="Node3D" parent="PlayerCamera/h"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+
+[node name="Camera" type="Camera3D" parent="PlayerCamera/h/v"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4)
