@@ -60,17 +60,17 @@ public partial class player_camera : Node3D
 			}
 		}
 		//ZOOM CONTROLS
-		else if (inputEvent is InputEventMouseButton){
-			InputEventMouseButton emb = (InputEventMouseButton) inputEvent;
-			if (emb.IsPressed()){
-				if (emb.ButtonIndex == MouseButton.WheelUp){
-					zoom_direction = 1.0f;
-				}
-				else if (emb.ButtonIndex == MouseButton.WheelDown){
-					zoom_direction = -1.0f;
-				}
-			}
-		}
+		// else if (inputEvent is InputEventMouseButton){
+			// InputEventMouseButton emb = (InputEventMouseButton) inputEvent;
+			// if (emb.IsPressed()){
+				// if (emb.ButtonIndex == MouseButton.WheelUp){
+					// zoom_direction = 1.0f;
+				// }
+				// else if (emb.ButtonIndex == MouseButton.WheelDown){
+					// zoom_direction = -1.0f;
+				// }
+			// }
+		// }
 	}
 
 	public override void _Process(double delta)
@@ -92,8 +92,12 @@ public partial class player_camera : Node3D
 		v.Rotation = replace_rotation_v;
 
 		//ZOOM
-		zoom_direction = Mathf.Clamp(zoom_direction - Mathf.Sign(zoom_direction) * fdelta * 2.0f, (float) Mathf.Min(0, Mathf.Sign(zoom_direction)), (float) Mathf.Max(0, Mathf.Sign(zoom_direction)));
-		float camera_z = Mathf.Clamp(camera.Position.Z + zoom_direction * camera_zoom_speed * fdelta, MIN_ZOOM, MAX_ZOOM);
-		camera.Position = new Vector3(camera.Position.X, camera.Position.Y, camera_z);
+		// zoom_direction = Mathf.Clamp(zoom_direction - Mathf.Sign(zoom_direction) * fdelta * 2.0f, (float) Mathf.Min(0, Mathf.Sign(zoom_direction)), (float) Mathf.Max(0, Mathf.Sign(zoom_direction)));
+		// float camera_z = Mathf.Clamp(camera.Position.Z + zoom_direction * camera_zoom_speed * fdelta, MIN_ZOOM, MAX_ZOOM);
+		// camera.Position = new Vector3(camera.Position.X, camera.Position.Y, camera_z);
+	}
+
+	public void toggle_zoomed_in(bool zoomed){
+		camera.Position = new Vector3(camera.Position.X, camera.Position.Y, zoomed ? 4 : 10);
 	}
 }

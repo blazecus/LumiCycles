@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://clfv5x8b3twc1"]
+[gd_scene load_steps=7 format=3 uid="uid://clfv5x8b3twc1"]
 
 [ext_resource type="PackedScene" uid="uid://bs2waxrg7lr82" path="res://game/world/platform.tscn" id="1_12lab"]
 [ext_resource type="PackedScene" uid="uid://by2lxt6065kk5" path="res://game/player/player.tscn" id="2_ehxtb"]
@@ -8,6 +8,12 @@ size = Vector3(4, 4, 4)
 
 [sub_resource type="BoxMesh" id="BoxMesh_2yiwf"]
 size = Vector3(4, 4, 4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_bkocm"]
+size = Vector3(100, 100, 100)
+
+[sub_resource type="BoxMesh" id="BoxMesh_jr6as"]
+size = Vector3(100, 100, 100)
 
 [node name="World" type="Node3D"]
 
@@ -55,5 +61,15 @@ shape = SubResource("BoxShape3D_uo6f0")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D4"]
 mesh = SubResource("BoxMesh_2yiwf")
+
+[node name="StaticBody3D5" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.879067, 0.476699, 0, -0.476699, 0.879067, -2.30363, -29.3486, 66.4457)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D5"]
+shape = SubResource("BoxShape3D_bkocm")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D5"]
+transform = Transform3D(1, 0, 0, 0, 0.999999, 0, 0, 0, 0.999999, 0, 0, 0)
+mesh = SubResource("BoxMesh_jr6as")
 
 [node name="Trails" type="Node3D" parent="."]

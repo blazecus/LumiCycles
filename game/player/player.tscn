@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://by2lxt6065kk5"]
+[gd_scene load_steps=7 format=3 uid="uid://by2lxt6065kk5"]
 
 [ext_resource type="Script" path="res://game/player/player.cs" id="1_oxyv2"]
 [ext_resource type="Script" path="res://game/player/player_camera.cs" id="2_mnuh0"]
@@ -8,26 +8,37 @@ size = Vector3(0.5, 1, 2)
 
 [sub_resource type="BoxMesh" id="BoxMesh_rho0k"]
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_hci5h"]
+size = Vector3(0.6, 1, 2.1)
+
 [sub_resource type="BoxShape3D" id="BoxShape3D_gdf23"]
 size = Vector3(0.5, 1, 2)
 
 [node name="player" type="CharacterBody3D"]
 script = ExtResource("1_oxyv2")
 
-[node name="mesh" type="MeshInstance3D" parent="."]
-transform = Transform3D(0.987401, 0, 0, 0, 0.987401, 0, 0, 0, 0.987401, 0, 0, 0)
-mesh = SubResource("BoxMesh_k8vaj")
+[node name="rotators" type="Node3D" parent="."]
 
-[node name="mesh2" type="MeshInstance3D" parent="mesh"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.50638)
-mesh = SubResource("BoxMesh_rho0k")
+[node name="mesh" type="MeshInstance3D" parent="rotators"]
+mesh = SubResource("BoxMesh_k8vaj")
 skeleton = NodePath("../..")
 
-[node name="trailtop" type="Marker3D" parent="mesh"]
+[node name="mesh2" type="MeshInstance3D" parent="rotators/mesh"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.50638)
+mesh = SubResource("BoxMesh_rho0k")
+skeleton = NodePath("../../..")
+
+[node name="trailtop" type="Marker3D" parent="rotators/mesh"]
 transform = Transform3D(1.01276, 0, 0, 0, 1.01276, 0, 0, 0, 1.01276, 0, 0.5, 0)
 
-[node name="trailbottom" type="Marker3D" parent="mesh"]
+[node name="trailbottom" type="Marker3D" parent="rotators/mesh"]
 transform = Transform3D(1.01276, 0, 0, 0, 1.01276, 0, 0, 0, 1.01276, 0, -0.5, 0)
+
+[node name="Area3D" type="Area3D" parent="rotators"]
+
+[node name="hurtbox" type="CollisionShape3D" parent="rotators/Area3D"]
+transform = Transform3D(0.999026, 0, 0, 0, 0.999026, 0, 0, 0, 0.999026, 0, 0.05, 0)
+shape = SubResource("BoxShape3D_hci5h")
 
 [node name="hurtbox" type="CollisionShape3D" parent="."]
 transform = Transform3D(0.999026, 0, 0, 0, 0.999026, 0, 0, 0, 0.999026, 0, 0, 0)
@@ -43,3 +54,5 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 
 [node name="Camera" type="Camera3D" parent="PlayerCamera/h/v"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4)
+
+[connection signal="body_entered" from="rotators/Area3D" to="." method="_on_area_3d_body_entered"]
