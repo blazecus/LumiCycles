@@ -5,25 +5,22 @@ public partial class trail : StaticBody3D
 {
 	private MeshInstance3D mesh;
 	private ImmediateMesh imesh;
+	//private CollisionShape3D collider;
+	//private ConvexPolygonShape3D collider_shape;
 	public Vector3 last_point1;
 	public Vector3 last_point2;
 	public Godot.Collections.Array<Vector3> points;
 	private player player_scene;
+	private int polygon_counter = 0;
+	private int start_index = 0;
 
 	public void setup(player player_s){
 		mesh = GetNode<MeshInstance3D>("mesh");
+		//collider = GetNode<CollisionShape3D>("collision");
+		//collider_shape = (ConvexPolygonShape3D) collider.Shape;
 		imesh = (ImmediateMesh) mesh.Mesh;
 		points = new Godot.Collections.Array<Vector3>();
 		player_scene = player_s;
-		// imesh.SurfaceAddVertex(new Vector3(0,0,0));
-		// imesh.SurfaceAddVertex(new Vector3(0,1,0));
-		// imesh.SurfaceAddVertex(new Vector3(1,0,0));
-		// imesh.SurfaceEnd();
-		// imesh.SurfaceBegin(Mesh.PrimitiveType.Triangles);
-		// imesh.SurfaceAddVertex(new Vector3(0,1,0));
-		// imesh.SurfaceAddVertex(new Vector3(1,1,0));
-		// imesh.SurfaceAddVertex(new Vector3(1,0,0));
-		// imesh.SurfaceEnd();
 	}
 	public override void _Ready()
 	{
@@ -39,11 +36,10 @@ public partial class trail : StaticBody3D
 		last_point2 = p2;
 	}
 
-	public void draw_mesh(){
-		imesh.ClearSurfaces();
+	public void draw_mesh(int start_index){
 		if(points.Count > 4){
 			imesh.SurfaceBegin(Mesh.PrimitiveType.Triangles);
-			for(int i = 0; i < points.Count - 3; i += 2){
+			for(int i = start_index; i < points.Count - 3; i += 2){
 				imesh.SurfaceAddVertex(points[i]);
 				imesh.SurfaceAddVertex(points[i+1]);
 				imesh.SurfaceAddVertex(points[i+2]);
@@ -60,55 +56,52 @@ public partial class trail : StaticBody3D
 				imesh.SurfaceAddVertex(points[i+3]);
 				imesh.SurfaceAddVertex(points[i+1]);
 			}
-			// imesh.SurfaceAddVertex(points[points.Count - 2]);
-			// imesh.SurfaceAddVertex(points[points.Count - 1]);
-			// imesh.SurfaceAddVertex(player_scene.trailbottom.GlobalPosition);
-
-			// imesh.SurfaceAddVertex(player_scene.trailbottom.GlobalPosition);
-			// imesh.SurfaceAddVertex(points[points.Count - 1]);
-			// imesh.SurfaceAddVertex(points[points.Count - 2]);
-
-			// imesh.SurfaceAddVertex(points[points.Count - 1]);
-			// imesh.SurfaceAddVertex(player_scene.trailtop.GlobalPosition);
-			// imesh.SurfaceAddVertex(player_scene.trailbottom.GlobalPosition);
-
-			// imesh.SurfaceAddVertex(player_scene.trailbottom.GlobalPosition);
-			// imesh.SurfaceAddVertex(player_scene.trailtop.GlobalPosition);
-			// imesh.SurfaceAddVertex(points[points.Count - 1]);
-
 			imesh.SurfaceEnd();
 		}
 	}
+
+	public void update_collision(){
+		// Vector3[] pc = new Vector3[(points.Count-6) * 3 - 6];
+		// for(int i = 0; i < points.Count - 9; i += 2){
+			// pc[i * 3] = points[i];
+			// pc[i * 3 + 1] = points[i+1];
+			// pc[i * 3 + 2] = points[i+2];
+// 
+			// pc[i * 3 + 3] = points[i+1];
+			// pc[i * 3 + 4] = points[i+3];
+			// pc[i * 3 + 5] = points[i+2];
+		// }
+		// collider_shape.Points = pc;
+		if(points.Count > 16){
+			CollisionShape3D p = new CollisionShape3D();
+			ConvexPolygonShape3D shape = new ConvexPolygonShape3D();
+			Vector3[] pc = new Vector3[6];
+			int i = points.Count - 10;
+			pc[0] = points[i];
+			pc[1] = points[i+1];
+			pc[2] = points[i+2];
+
+			pc[3] = points[i+1];
+			pc[4] = points[i+3];
+			pc[5] = points[i+2];
+			shape.Points = pc;
+			p.Shape = shape;
+			AddChild(p);
+		}
+	}
 	public void add_section(Vector3 p1, Vector3 p2){
-		/*CollisionPolygon3D next_collision1 = new CollisionPolygon3D();
-		CollisionPolygon3D next_collision2 = new CollisionPolygon3D();
-		next_collision1.Depth = 0.1f;
-		next_collision2.Depth = 0.1f;
-		Vector2[] poly1 = {last_point1, last_point2, p1};
-		next_collision1.Polygon.*/
-				// imesh.SurfaceBegin(Mesh.PrimitiveType.Triangles);
-		// imesh.SurfaceAddVertex(last_point1);
-		// imesh.SurfaceAddVertex(last_point2);
-		// imesh.SurfaceAddVertex(p1);
-
-		// imesh.SurfaceAddVertex(last_point2);
-		// imesh.SurfaceAddVertex(p2);
-		// imesh.SurfaceAddVertex(p1);
-		// imesh.SurfaceEnd();
-		//points.Add(last_point1);
-		//points.Add(last_point2);
-		//points.Add(p1);
-
-		//points.Add(last_point2);
-		//points.Add(p2);
-		//points.Add(p1);
-		//points.Resize((int) Mesh.ArrayType.Max);
-		//imesh.ClearSurfaces();
-		//imesh.AddSurfaceFromArrays(Mesh.PrimitiveType.Triangles, points);
 		points.Add(p1);
 		points.Add(p2);
-		//GD.Print(points.Count);
-		draw_mesh();
+		update_collision();
+		polygon_counter++;
+		if(polygon_counter % 200 == 0){
+			imesh.ClearSurfaces();
+			start_index = points.Count - 2;
+			draw_mesh(0);
+		}
+		else{
+			draw_mesh(start_index);
+		}
 		set_last_points(p1,p2);
 	}
 }

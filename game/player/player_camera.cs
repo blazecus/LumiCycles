@@ -32,7 +32,7 @@ public partial class player_camera : Node3D
 		h = GetNode<Node3D>("h");
 		v = GetNode<Node3D>("h/v");
 		camera = GetNode<Camera3D>("h/v/Camera");
-		Input.MouseMode = Input.MouseModeEnum.Captured;
+		//Input.MouseMode = Input.MouseModeEnum.Captured;
 	}
 
 	public override void _Input(InputEvent inputEvent){

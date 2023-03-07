@@ -74,12 +74,16 @@ public partial class player : CharacterBody3D
 		//keyboard - ADD IN SETTINGS
 		//int wheel_movement_direction = (Input.IsActionPressed("right") ? 1 : 0) - (Input.IsActionPressed("left") ? 1 : 0);
 		//controller
-		int wheel_movement_direction = -Mathf.Sign(controller_left_x);
-		float wheel_movement_speed = WHEEL_SPEED;
-		if(wheel_movement_direction != 0 && controller_left_x != 0){
-			wheel_movement_speed *= Mathf.Abs(controller_left_x);
-		}
-		wheel_position = Mathf.MoveToward(wheel_position, wheel_movement_direction, wheel_movement_speed);
+		//MOVING WHEEL
+		// int wheel_movement_direction = -Mathf.Sign(controller_left_x);
+		// float wheel_movement_speed = WHEEL_SPEED;
+		// if(wheel_movement_direction != 0 && controller_left_x != 0){
+		// 	wheel_movement_speed *= Mathf.Abs(controller_left_x);
+		// }
+		// wheel_position = Mathf.MoveToward(wheel_position, wheel_movement_direction, wheel_movement_speed);
+
+		//fixed wheel
+		wheel_position = -controller_left_x;
 
 		if(IsOnFloor()){
 			float rotation_amount = wheel_position * deltaf * (velocity.Length() / TOP_SPEED) * MOVE_DIRECTION_ROTATION_SPEED;
@@ -90,31 +94,41 @@ public partial class player : CharacterBody3D
 			mesh.Rotate(Vector3.Up, rotation_amount);
 			hurtbox.Rotate(Vector3.Up, rotation_amount);
 			//Rotate(Vector3.Up, rotation_amount);
-			if (velocity.Dot(-move_direction) <= 0 && Input.IsActionPressed("forward")){
-				if(velocity.Length() >= TOP_SPEED){
-					velocity = move_direction.Normalized() * TOP_SPEED;
-				}
-				else{
-					velocity = move_direction * (velocity.Length() + ACCELERATION * deltaf);
-				}
-			}
-			else if(velocity.Dot(-move_direction) >= 0 && Input.IsActionPressed("brake")){
-				if(velocity.Length() >= TOP_SPEED){
-					velocity = -move_direction.Normalized() * TOP_SPEED;
-				}
-				else{
-					velocity = -move_direction * (velocity.Length() + ACCELERATION * deltaf);
-				}
+
+			//ABLE TO STOP
+			// if (velocity.Dot(-move_direction) <= 0 && Input.IsActionPressed("forward")){
+			// 	if(velocity.Length() >= TOP_SPEED){
+			// 		velocity = move_direction.Normalized() * TOP_SPEED;
+			// 	}
+			// 	else{
+			// 		velocity = move_direction * (velocity.Length() + ACCELERATION * deltaf);
+			// 	}
+			// }
+			// else if(velocity.Dot(-move_direction) >= 0 && Input.IsActionPressed("brake")){
+			// 	if(velocity.Length() >= TOP_SPEED){
+			// 		velocity = -move_direction.Normalized() * TOP_SPEED;
+			// 	}
+			// 	else{
+			// 		velocity = -move_direction * (velocity.Length() + ACCELERATION * deltaf);
+			// 	}
+			// }
+			// else{
+			// 	if(velocity.Length() < 1.0f){
+			// 		velocity = Vector3.Zero;
+			// 	}
+			// 	else{
+			// 		float drag_speed = Mathf.Max(0.1f, velocity.LengthSquared() * DRAG_COEFF * deltaf * (Input.IsActionPressed("brake") ? 5 : 1));
+			// 		velocity -= velocity.Normalized() * drag_speed;
+			// 		velocity = -Mathf.Sign(velocity.Dot(-move_direction)) * move_direction.Normalized() * velocity.Length();
+			// 	}
+			// }
+
+			//UNABLE TO STOP
+			if(velocity.Length() >= TOP_SPEED){
+				velocity = move_direction.Normalized() * TOP_SPEED;
 			}
 			else{
-				if(velocity.Length() < 1.0f){
-					velocity = Vector3.Zero;
-				}
-				else{
-					float drag_speed = Mathf.Max(0.1f, velocity.LengthSquared() * DRAG_COEFF * deltaf * (Input.IsActionPressed("brake") ? 5 : 1));
-					velocity -= velocity.Normalized() * drag_speed;
-					velocity = -Mathf.Sign(velocity.Dot(-move_direction)) * move_direction.Normalized() * velocity.Length();
-				}
+			 	velocity = move_direction * (velocity.Length() + ACCELERATION * deltaf);
 			}
 		}
 
