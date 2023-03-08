@@ -25,6 +25,7 @@ public partial class player : CharacterBody3D
 	private CollisionShape3D hurtbox;
 	private Node3D rotators;
 	private player_camera camera;
+	private RayCast3D slope_check;
 	private float trail_timer = 0.0f;
 	private Vector3 move_direction = new Vector3(0.0f, 0.0f, 1.0f);
 	private float wheel_position = 0.0f;
@@ -37,6 +38,8 @@ public partial class player : CharacterBody3D
 	private float total_forward_rotation = 0.0f;
 
 	private Vector3 last_pos = Vector3.Zero;
+	private Vector3 current_normal = new Vector3(0.0f, 1.0f, 0.0f);
+	private float velocity_magnitude = 1.0f;
 
 	public override void _Ready(){
 		rotators = GetNode<Node3D>("rotators");
@@ -45,6 +48,7 @@ public partial class player : CharacterBody3D
 		trailtop = GetNode<Marker3D>("rotators/mesh/trailtop");
 		trailbottom = GetNode<Marker3D>("rotators/mesh/trailbottom");
 		camera = GetNode<player_camera>("PlayerCamera");
+		slope_check = GetNode<RayCast3D>("slope_check");
 		player_trail = (trail) trail_scene.Instantiate();
 		player_trail.setup(this);
 		player_trail.set_last_points(trailbottom.GlobalPosition, trailtop.GlobalPosition);
@@ -54,8 +58,20 @@ public partial class player : CharacterBody3D
 	public override void _PhysicsProcess(double delta)
 	{
 		float deltaf = (float) delta;
+		GetNode<MeshInstance3D>("move_direction_check").Position = move_direction * 3;
+		GetNode<MeshInstance3D>("normal_check").Position = current_normal * 3;
+		if(slope_check.IsColliding()){
+			Vector3 next_normal = slope_check.GetCollisionNormal().Normalized();
+			if(next_normal != current_normal){
+				Vector3 rotate_axis = current_normal.Cross(next_normal).Normalized();
+				//GD.Print(rotate_axis);
+				move_direction = move_direction.Rotated(rotate_axis, current_normal.SignedAngleTo(next_normal, rotate_axis)).Normalized();
+				current_normal = next_normal;
+			}
+		}
+
 		Vector3 velocity = Velocity;
-		
+
 		trail_timer += deltaf;
 		if(trail_timer > TRAIL_CHECK_INTERVAL){
 			if((Position - last_pos).Length() > TRAIL_LENGTH_INTERVAL){
@@ -65,10 +81,10 @@ public partial class player : CharacterBody3D
 			trail_timer = 0.0f;
 		}
 
-		// Add the gravity.
+		// Add the gravity, rotate forwards
 		if (!IsOnFloor()){
 			velocity.Y -= gravity * (float)delta;
-			Vector3 axis = -move_direction.Cross(Vector3.Up);
+			Vector3 axis = -move_direction.Cross(current_normal);
 			float added_rotation = deltaf * FALLING_FORWARD_ROTATION_SPEED;
 			if(total_forward_rotation + added_rotation > MAX_FALLING_FORWARD_ROTATION){
 				added_rotation = MAX_FALLING_FORWARD_ROTATION - total_forward_rotation;
@@ -77,22 +93,10 @@ public partial class player : CharacterBody3D
 			total_forward_rotation += added_rotation;
 		}
 		else if(total_forward_rotation != 0.0){
-			Vector3 axis = -move_direction.Cross(Vector3.Up);
-			rotators.Rotate(axis, -total_forward_rotation);
 			total_forward_rotation = 0.0f;
 		}
-		//keyboard - ADD IN SETTINGS
-		//int wheel_movement_direction = (Input.IsActionPressed("right") ? 1 : 0) - (Input.IsActionPressed("left") ? 1 : 0);
-		//controller
-		//MOVING WHEEL
-		// int wheel_movement_direction = -Mathf.Sign(controller_left_x);
-		// float wheel_movement_speed = WHEEL_SPEED;
-		// if(wheel_movement_direction != 0 && controller_left_x != 0){
-		// 	wheel_movement_speed *= Mathf.Abs(controller_left_x);
-		// }
-		// wheel_position = Mathf.MoveToward(wheel_position, wheel_movement_direction, wheel_movement_speed);
 
-		//fixed wheel
+		//CONTROLLER WHEEL CONTROL
 		wheel_position = -controller_left_x;
 
 		if(IsOnFloor()){
@@ -100,58 +104,34 @@ public partial class player : CharacterBody3D
 			if(velocity.Length() < 1){
 				rotation_amount = wheel_position * deltaf * MOVE_DIRECTION_ROTATION_SPEED * 0.5f;
 			}
-			move_direction = move_direction.Rotated(Vector3.Up, rotation_amount);
-			rotators.Rotate(Vector3.Up, rotation_amount);
-			hurtbox.Rotate(Vector3.Up, rotation_amount);
-			//Rotate(Vector3.Up, rotation_amount);
 
-			//ABLE TO STOP
-			// if (velocity.Dot(-move_direction) <= 0 && Input.IsActionPressed("forward")){
-			// 	if(velocity.Length() >= TOP_SPEED){
-			// 		velocity = move_direction.Normalized() * TOP_SPEED;
-			// 	}
-			// 	else{
-			// 		velocity = move_direction * (velocity.Length() + ACCELERATION * deltaf);
-			// 	}
-			// }
-			// else if(velocity.Dot(-move_direction) >= 0 && Input.IsActionPressed("brake")){
-			// 	if(velocity.Length() >= TOP_SPEED){
-			// 		velocity = -move_direction.Normalized() * TOP_SPEED;
-			// 	}
-			// 	else{
-			// 		velocity = -move_direction * (velocity.Length() + ACCELERATION * deltaf);
-			// 	}
-			// }
-			// else{
-			// 	if(velocity.Length() < 1.0f){
-			// 		velocity = Vector3.Zero;
-			// 	}
-			// 	else{
-			// 		float drag_speed = Mathf.Max(0.1f, velocity.LengthSquared() * DRAG_COEFF * deltaf * (Input.IsActionPressed("brake") ? 5 : 1));
-			// 		velocity -= velocity.Normalized() * drag_speed;
-			// 		velocity = -Mathf.Sign(velocity.Dot(-move_direction)) * move_direction.Normalized() * velocity.Length();
-			// 	}
-			// }
+			//control where to move based on wheel position
+			move_direction = move_direction.Rotated(current_normal, rotation_amount).Normalized();
+			
+			//rotate hurtbox and model
+			Vector3 lookat_pos = GlobalPosition - move_direction * 3;
+			rotators.LookAt(lookat_pos, current_normal);
+			hurtbox.LookAt(lookat_pos, current_normal);
 
 			bool boosting = Input.IsActionPressed("boost");
-			//UNABLE TO STOP
 			if(velocity.Length() >= TOP_SPEED){
-				velocity = move_direction.Normalized() * (boosting ? BOOST_TOP_SPEED : TOP_SPEED);
+				velocity = move_direction * (boosting ? BOOST_TOP_SPEED : TOP_SPEED);
 			}
 			else{
-			 	velocity = move_direction * (velocity.Length() + (boosting ? BOOST_ACCELERATION : ACCELERATION) * deltaf);
+			 	velocity = move_direction * (velocity_magnitude + (boosting ? BOOST_ACCELERATION : ACCELERATION) * deltaf);
 			}
 		}
 
 		// Handle Jump.
 		if (Input.IsActionJustPressed("jump") && IsOnFloor()){
-			velocity.Y = JUMP_VELOCITY;
-			Vector3 axis = -move_direction.Cross(Vector3.Up);
+			velocity += current_normal * JUMP_VELOCITY;
+			Vector3 axis = -move_direction.Cross(current_normal);
 			rotators.Rotate(axis, -Mathf.Pi/4.0f);
 			total_forward_rotation -= Mathf.Pi/4.0f;
 		}
 
 		Velocity = velocity;
+		velocity_magnitude = Velocity.Length();
 		MoveAndSlide();
 	}
 
@@ -182,6 +162,6 @@ public partial class player : CharacterBody3D
 	
 	private void _on_area_3d_body_entered(Node3D body)
 	{
-		GD.Print(body);
+		//GD.Print(body);
 	}
 }

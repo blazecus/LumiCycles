@@ -5,8 +5,6 @@ public partial class trail : StaticBody3D
 {
 	private MeshInstance3D mesh;
 	private ImmediateMesh imesh;
-	//private CollisionShape3D collider;
-	//private ConvexPolygonShape3D collider_shape;
 	public Vector3 last_point1;
 	public Vector3 last_point2;
 	public Godot.Collections.Array<Vector3> points;
@@ -16,15 +14,12 @@ public partial class trail : StaticBody3D
 
 	public void setup(player player_s){
 		mesh = GetNode<MeshInstance3D>("mesh");
-		//collider = GetNode<CollisionShape3D>("collision");
-		//collider_shape = (ConvexPolygonShape3D) collider.Shape;
 		imesh = (ImmediateMesh) mesh.Mesh;
 		points = new Godot.Collections.Array<Vector3>();
 		player_scene = player_s;
 	}
 	public override void _Ready()
 	{
-
 	}
 
 	public override void _Process(double delta)
@@ -61,17 +56,6 @@ public partial class trail : StaticBody3D
 	}
 
 	public void update_collision(){
-		// Vector3[] pc = new Vector3[(points.Count-6) * 3 - 6];
-		// for(int i = 0; i < points.Count - 9; i += 2){
-			// pc[i * 3] = points[i];
-			// pc[i * 3 + 1] = points[i+1];
-			// pc[i * 3 + 2] = points[i+2];
-// 
-			// pc[i * 3 + 3] = points[i+1];
-			// pc[i * 3 + 4] = points[i+3];
-			// pc[i * 3 + 5] = points[i+2];
-		// }
-		// collider_shape.Points = pc;
 		if(points.Count > 16){
 			CollisionShape3D p = new CollisionShape3D();
 			ConvexPolygonShape3D shape = new ConvexPolygonShape3D();
