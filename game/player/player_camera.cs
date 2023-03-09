@@ -8,6 +8,8 @@ public partial class player_camera : Node3D
 	private const float MAX_ZOOM = 10.0f;
 	[Export]
 	private const float CONTROLLER_SENSITIVITY = 10.0f;
+	private const float DEFAULT_ZOOM = 10.0f;
+	private const float BOOST_ZOOM = 6.0f;
 	private CharacterBody3D player;
 	private Node3D h;
 	private Node3D v;
@@ -26,6 +28,10 @@ public partial class player_camera : Node3D
 	private float controller_right_x = 0.0f;
 	private float controller_right_y = 0.0f;
 
+	private float goal_zoom = 4.0f;
+	private float current_zoom  = 4.0f;
+	private float zoom_speed = 10.0f;
+
 	public override void _Ready()
 	{
 		player = GetParent<CharacterBody3D>();
@@ -33,6 +39,7 @@ public partial class player_camera : Node3D
 		v = GetNode<Node3D>("h/v");
 		camera = GetNode<Camera3D>("h/v/Camera");
 		//Input.MouseMode = Input.MouseModeEnum.Captured;
+		current_zoom = goal_zoom;
 	}
 
 	public override void _Input(InputEvent inputEvent){
@@ -75,6 +82,17 @@ public partial class player_camera : Node3D
 
 	public override void _Process(double delta)
 	{
+		if(goal_zoom != camera.Position.Z){
+			int zoom_goal_direction = MathF.Sign(goal_zoom - camera.Position.Z);
+			current_zoom += zoom_goal_direction * (float) delta * zoom_speed;
+			if(zoom_goal_direction * current_zoom > zoom_goal_direction * goal_zoom){
+				current_zoom = goal_zoom;
+			}
+			camera.Position = new Vector3(camera.Position.X, camera.Position.Y, current_zoom);
+			//GD.Print(current_zoom);
+		}
+		//camera.Position = new Vector3(camera.Position.X, camera.Position.Y, );
+
 		//CONTROLLER CONTROLS
 		crh += controller_right_x * hs * CONTROLLER_SENSITIVITY;
 		crv -= controller_right_y * vs * CONTROLLER_SENSITIVITY;
@@ -98,6 +116,6 @@ public partial class player_camera : Node3D
 	}
 
 	public void toggle_zoomed_in(bool zoomed){
-		camera.Position = new Vector3(camera.Position.X, camera.Position.Y, zoomed ? 4 : 10);
+		goal_zoom = zoomed ? BOOST_ZOOM : DEFAULT_ZOOM;
 	}
 }

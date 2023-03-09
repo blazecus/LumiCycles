@@ -63,7 +63,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4)
 
 [node name="slope_check" type="RayCast3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1.85191, 0, 0, 0, 1, 0, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1)
 
 [node name="move_direction_check" type="MeshInstance3D" parent="."]
 mesh = SubResource("BoxMesh_upq8o")
