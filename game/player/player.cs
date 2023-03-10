@@ -26,7 +26,7 @@ public partial class player : CharacterBody3D
 	private CollisionShape3D hurtbox;
 	private Node3D rotators;
 	private player_camera camera;
-	private RayCast3D slope_check;
+	private Node3D slope_check;
 	private float trail_timer = 0.0f;
 	private Vector3 move_direction = new Vector3(0.0f, 0.0f, 1.0f);
 	private float wheel_position = 0.0f;
@@ -52,7 +52,7 @@ public partial class player : CharacterBody3D
 		trailtop = GetNode<Marker3D>("rotators/mesh/trailtop");
 		trailbottom = GetNode<Marker3D>("rotators/mesh/trailbottom");
 		camera = GetNode<player_camera>("PlayerCamera");
-		slope_check = GetNode<RayCast3D>("slope_check");
+		slope_check = GetNode<Node3D>("slope_check");
 		player_trail = (trail) trail_scene.Instantiate();
 		player_trail.setup(this);
 		player_trail.set_last_points(trailbottom.GlobalPosition, trailtop.GlobalPosition);
@@ -61,15 +61,24 @@ public partial class player : CharacterBody3D
 	}
 	public override void _PhysicsProcess(double delta)
 	{
-		GD.Print(Velocity.Length());
+		GD.Print(Velocity);
 		float deltaf = (float) delta;
 		jump_timer += deltaf;
 
 		//check -= deltaf;
 		GetNode<MeshInstance3D>("move_direction_check").Position = move_direction * 3;
 		GetNode<MeshInstance3D>("normal_check").Position = current_normal * 3;
-		if(slope_check.IsColliding() && jump_timer > JUMP_BUFFER){
-			Vector3 next_normal = slope_check.GetCollisionNormal().Normalized();
+
+		Vector3 next_normal = new Vector3(-2,-1,-1);
+		if(jump_timer > JUMP_BUFFER){
+			foreach(RayCast3D raycast in slope_check.GetChildren()){
+				if(raycast.IsColliding() && raycast.GetCollisionPoint().Y < Position.Y){
+					next_normal = raycast.GetCollisionNormal().Normalized();
+					break;
+				}
+			}
+		}
+		if(next_normal.X != -2){
 			if(next_normal != current_normal){
 				//GD.Print(next_normal);
 				//GD.Print(current_normal);
@@ -78,6 +87,7 @@ public partial class player : CharacterBody3D
 				float rotate_angle = current_normal.SignedAngleTo(next_normal, rotate_axis);
 				if(rotate_angle < Mathf.Pi/3){
 					move_direction = move_direction.Rotated(rotate_axis, rotate_angle).Normalized();
+					total_forward_rotation -= rotate_angle;
 					current_normal = next_normal;
 				}
 			}
@@ -108,7 +118,8 @@ public partial class player : CharacterBody3D
 			total_forward_rotation += added_rotation;
 		}
 		else if(IsOnFloor() && air_timer > AIR_ROTATE_BUFFER){
-			total_forward_rotation = 0.0f;
+			Vector3 rotate_axis = current_normal.Cross(Vector3.Up).Normalized();
+			total_forward_rotation = -current_normal.SignedAngleTo(Vector3.Up, rotate_axis);
 		}
 
 		if(IsOnFloor()){
