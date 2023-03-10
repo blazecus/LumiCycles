@@ -61,14 +61,14 @@ public partial class player : CharacterBody3D
 	}
 	public override void _PhysicsProcess(double delta)
 	{
-		GD.Print(Velocity);
 		float deltaf = (float) delta;
 		jump_timer += deltaf;
 
-		//check -= deltaf;
+		//DEBUGGING
 		GetNode<MeshInstance3D>("move_direction_check").Position = move_direction * 3;
 		GetNode<MeshInstance3D>("normal_check").Position = current_normal * 3;
 
+		//check for new normal - only below is relevant if already on ground, else it will check around too (for weird landing angles)
 		Vector3 next_normal = new Vector3(-2,-1,-1);
 		if(jump_timer > JUMP_BUFFER){
 			foreach(RayCast3D raycast in slope_check.GetChildren()){
@@ -78,11 +78,9 @@ public partial class player : CharacterBody3D
 				}
 			}
 		}
+		//if new normal is found, rotate appropriately
 		if(next_normal.X != -2){
 			if(next_normal != current_normal){
-				//GD.Print(next_normal);
-				//GD.Print(current_normal);
-				//check = 1.0f;
 				Vector3 rotate_axis = current_normal.Cross(next_normal).Normalized();
 				float rotate_angle = current_normal.SignedAngleTo(next_normal, rotate_axis);
 				if(rotate_angle < Mathf.Pi/3){
@@ -95,6 +93,7 @@ public partial class player : CharacterBody3D
 
 		Vector3 velocity = Velocity;
 
+		//add trail points
 		trail_timer += deltaf;
 		if(trail_timer > TRAIL_CHECK_INTERVAL){
 			if((Position - last_pos).Length() > TRAIL_LENGTH_INTERVAL){
@@ -104,24 +103,24 @@ public partial class player : CharacterBody3D
 			trail_timer = 0.0f;
 		}
 
-		// Add the gravity, rotate forwards
+		// rotate forwards while falling, but only to a certain point
 		if (!IsOnFloor() && air_timer > AIR_ROTATE_BUFFER){
-			//GD.Print(total_forward_rotation);
 			Vector3 axis = -move_direction.Cross(current_normal).Normalized();
 			float added_rotation = deltaf * FALLING_FORWARD_ROTATION_SPEED;
 			if(total_forward_rotation + added_rotation > MAX_FALLING_FORWARD_ROTATION){
 				added_rotation = MAX_FALLING_FORWARD_ROTATION - total_forward_rotation;
 			}
-			//rotators.Rotate(axis, added_rotation);
 			current_normal = current_normal.Rotated(axis, added_rotation).Normalized();
 			move_direction = move_direction.Rotated(axis, added_rotation).Normalized();
 			total_forward_rotation += added_rotation;
 		}
 		else if(IsOnFloor() && air_timer > AIR_ROTATE_BUFFER){
+			//hit ground after falling/jumping - set current forward rotation to slope of ground
 			Vector3 rotate_axis = current_normal.Cross(Vector3.Up).Normalized();
 			total_forward_rotation = -current_normal.SignedAngleTo(Vector3.Up, rotate_axis);
 		}
 
+		//airtime
 		if(IsOnFloor()){
 			air_timer = 0.0f;
 		}
@@ -132,19 +131,20 @@ public partial class player : CharacterBody3D
 		//CONTROLLER WHEEL CONTROL
 		wheel_position = -controller_left_x;
 
+		//turning
 		float rotation_amount = wheel_position * deltaf * (velocity.Length() / TOP_SPEED) * MOVE_DIRECTION_ROTATION_SPEED;
 		if(velocity.Length() < 1 || !IsOnFloor()){
 			rotation_amount = wheel_position * deltaf * MOVE_DIRECTION_ROTATION_SPEED * 0.5f;
 		}
-
 		//control where to move based on wheel position
 		move_direction = move_direction.Rotated(current_normal, rotation_amount).Normalized();
 		
-		//rotate hurtbox and model
+		//rotate hurtbox and model to look at move direction
 		Vector3 lookat_pos = GlobalPosition - move_direction * 3;
 		rotators.LookAt(lookat_pos, current_normal);
 		hurtbox.LookAt(lookat_pos, current_normal);
 
+		//movement!
 		if(IsOnFloor() && jump_timer > JUMP_BUFFER){
 			bool boosting = Input.IsActionPressed("boost");
 			camera.toggle_zoomed_in(boosting);
@@ -167,13 +167,11 @@ public partial class player : CharacterBody3D
 			jump_timer = 0.0f;
 		}
 
+		//gravity
 		velocity.Y -= gravity * (float)delta;
 		
 		Velocity = velocity;
 		velocity_magnitude = Velocity.Length();
-		//if(check > 0){
-		//	GD.Print(Velocity);
-		//}
 		MoveAndSlide();
 	}
 
@@ -195,12 +193,6 @@ public partial class player : CharacterBody3D
 			}
 		}
 	}
-
-	private void fix_rotation(Vector3 point_direction){
-		hurtbox.LookAt(point_direction);
-		mesh.LookAt(point_direction);
-	}
-	
 	
 	private void _on_area_3d_body_entered(Node3D body)
 	{
