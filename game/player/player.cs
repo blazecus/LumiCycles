@@ -1,3 +1,4 @@
+using System.Security.Principal;
 using Godot;
 using System;
 
@@ -36,8 +37,6 @@ public partial class player : CharacterBody3D
 
 	private float controller_left_x = 0.0f;
 	private float controller_left_y = 0.0f;
-	private float total_forward_rotation = 0.0f;
-
 	private Vector3 last_pos = Vector3.Zero;
 	private Vector3 current_normal = new Vector3(0.0f, 1.0f, 0.0f);
 	private float velocity_magnitude = 1.0f;
@@ -69,7 +68,7 @@ public partial class player : CharacterBody3D
 		GetNode<MeshInstance3D>("normal_check").Position = current_normal * 3;
 
 		//check for new normal - only below is relevant if already on ground, else it will check around too (for weird landing angles)
-		Vector3 next_normal = new Vector3(-2,-1,-1);
+		Vector3 next_normal = current_normal;
 		if(jump_timer > JUMP_BUFFER){
 			foreach(RayCast3D raycast in slope_check.GetChildren()){
 				if(raycast.IsColliding() && raycast.GetCollisionPoint().Y < Position.Y){
@@ -79,17 +78,15 @@ public partial class player : CharacterBody3D
 			}
 		}
 		//if new normal is found, rotate appropriately
-		if(next_normal.X != -2){
 			if(next_normal != current_normal){
 				Vector3 rotate_axis = current_normal.Cross(next_normal).Normalized();
 				float rotate_angle = current_normal.SignedAngleTo(next_normal, rotate_axis);
-				if(rotate_angle < Mathf.Pi/3){
+				if(rotate_angle < Mathf.Pi/3 || air_timer > JUMP_BUFFER){
 					move_direction = move_direction.Rotated(rotate_axis, rotate_angle).Normalized();
-					total_forward_rotation -= rotate_angle;
 					current_normal = next_normal;
 				}
 			}
-		}
+		
 
 		Vector3 velocity = Velocity;
 
@@ -105,19 +102,17 @@ public partial class player : CharacterBody3D
 
 		// rotate forwards while falling, but only to a certain point
 		if (!IsOnFloor() && air_timer > AIR_ROTATE_BUFFER){
-			Vector3 axis = -move_direction.Cross(current_normal).Normalized();
 			float added_rotation = deltaf * FALLING_FORWARD_ROTATION_SPEED;
-			if(total_forward_rotation + added_rotation > MAX_FALLING_FORWARD_ROTATION){
-				added_rotation = MAX_FALLING_FORWARD_ROTATION - total_forward_rotation;
+			Vector3 axis = move_direction.Cross(current_normal).Normalized();
+			float current_total_rotation = current_normal.SignedAngleTo(Vector3.Up, axis);
+			if(current_total_rotation + added_rotation > MAX_FALLING_FORWARD_ROTATION){
+				added_rotation = MAX_FALLING_FORWARD_ROTATION - current_total_rotation;
 			}
-			current_normal = current_normal.Rotated(axis, added_rotation).Normalized();
-			move_direction = move_direction.Rotated(axis, added_rotation).Normalized();
-			total_forward_rotation += added_rotation;
+			current_normal = current_normal.Rotated(-axis, added_rotation).Normalized();
+			move_direction = move_direction.Rotated(-axis, added_rotation).Normalized();
 		}
 		else if(IsOnFloor() && air_timer > AIR_ROTATE_BUFFER){
 			//hit ground after falling/jumping - set current forward rotation to slope of ground
-			Vector3 rotate_axis = current_normal.Cross(Vector3.Up).Normalized();
-			total_forward_rotation = -current_normal.SignedAngleTo(Vector3.Up, rotate_axis);
 		}
 
 		//airtime
@@ -162,8 +157,6 @@ public partial class player : CharacterBody3D
 			Vector3 axis = -move_direction.Cross(current_normal).Normalized();
 			current_normal = current_normal.Rotated(axis, -Mathf.Pi/4.0f).Normalized();
 			move_direction = move_direction.Rotated(axis, -Mathf.Pi/4.0f).Normalized();
-			//rotators.Rotate(axis, -Mathf.Pi/4.0f);
-			total_forward_rotation = -Mathf.Pi/4.0f;
 			jump_timer = 0.0f;
 		}
 

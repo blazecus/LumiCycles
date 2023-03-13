@@ -5,6 +5,7 @@
 [sub_resource type="ImmediateMesh" id="ImmediateMesh_dwtus"]
 
 [node name="trail" type="StaticBody3D"]
+collision_layer = 2
 script = ExtResource("1_awmrc")
 
 [node name="mesh" type="MeshInstance3D" parent="."]
