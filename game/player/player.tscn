@@ -31,6 +31,12 @@ properties/1/sync = true
 properties/2/path = NodePath("hurtbox:rotation")
 properties/2/spawn = true
 properties/2/sync = true
+properties/3/path = NodePath(".:active")
+properties/3/spawn = true
+properties/3/sync = true
+properties/4/path = NodePath(".:alive")
+properties/4/spawn = true
+properties/4/sync = true
 
 [node name="player" type="CharacterBody3D"]
 collision_layer = 4

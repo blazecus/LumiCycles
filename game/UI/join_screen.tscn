@@ -1,0 +1,31 @@
+[gd_scene load_steps=2 format=3 uid="uid://bv3urc7dgrc8r"]
+
+[ext_resource type="Script" path="res://game/UI/join_screen.cs" id="1_gatoq"]
+
+[node name="join_screen" type="Node2D"]
+script = ExtResource("1_gatoq")
+
+[node name="join_button" type="Button" parent="."]
+offset_left = 543.0
+offset_top = 507.0
+offset_right = 632.0
+offset_bottom = 538.0
+text = "Join Lobby"
+
+[node name="back_button" type="Button" parent="."]
+offset_left = 119.0
+offset_top = 125.0
+offset_right = 208.0
+offset_bottom = 156.0
+text = "Back"
+
+[node name="address_entry" type="LineEdit" parent="."]
+offset_left = 548.0
+offset_top = 263.0
+offset_right = 556.0
+offset_bottom = 271.0
+placeholder_text = "input IP here
+"
+
+[connection signal="button_up" from="join_button" to="." method="_on_join_button_button_up"]
+[connection signal="button_up" from="back_button" to="." method="_on_back_button_button_up"]

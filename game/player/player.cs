@@ -43,6 +43,10 @@ public partial class player : CharacterBody3D
 	private float jump_timer = 0.0f;
 	private float air_timer = 0.0f;
 
+	[Export]
+	public bool active = false;
+	[Export]
+	public bool alive = true;
 
 	public override void _Ready(){
 		rotators = GetNode<Node3D>("rotators");
@@ -55,12 +59,29 @@ public partial class player : CharacterBody3D
 		player_trail = (trail) trail_scene.Instantiate();
 		player_trail.setup(this);
 		player_trail.set_last_points(trailbottom.GlobalPosition, trailtop.GlobalPosition);
-		GetParent().GetNode("Trails").AddChild(player_trail);
+		GetParent().GetParent().GetNode("Trails").AddChild(player_trail);
 		camera.toggle_zoomed_in(false);
+		camera.camera.Current = false;
+		if(IsMultiplayerAuthority()){
+			camera.camera.Current = true;
+		}
 	}
 	public override void _PhysicsProcess(double delta)
 	{
+		//no trails if not active or movement
+		if(!active && alive){
+			return;
+		}
+
 		float deltaf = (float) delta;
+		//add trail even if not network authority - for now these are not synced
+		add_trail(deltaf);
+
+		//rest is movement and controls - synced
+		if(!IsMultiplayerAuthority()){
+			return;
+		}
+
 		jump_timer += deltaf;
 
 		//DEBUGGING
@@ -89,16 +110,6 @@ public partial class player : CharacterBody3D
 		
 
 		Vector3 velocity = Velocity;
-
-		//add trail points
-		trail_timer += deltaf;
-		if(trail_timer > TRAIL_CHECK_INTERVAL){
-			if((Position - last_pos).Length() > TRAIL_LENGTH_INTERVAL){
-				player_trail.add_section(trailbottom.GlobalPosition, trailtop.GlobalPosition);
-				last_pos = Position;
-			}
-			trail_timer = 0.0f;
-		}
 
 		// rotate forwards while falling, but only to a certain point
 		if (!IsOnFloor() && air_timer > AIR_ROTATE_BUFFER){
@@ -169,6 +180,10 @@ public partial class player : CharacterBody3D
 	}
 
 	public override void _Input(InputEvent inputEvent){
+		if(!IsMultiplayerAuthority()){
+			return;
+		}
+
 		if (inputEvent is InputEventJoypadMotion) {
 			InputEventJoypadMotion j = (InputEventJoypadMotion) inputEvent;
 
@@ -187,8 +202,25 @@ public partial class player : CharacterBody3D
 		}
 	}
 	
+	private void add_trail(float deltaf){
+		//add trail points
+		trail_timer += deltaf;
+		if(trail_timer > TRAIL_CHECK_INTERVAL){
+			if((Position - last_pos).Length() > TRAIL_LENGTH_INTERVAL){
+				player_trail.add_section(trailbottom.GlobalPosition, trailtop.GlobalPosition);
+				last_pos = Position;
+			}
+			trail_timer = 0.0f;
+		}
+	}
+
 	private void _on_area_3d_body_entered(Node3D body)
 	{
 		//GD.Print(body);
+	}
+
+	public void spawn_player(Vector3 position){
+		active = true;
+		Position = position;
 	}
 }

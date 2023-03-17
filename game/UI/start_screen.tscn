@@ -1,0 +1,23 @@
+[gd_scene load_steps=2 format=3 uid="uid://p4yb1msnkwyk"]
+
+[ext_resource type="Script" path="res://game/UI/start_screen.cs" id="1_vi653"]
+
+[node name="start_screen" type="Node2D"]
+script = ExtResource("1_vi653")
+
+[node name="join_game" type="Button" parent="."]
+offset_left = 517.0
+offset_top = 220.0
+offset_right = 604.0
+offset_bottom = 251.0
+text = "Join Game"
+
+[node name="host_game" type="Button" parent="."]
+offset_left = 517.0
+offset_top = 279.0
+offset_right = 611.0
+offset_bottom = 310.0
+text = "Host Game"
+
+[connection signal="button_up" from="join_game" to="." method="_on_join_game_button_up"]
+[connection signal="button_up" from="host_game" to="." method="_on_host_game_button_up"]

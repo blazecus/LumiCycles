@@ -7,13 +7,13 @@ public partial class player_camera : Node3D
 	[Export]
 	private const float MAX_ZOOM = 10.0f;
 	[Export]
-	private const float CONTROLLER_SENSITIVITY = 10.0f;
+	private const float CONTROLLER_SENSITIVITY = 3000.0f;
 	private const float DEFAULT_ZOOM = 10.0f;
 	private const float BOOST_ZOOM = 6.0f;
 	private CharacterBody3D player;
 	private Node3D h;
 	private Node3D v;
-	private Camera3D camera;
+	public Camera3D camera;
 	private float crh = 0.0f;
 	private float crv = 0.0f;
 	private float crv_max = 20.0f;
@@ -94,8 +94,8 @@ public partial class player_camera : Node3D
 		//camera.Position = new Vector3(camera.Position.X, camera.Position.Y, );
 
 		//CONTROLLER CONTROLS
-		crh += controller_right_x * hs * CONTROLLER_SENSITIVITY;
-		crv -= controller_right_y * vs * CONTROLLER_SENSITIVITY;
+		crh += controller_right_x * hs * CONTROLLER_SENSITIVITY * (float) delta;
+		crv -= controller_right_y * vs * CONTROLLER_SENSITIVITY * (float) delta;
 
 		//CAMERA ROTATION
 		float fdelta = (float) delta;
