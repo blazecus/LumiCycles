@@ -87,4 +87,31 @@ offset_right = 576.0
 offset_bottom = 479.0
 text = "Start Game!"
 
+[node name="back_button" type="Button" parent="CanvasLayer"]
+offset_left = 95.0
+offset_top = 90.0
+offset_right = 195.0
+offset_bottom = 121.0
+text = "Back"
+
+[node name="Label" type="Label" parent="CanvasLayer"]
+offset_left = 476.0
+offset_top = 161.0
+offset_right = 516.0
+offset_bottom = 184.0
+
+[node name="numplayers" type="Label" parent="CanvasLayer"]
+offset_left = 496.0
+offset_top = 287.0
+offset_right = 536.0
+offset_bottom = 310.0
+
+[node name="debug" type="Label" parent="CanvasLayer"]
+offset_left = 665.0
+offset_top = 205.0
+offset_right = 705.0
+offset_bottom = 228.0
+
+[connection signal="spawned" from="MultiplayerSpawner" to="." method="_on_multiplayer_spawner_spawned"]
 [connection signal="button_up" from="CanvasLayer/start_button" to="." method="_on_start_button_button_up"]
+[connection signal="button_up" from="CanvasLayer/back_button" to="." method="_on_back_button_button_up"]

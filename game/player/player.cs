@@ -48,6 +48,10 @@ public partial class player : CharacterBody3D
 	[Export]
 	public bool alive = true;
 
+	public override void _EnterTree(){
+		SetMultiplayerAuthority(Int32.Parse(Name));
+	}
+	
 	public override void _Ready(){
 		rotators = GetNode<Node3D>("rotators");
 		mesh = GetNode<MeshInstance3D>("rotators/mesh");
@@ -61,10 +65,8 @@ public partial class player : CharacterBody3D
 		player_trail.set_last_points(trailbottom.GlobalPosition, trailtop.GlobalPosition);
 		GetParent().GetParent().GetNode("Trails").AddChild(player_trail);
 		camera.toggle_zoomed_in(false);
-		camera.camera.Current = false;
-		if(IsMultiplayerAuthority()){
-			camera.camera.Current = true;
-		}
+
+		camera.camera.Current = IsMultiplayerAuthority();
 	}
 	public override void _PhysicsProcess(double delta)
 	{

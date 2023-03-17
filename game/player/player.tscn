@@ -40,7 +40,7 @@ properties/4/sync = true
 
 [node name="player" type="CharacterBody3D"]
 collision_layer = 4
-collision_mask = 3
+collision_mask = 7
 script = ExtResource("1_oxyv2")
 
 [node name="rotators" type="Node3D" parent="."]

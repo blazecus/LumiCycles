@@ -25,7 +25,7 @@ project/assembly_name="Light Bike"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/qodot/plugin.cfg")
+enabled=PackedStringArray()
 
 [input]
 

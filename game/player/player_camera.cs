@@ -32,6 +32,9 @@ public partial class player_camera : Node3D
 	private float current_zoom  = 4.0f;
 	private float zoom_speed = 10.0f;
 
+	public override void _EnterTree(){
+		SetMultiplayerAuthority(Int32.Parse(GetParent().Name));
+	}
 	public override void _Ready()
 	{
 		player = GetParent<CharacterBody3D>();
@@ -43,6 +46,9 @@ public partial class player_camera : Node3D
 	}
 
 	public override void _Input(InputEvent inputEvent){
+		if(!IsMultiplayerAuthority()){
+			return;
+		}
 		//CAMERA CONTROLS
 		//MOUSE
 		if(inputEvent is InputEventMouseMotion){
@@ -82,6 +88,9 @@ public partial class player_camera : Node3D
 
 	public override void _Process(double delta)
 	{
+		if(!IsMultiplayerAuthority()){
+			return;
+		}
 		if(goal_zoom != camera.Position.Z){
 			int zoom_goal_direction = MathF.Sign(goal_zoom - camera.Position.Z);
 			current_zoom += zoom_goal_direction * (float) delta * zoom_speed;
