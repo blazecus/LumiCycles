@@ -51,7 +51,7 @@ public partial class player : CharacterBody3D
 	public override void _EnterTree(){
 		SetMultiplayerAuthority(Int32.Parse(Name));
 	}
-	
+
 	public override void _Ready(){
 		rotators = GetNode<Node3D>("rotators");
 		mesh = GetNode<MeshInstance3D>("rotators/mesh");
@@ -144,13 +144,21 @@ public partial class player : CharacterBody3D
 		if(velocity.Length() < 1 || !IsOnFloor()){
 			rotation_amount = wheel_position * deltaf * MOVE_DIRECTION_ROTATION_SPEED * 0.5f;
 		}
+		if(!settings.Instance.controller_toggle){
+			if(Input.IsActionPressed("left")){
+				rotation_amount = -deltaf * MOVE_DIRECTION_ROTATION_SPEED * 0.5f;
+			}
+			else if(Input.IsActionPressed("right")){
+				rotation_amount = deltaf * MOVE_DIRECTION_ROTATION_SPEED * 0.5f;
+			}
+		}
 		//control where to move based on wheel position
 		move_direction = move_direction.Rotated(current_normal, rotation_amount).Normalized();
 		
 		//rotate hurtbox and model to look at move direction
 		Vector3 lookat_pos = GlobalPosition - move_direction * 3;
 		rotators.LookAt(lookat_pos, current_normal);
-		hurtbox.LookAt(lookat_pos, current_normal);
+		hurtbox.LookAt(lookat_pos, current_normal); 
 
 		//movement!
 		if(IsOnFloor() && jump_timer > JUMP_BUFFER){

@@ -5,6 +5,7 @@ public partial class start_screen : Node2D
 {
 	private PackedScene game_scene = ResourceLoader.Load<PackedScene>("res://game/world/world.tscn");
 	private PackedScene join_scene = ResourceLoader.Load<PackedScene>("res://game/UI/join_screen.tscn"); 
+	private PackedScene settings_scene = ResourceLoader.Load<PackedScene>("res://game/UI/settings_screen.tscn");
 
 	public override void _Ready()
 	{
@@ -23,6 +24,10 @@ public partial class start_screen : Node2D
 	{
 		settings.Instance.host = true;
 		GetTree().ChangeSceneToPacked(game_scene);
+	}
+
+	private void _on_settings_page_button_up(){
+		GetTree().ChangeSceneToPacked(settings_scene);
 	}
 }
 

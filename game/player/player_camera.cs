@@ -41,7 +41,6 @@ public partial class player_camera : Node3D
 		h = GetNode<Node3D>("h");
 		v = GetNode<Node3D>("h/v");
 		camera = GetNode<Camera3D>("h/v/Camera");
-		//Input.MouseMode = Input.MouseModeEnum.Captured;
 		current_zoom = goal_zoom;
 	}
 
@@ -49,26 +48,33 @@ public partial class player_camera : Node3D
 		if(!IsMultiplayerAuthority()){
 			return;
 		}
-		//CAMERA CONTROLS
-		//MOUSE
+		player parent = GetParent<player>();
+		if(parent.active && !settings.Instance.controller_toggle){
+			Input.MouseMode = Input.MouseModeEnum.Captured;
+		}
+		//MOUSE CAMERA CONTROLS
 		if(inputEvent is InputEventMouseMotion){
-			InputEventMouseMotion p = (InputEventMouseMotion) inputEvent;
-			crh += -p.Relative.X * hs;
-			crv += -p.Relative.Y * vs;
+			if(!settings.Instance.controller_toggle){
+				InputEventMouseMotion p = (InputEventMouseMotion) inputEvent;
+				crh += -p.Relative.X * hs;
+				crv += -p.Relative.Y * vs;
+			}
 		}
 		//CONTROLLER
 		else if (inputEvent is InputEventJoypadMotion) {
-			InputEventJoypadMotion j = (InputEventJoypadMotion) inputEvent;
-			if(j.Axis == JoyAxis.RightX){
-				controller_right_x = j.AxisValue;
-				if(Mathf.Abs(controller_right_x) < 0.1f){
-					controller_right_x = 0.0f;
+			if(settings.Instance.controller_toggle){
+				InputEventJoypadMotion j = (InputEventJoypadMotion) inputEvent;
+				if(j.Axis == JoyAxis.RightX){
+					controller_right_x = j.AxisValue;
+					if(Mathf.Abs(controller_right_x) < 0.1f){
+						controller_right_x = 0.0f;
+					}
 				}
-			}
-			else if (j.Axis == JoyAxis.RightY){
-				controller_right_y = j.AxisValue;
-				if(Mathf.Abs(controller_right_y) < 0.1f){
-					controller_right_y = 0.0f;
+				else if (j.Axis == JoyAxis.RightY){
+					controller_right_y = j.AxisValue;
+					if(Mathf.Abs(controller_right_y) < 0.1f){
+						controller_right_y = 0.0f;
+					}
 				}
 			}
 		}
@@ -98,13 +104,13 @@ public partial class player_camera : Node3D
 				current_zoom = goal_zoom;
 			}
 			camera.Position = new Vector3(camera.Position.X, camera.Position.Y, current_zoom);
-			//GD.Print(current_zoom);
 		}
-		//camera.Position = new Vector3(camera.Position.X, camera.Position.Y, );
 
-		//CONTROLLER CONTROLS
-		crh += controller_right_x * hs * CONTROLLER_SENSITIVITY * (float) delta;
-		crv -= controller_right_y * vs * CONTROLLER_SENSITIVITY * (float) delta;
+		if(settings.Instance.controller_toggle){
+			//CONTROLLER CONTROLS
+			crh += controller_right_x * hs * CONTROLLER_SENSITIVITY * (float) delta;
+			crv -= controller_right_y * vs * CONTROLLER_SENSITIVITY * (float) delta;
+		}
 
 		//CAMERA ROTATION
 		float fdelta = (float) delta;

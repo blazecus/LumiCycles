@@ -3,6 +3,7 @@ using System;
 
 public partial class trail : StaticBody3D
 {
+	private const int CHUNK_SIZE = 100;
 	private MeshInstance3D mesh;
 	private ImmediateMesh imesh;
 	public Vector3 last_point1;

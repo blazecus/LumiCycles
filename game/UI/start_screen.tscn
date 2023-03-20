@@ -19,5 +19,13 @@ offset_right = 611.0
 offset_bottom = 310.0
 text = "Host Game"
 
+[node name="settings_page" type="Button" parent="."]
+offset_left = 520.0
+offset_top = 342.0
+offset_right = 614.0
+offset_bottom = 373.0
+text = "Settings"
+
 [connection signal="button_up" from="join_game" to="." method="_on_join_game_button_up"]
 [connection signal="button_up" from="host_game" to="." method="_on_host_game_button_up"]
+[connection signal="button_up" from="settings_page" to="." method="_on_settings_page_button_up"]

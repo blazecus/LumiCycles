@@ -1,0 +1,23 @@
+[gd_scene load_steps=2 format=3 uid="uid://14l833gd8k8h"]
+
+[ext_resource type="Script" path="res://game/UI/settings_screen.cs" id="1_uyygy"]
+
+[node name="settings_screen" type="Node2D"]
+script = ExtResource("1_uyygy")
+
+[node name="toggle_controls" type="Button" parent="."]
+offset_left = 469.0
+offset_top = 264.0
+offset_right = 477.0
+offset_bottom = 272.0
+text = "Switch to keyboard/mouse"
+
+[node name="back_button" type="Button" parent="."]
+offset_left = 65.0
+offset_top = 58.0
+offset_right = 280.0
+offset_bottom = 89.0
+text = "Back"
+
+[connection signal="button_up" from="toggle_controls" to="." method="_on_toggle_controls_button_up"]
+[connection signal="button_up" from="back_button" to="." method="_on_back_button_button_up"]
