@@ -58,7 +58,7 @@ public partial class world : Node
 			return;
 		}
 		Multiplayer.MultiplayerPeer = peer;
-		lobby_menu.GetNode<Label>("label").Text = "lobby " + peer.Host.ToString();
+		lobby_menu.GetNode<Label>("Label").Text = "lobby " + peer.Host.ToString();
 	}
 
 	private void CreatePlayer(long id){
