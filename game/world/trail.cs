@@ -1,23 +1,39 @@
 using Godot;
 using System;
 
+/*-------------------------------------------
+Synchronization plan
+Instead of using multiplayersynchronizer, synchronizations will have to be done through rpcs,
+since they have to be timed on when the network authority moves to the next chunk. 
+chunks should be done fairly often, which means the mesh might have to be copied fairly often
+-------------------------------------------*/
+
+
 public partial class trail : StaticBody3D
 {
 	private const int CHUNK_SIZE = 100;
+	public const float TRAIL_CHECK_INTERVAL = 0.1f;
+	public const float TRAIL_LENGTH_INTERVAL = 0.5f;
 	private MeshInstance3D mesh;
 	private ImmediateMesh imesh;
-	public Vector3 last_point1;
-	public Vector3 last_point2;
 	public Godot.Collections.Array<Vector3> points;
-	private player player_scene;
+	public Godot.Collections.Array<Vector3> added_points;
+	public int added_count = 0;
+	private player parent_player;
 	private int polygon_counter = 0;
 	private int start_index = 0;
+	private int network_authority_id = 0;
+	private float trail_timer = 0.0f;
+	private Vector3 last_player_pos = Vector3.Zero;
 
 	public void setup(player player_s){
 		mesh = GetNode<MeshInstance3D>("mesh");
 		imesh = (ImmediateMesh) mesh.Mesh;
 		points = new Godot.Collections.Array<Vector3>();
-		player_scene = player_s;
+		added_points = new Godot.Collections.Array<Vector3>();
+		parent_player = player_s;
+		network_authority_id = Int32.Parse(parent_player.Name);
+		SetMultiplayerAuthority(network_authority_id);
 	}
 	public override void _Ready()
 	{
@@ -25,11 +41,15 @@ public partial class trail : StaticBody3D
 
 	public override void _Process(double delta)
 	{
-	}
-
-	public void set_last_points(Vector3 p1, Vector3 p2){
-		last_point1 = p1;
-		last_point2 = p2;
+		float deltaf = (float) delta;
+		trail_timer += deltaf;
+		if(trail_timer > TRAIL_CHECK_INTERVAL){
+			if((parent_player.Position - last_player_pos).Length() > TRAIL_LENGTH_INTERVAL){
+				add_section(parent_player.trailbottom.GlobalPosition, parent_player.trailtop.GlobalPosition);
+				last_player_pos = parent_player.Position;
+			}
+			trail_timer = 0.0f;
+		}
 	}
 
 	public void draw_mesh(int start_index){
@@ -56,37 +76,111 @@ public partial class trail : StaticBody3D
 		}
 	}
 
+	public void draw_last_rect(){
+		if(added_points.Count >= 4){
+			imesh.SurfaceBegin(Mesh.PrimitiveType.Triangles);
+
+			int i = added_points.Count - 4;
+
+				imesh.SurfaceAddVertex(added_points[i]);
+				imesh.SurfaceAddVertex(added_points[i+1]);
+				imesh.SurfaceAddVertex(added_points[i+2]);
+
+				imesh.SurfaceAddVertex(added_points[i+2]);
+				imesh.SurfaceAddVertex(added_points[i+1]);
+				imesh.SurfaceAddVertex(added_points[i]);
+
+				imesh.SurfaceAddVertex(added_points[i+1]);
+				imesh.SurfaceAddVertex(added_points[i+3]);
+				imesh.SurfaceAddVertex(added_points[i+2]);
+
+				imesh.SurfaceAddVertex(added_points[i+2]);
+				imesh.SurfaceAddVertex(added_points[i+3]);
+				imesh.SurfaceAddVertex(added_points[i+1]);
+		
+			imesh.SurfaceEnd();
+		}
+	}
+
 	public void update_collision(){
-		if(points.Count > 16){
+		if(added_points.Count > 16){
 			CollisionShape3D p = new CollisionShape3D();
 			ConvexPolygonShape3D shape = new ConvexPolygonShape3D();
 			Vector3[] pc = new Vector3[6];
-			int i = points.Count - 10;
-			pc[0] = points[i];
-			pc[1] = points[i+1];
-			pc[2] = points[i+2];
+			int i = added_points.Count - 10;
+			pc[0] = added_points[i];
+			pc[1] = added_points[i+1];
+			pc[2] = added_points[i+2];
 
-			pc[3] = points[i+1];
-			pc[4] = points[i+3];
-			pc[5] = points[i+2];
+			pc[3] = added_points[i+1];
+			pc[4] = added_points[i+3];
+			pc[5] = added_points[i+2];
 			shape.Points = pc;
 			p.Shape = shape;
 			AddChild(p);
 		}
 	}
+
 	public void add_section(Vector3 p1, Vector3 p2){
-		points.Add(p1);
-		points.Add(p2);
-		update_collision();
-		polygon_counter++;
-		if(polygon_counter % 200 == 0){
-			imesh.ClearSurfaces();
-			start_index = points.Count - 2;
-			draw_mesh(0);
+		if(!IsMultiplayerAuthority()){
+			added_points.Add(p1);
+			added_points.Add(p2);
+			update_collision();
+			draw_last_rect();
 		}
 		else{
-			draw_mesh(start_index);
+			//Network authority
+			added_points.Add(p1);
+			added_points.Add(p2);
+			update_collision();
+			polygon_counter++;
+			if(polygon_counter % CHUNK_SIZE == 0){
+				authority_sync();
+			}
+			else{
+				draw_last_rect();
+			}
 		}
-		set_last_points(p1,p2);
+	}
+
+	private void authority_sync(){
+		imesh.ClearSurfaces();
+		foreach(Vector3 point in added_points){
+			points.Add(point);
+		}
+		Rpc("sync_trail", added_points);
+		added_points.Clear();
+		draw_mesh(0);
+	}
+		
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer)]	
+	public void sync_trail(Godot.Collections.Array<Vector3> sync_points){
+		//update collisions - remove client side
+		for(int i = 0; i < added_points.Count / 2; i++){
+			GetChild<CollisionShape3D>(GetChildCount() - 1).QueueFree();
+		}
+		//add new from sync_points
+		for(int i = 0; i < sync_points.Count - 4; i += 2){
+			CollisionShape3D p = new CollisionShape3D();
+			ConvexPolygonShape3D shape = new ConvexPolygonShape3D();
+			Vector3[] pc = new Vector3[6];
+			pc[0] = sync_points[i];
+			pc[1] = sync_points[i+1];
+			pc[2] = sync_points[i+2];
+
+			pc[3] = sync_points[i+1];
+			pc[4] = sync_points[i+3];
+			pc[5] = sync_points[i+2];
+			shape.Points = pc;
+			p.Shape = shape;
+			AddChild(p);
+		}
+
+		//update points and mesh
+		foreach(Vector3 point in sync_points){
+			points.Add(point);
+		}
+		added_points.Clear();
+		draw_mesh(0);
 	}
 }

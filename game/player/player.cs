@@ -37,7 +37,7 @@ public partial class player : CharacterBody3D
 
 	private float controller_left_x = 0.0f;
 	private float controller_left_y = 0.0f;
-	private Vector3 last_pos = Vector3.Zero;
+	public Vector3 last_pos = Vector3.Zero;
 	private Vector3 current_normal = new Vector3(0.0f, 1.0f, 0.0f);
 	private float velocity_magnitude = 1.0f;
 	private float jump_timer = 0.0f;
@@ -62,7 +62,6 @@ public partial class player : CharacterBody3D
 		slope_check = GetNode<Node3D>("slope_check");
 		player_trail = (trail) trail_scene.Instantiate();
 		player_trail.setup(this);
-		player_trail.set_last_points(trailbottom.GlobalPosition, trailtop.GlobalPosition);
 		GetParent().GetParent().GetNode("Trails").AddChild(player_trail);
 		camera.toggle_zoomed_in(false);
 
@@ -75,14 +74,15 @@ public partial class player : CharacterBody3D
 			return;
 		}
 
-		float deltaf = (float) delta;
-		//add trail even if not network authority - for now these are not synced
-		add_trail(deltaf);
-
 		//rest is movement and controls - synced
 		if(!IsMultiplayerAuthority()){
 			return;
 		}
+
+		float deltaf = (float) delta;
+
+		//trail logic moved to trail script
+		//add_trail(deltaf);
 
 		jump_timer += deltaf;
 
@@ -212,7 +212,8 @@ public partial class player : CharacterBody3D
 		}
 	}
 	
-	private void add_trail(float deltaf){
+	//moved to trail script
+	/*private void add_trail(float deltaf){
 		//add trail points
 		trail_timer += deltaf;
 		if(trail_timer > TRAIL_CHECK_INTERVAL){
@@ -222,7 +223,7 @@ public partial class player : CharacterBody3D
 			}
 			trail_timer = 0.0f;
 		}
-	}
+	}*/
 
 	private void _on_area_3d_body_entered(Node3D body)
 	{
