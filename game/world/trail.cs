@@ -14,6 +14,8 @@ public partial class trail : StaticBody3D
 	private const int CHUNK_SIZE = 100;
 	public const float TRAIL_CHECK_INTERVAL = 0.1f;
 	public const float TRAIL_LENGTH_INTERVAL = 0.5f;
+	public const int TRAIL_HITBOX_LAG = 4;
+	public const float TRAIL_STARTUP = 1.5f;
 	private MeshInstance3D mesh;
 	private ImmediateMesh imesh;
 	public Godot.Collections.Array<Vector3> points;
@@ -34,6 +36,7 @@ public partial class trail : StaticBody3D
 		parent_player = player_s;
 		network_authority_id = Int32.Parse(parent_player.Name);
 		SetMultiplayerAuthority(network_authority_id);
+		trail_timer = -TRAIL_STARTUP;
 	}
 	public override void _Ready()
 	{
@@ -41,6 +44,9 @@ public partial class trail : StaticBody3D
 
 	public override void _Process(double delta)
 	{
+		if(!parent_player.active || !parent_player.alive){
+			return;
+		}
 		float deltaf = (float) delta;
 		trail_timer += deltaf;
 		if(trail_timer > TRAIL_CHECK_INTERVAL){
@@ -79,7 +85,6 @@ public partial class trail : StaticBody3D
 	public void draw_last_rect(){
 		if(added_points.Count >= 4){
 			imesh.SurfaceBegin(Mesh.PrimitiveType.Triangles);
-
 			int i = added_points.Count - 4;
 
 				imesh.SurfaceAddVertex(added_points[i]);
@@ -97,17 +102,70 @@ public partial class trail : StaticBody3D
 				imesh.SurfaceAddVertex(added_points[i+2]);
 				imesh.SurfaceAddVertex(added_points[i+3]);
 				imesh.SurfaceAddVertex(added_points[i+1]);
-		
+
+			imesh.SurfaceEnd();
+		}
+		else{
+			if(points.Count < 2){
+				return;
+			}
+			imesh.SurfaceBegin(Mesh.PrimitiveType.Triangles);
+
+				imesh.SurfaceAddVertex(points[points.Count-2]);
+				imesh.SurfaceAddVertex(points[points.Count-1]);
+				imesh.SurfaceAddVertex(added_points[0]);
+
+				imesh.SurfaceAddVertex(added_points[0]);
+				imesh.SurfaceAddVertex(points[points.Count-1]);
+				imesh.SurfaceAddVertex(points[points.Count-2]);
+
+				imesh.SurfaceAddVertex(points[points.Count-1]);
+				imesh.SurfaceAddVertex(added_points[1]);
+				imesh.SurfaceAddVertex(added_points[0]);
+
+				imesh.SurfaceAddVertex(added_points[0]);
+				imesh.SurfaceAddVertex(added_points[1]);
+				imesh.SurfaceAddVertex(points[points.Count-1]);
+
 			imesh.SurfaceEnd();
 		}
 	}
 
 	public void update_collision(){
-		if(added_points.Count > 16){
-			CollisionShape3D p = new CollisionShape3D();
-			ConvexPolygonShape3D shape = new ConvexPolygonShape3D();
-			Vector3[] pc = new Vector3[6];
-			int i = added_points.Count - 10;
+		CollisionShape3D p = new CollisionShape3D();
+		ConvexPolygonShape3D shape = new ConvexPolygonShape3D();
+		Vector3[] pc = new Vector3[6];
+		int i = added_points.Count - TRAIL_HITBOX_LAG * 2;
+		//hard coding edge cases - definitely a better solution but not important
+		if(i == -2){
+			if(points.Count < 2){
+				return;
+			}
+			//halfway in points case
+			pc[0] = points[points.Count - 2];
+			pc[1] = points[points.Count - 1];
+			pc[2] = added_points[0];
+
+			pc[3] = points[points.Count - 1];
+			pc[4] = added_points[1];
+			pc[5] = added_points[0];			
+		}
+		else if(i < -2){
+			//all the way in points
+			if(points.Count < 4){
+				//dont add shape
+				return;
+			}
+			pc[0] = points[points.Count + i];
+			pc[1] = points[points.Count + i + 1];
+			pc[2] = points[points.Count + i + 2];
+
+			pc[3] = points[points.Count + i + 1];
+			pc[4] = points[points.Count + i + 3];
+			pc[5] = points[points.Count + i + 2];
+		}
+		else{
+			//normal - all the way in added points
 			pc[0] = added_points[i];
 			pc[1] = added_points[i+1];
 			pc[2] = added_points[i+2];
@@ -115,10 +173,10 @@ public partial class trail : StaticBody3D
 			pc[3] = added_points[i+1];
 			pc[4] = added_points[i+3];
 			pc[5] = added_points[i+2];
-			shape.Points = pc;
-			p.Shape = shape;
-			AddChild(p);
 		}
+		shape.Points = pc;
+		p.Shape = shape;
+		AddChild(p);
 	}
 
 	public void add_section(Vector3 p1, Vector3 p2){
@@ -155,32 +213,24 @@ public partial class trail : StaticBody3D
 		
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer)]	
 	public void sync_trail(Godot.Collections.Array<Vector3> sync_points){
-		//update collisions - remove client side
+		//remove bad client side collision shapes
 		for(int i = 0; i < added_points.Count / 2; i++){
 			GetChild<CollisionShape3D>(GetChildCount() - 1).QueueFree();
 		}
-		//add new from sync_points
-		for(int i = 0; i < sync_points.Count - 4; i += 2){
-			CollisionShape3D p = new CollisionShape3D();
-			ConvexPolygonShape3D shape = new ConvexPolygonShape3D();
-			Vector3[] pc = new Vector3[6];
-			pc[0] = sync_points[i];
-			pc[1] = sync_points[i+1];
-			pc[2] = sync_points[i+2];
+		added_points.Clear();
 
-			pc[3] = sync_points[i+1];
-			pc[4] = sync_points[i+3];
-			pc[5] = sync_points[i+2];
-			shape.Points = pc;
-			p.Shape = shape;
-			AddChild(p);
+		//use update_collision to them back
+		for(int i = 0; i < sync_points.Count; i += 2){
+			added_points.Add(sync_points[i]);
+			added_points.Add(sync_points[i+1]);
+			update_collision();
 		}
+		added_points.Clear();
 
 		//update points and mesh
 		foreach(Vector3 point in sync_points){
 			points.Add(point);
 		}
-		added_points.Clear();
 		draw_mesh(0);
 	}
 }
