@@ -11,7 +11,7 @@ chunks should be done fairly often, which means the mesh might have to be copied
 
 public partial class trail : StaticBody3D
 {
-	private const int CHUNK_SIZE = 100;
+	private const int CHUNK_SIZE = 10;
 	public const float TRAIL_CHECK_INTERVAL = 0.1f;
 	public const float TRAIL_LENGTH_INTERVAL = 0.5f;
 	public const int TRAIL_HITBOX_LAG = 4;
@@ -30,7 +30,9 @@ public partial class trail : StaticBody3D
 
 	public void setup(player player_s){
 		mesh = GetNode<MeshInstance3D>("mesh");
-		imesh = (ImmediateMesh) mesh.Mesh;
+		//imesh = (ImmediateMesh) mesh.Mesh;
+		imesh = new ImmediateMesh();
+		mesh.Mesh = imesh;
 		points = new Godot.Collections.Array<Vector3>();
 		added_points = new Godot.Collections.Array<Vector3>();
 		parent_player = player_s;
@@ -198,16 +200,17 @@ public partial class trail : StaticBody3D
 			else{
 				draw_last_rect();
 			}
+			GD.Print(imesh.GetSurfaceCount());
 		}
 	}
 
 	private void authority_sync(){
-		imesh.ClearSurfaces();
 		foreach(Vector3 point in added_points){
 			points.Add(point);
 		}
 		Rpc("sync_trail", added_points);
 		added_points.Clear();
+		imesh.ClearSurfaces();
 		draw_mesh(0);
 	}
 		
@@ -231,6 +234,8 @@ public partial class trail : StaticBody3D
 		foreach(Vector3 point in sync_points){
 			points.Add(point);
 		}
+
+		imesh.ClearSurfaces();
 		draw_mesh(0);
 	}
 }
