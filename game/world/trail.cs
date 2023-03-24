@@ -16,6 +16,9 @@ public partial class trail : StaticBody3D
 	public const float TRAIL_LENGTH_INTERVAL = 0.5f;
 	public const int TRAIL_HITBOX_LAG = 4;
 	public const float TRAIL_STARTUP = 1.5f;
+
+	private Material trail_material = GD.Load<Material>("res://assets/materials/bike_material.tres");
+
 	private MeshInstance3D mesh;
 	private ImmediateMesh imesh;
 	public Godot.Collections.Array<Vector3> points;
@@ -27,6 +30,7 @@ public partial class trail : StaticBody3D
 	private int network_authority_id = 0;
 	private float trail_timer = 0.0f;
 	private Vector3 last_player_pos = Vector3.Zero;
+	public Color color = new Color(0.0f, 0.0f, 0.0f, 1.0f);
 
 	public void setup(player player_s){
 		mesh = GetNode<MeshInstance3D>("mesh");
@@ -62,7 +66,7 @@ public partial class trail : StaticBody3D
 
 	public void draw_mesh(int start_index){
 		if(points.Count > 4){
-			imesh.SurfaceBegin(Mesh.PrimitiveType.Triangles);
+			imesh.SurfaceBegin(Mesh.PrimitiveType.Triangles, trail_material);
 			for(int i = start_index; i < points.Count - 3; i += 2){
 				imesh.SurfaceAddVertex(points[i]);
 				imesh.SurfaceAddVertex(points[i+1]);
@@ -86,7 +90,7 @@ public partial class trail : StaticBody3D
 
 	public void draw_last_rect(){
 		if(added_points.Count >= 4){
-			imesh.SurfaceBegin(Mesh.PrimitiveType.Triangles);
+			imesh.SurfaceBegin(Mesh.PrimitiveType.Triangles, trail_material);
 			int i = added_points.Count - 4;
 
 				imesh.SurfaceAddVertex(added_points[i]);
@@ -111,7 +115,7 @@ public partial class trail : StaticBody3D
 			if(points.Count < 2){
 				return;
 			}
-			imesh.SurfaceBegin(Mesh.PrimitiveType.Triangles);
+			imesh.SurfaceBegin(Mesh.PrimitiveType.Triangles, trail_material);
 
 				imesh.SurfaceAddVertex(points[points.Count-2]);
 				imesh.SurfaceAddVertex(points[points.Count-1]);
@@ -200,7 +204,6 @@ public partial class trail : StaticBody3D
 			else{
 				draw_last_rect();
 			}
-			GD.Print(imesh.GetSurfaceCount());
 		}
 	}
 
@@ -237,5 +240,11 @@ public partial class trail : StaticBody3D
 
 		imesh.ClearSurfaces();
 		draw_mesh(0);
+	}
+
+	public void set_color(Color input_color){
+		color = input_color;
+		//imesh.SurfaceSetColor(color);
+		mesh.SetInstanceShaderParameter("input_color", color);
 	}
 }

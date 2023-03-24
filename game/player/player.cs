@@ -42,6 +42,7 @@ public partial class player : CharacterBody3D
 	private float velocity_magnitude = 1.0f;
 	private float jump_timer = 0.0f;
 	private float air_timer = 0.0f;
+	public Color color = new Color(0.0f, 0.0f, 0.0f, 1.0f);
 
 	[Export]
 	public bool active = false;
@@ -233,5 +234,15 @@ public partial class player : CharacterBody3D
 	public void spawn_player(Vector3 position){
 		active = true;
 		Position = position;
+	}
+
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer)]	
+	public void set_color(Color input_color){
+		if(IsMultiplayerAuthority()){
+			Rpc("set_color", input_color);
+		}
+		color = input_color;
+		player_trail.set_color(input_color);
+		mesh.SetInstanceShaderParameter("input_color", color);
 	}
 }

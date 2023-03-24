@@ -1,0 +1,7 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://c3txy5w43kvy7"]
+
+[ext_resource type="Shader" path="res://assets/shaders/bike_shader.gdshader" id="1_yfdfb"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_yfdfb")

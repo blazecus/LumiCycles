@@ -116,5 +116,14 @@ public partial class world : Node
 	private void _on_multiplayer_spawner_spawned(){
 		lobby_menu.GetNode<Label>("debug").Text = Multiplayer.GetPeers().Count().ToString();
 	}
+
+	public void _on_color_picker_button_color_changed(Color color){
+		foreach(player p in GetNode<Node3D>("Players").GetChildren()){
+			if(p.IsMultiplayerAuthority()){
+				p.set_color(color);
+				//p.set_color(lobby_menu.GetNode<ColorPicker>("ColorPicker").Color);
+			}
+		}
+	}
 }
 

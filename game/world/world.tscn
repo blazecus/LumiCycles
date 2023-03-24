@@ -112,6 +112,13 @@ offset_top = 205.0
 offset_right = 705.0
 offset_bottom = 228.0
 
+[node name="ColorPickerButton" type="ColorPickerButton" parent="CanvasLayer"]
+offset_left = 799.0
+offset_top = 301.0
+offset_right = 832.0
+offset_bottom = 329.0
+
 [connection signal="spawned" from="MultiplayerSpawner" to="." method="_on_multiplayer_spawner_spawned"]
 [connection signal="button_up" from="CanvasLayer/start_button" to="." method="_on_start_button_button_up"]
 [connection signal="button_up" from="CanvasLayer/back_button" to="." method="_on_back_button_button_up"]
+[connection signal="color_changed" from="CanvasLayer/ColorPickerButton" to="." method="_on_color_picker_button_color_changed"]

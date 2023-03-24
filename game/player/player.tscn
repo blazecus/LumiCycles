@@ -2,12 +2,10 @@
 
 [ext_resource type="Script" path="res://game/player/player.cs" id="1_oxyv2"]
 [ext_resource type="Script" path="res://game/player/player_camera.cs" id="2_mnuh0"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_q3s8r"]
-albedo_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
+[ext_resource type="Material" uid="uid://c3txy5w43kvy7" path="res://assets/materials/bike_material.tres" id="2_pxky8"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_k8vaj"]
-material = SubResource("StandardMaterial3D_q3s8r")
+material = ExtResource("2_pxky8")
 size = Vector3(0.5, 1, 2)
 
 [sub_resource type="BoxMesh" id="BoxMesh_rho0k"]
