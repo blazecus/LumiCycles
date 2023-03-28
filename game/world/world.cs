@@ -7,6 +7,7 @@ using System;
 public partial class world : Node
 {
 	const int PORT = 8899;
+	const float END_ROUND_TIMER = 3.0f;
 
 	private PackedScene start_screen = GD.Load<PackedScene>("res://game/UI/start_screen.tscn");
 	private PackedScene player_scene = GD.Load<PackedScene>("res://game/player/player.tscn");
@@ -14,11 +15,27 @@ public partial class world : Node
 	private ENetMultiplayerPeer peer = new ENetMultiplayerPeer();
 
 	private CanvasLayer lobby_menu;
+	private CanvasLayer hud;
 	private Label info_label;
+	private Node3D players;
+
+	public Godot.Collections.Array<int> player_win_count = new Godot.Collections.Array<int>();
+	private player winner;
 	private bool host = true;
+	[Export]
+	private int rounds_left = 1;
+	[Export]
+	private int total_rounds = 1;
+	[Export]
+	private int player_count = 1;
+	[Export]
+	private int alive_players = 1;
+	private float end_round_time = 0.0f;
 
 	public override void _EnterTree(){
-		lobby_menu = GetNode<CanvasLayer>("CanvasLayer");
+		lobby_menu = GetNode<CanvasLayer>("menu_layer");
+		hud = GetNode<CanvasLayer>("hud_layer");
+		players = GetNode<Node3D>("Players");
 		info_label = lobby_menu.GetNode<Label>("Label");
 	}
 
@@ -34,8 +51,25 @@ public partial class world : Node
 	
 	public override void _Process(double delta)
 	{
-		lobby_menu.GetNode<Label>("debug").Text = GetNode<Node3D>("Players").GetChildren().Count().ToString();
-		lobby_menu.GetNode<Label>("numplayers").Text = Multiplayer.GetPeers().Count().ToString();
+		if(rounds_left <= 0){
+			lobby_menu.GetNode<Label>("debug").Text = GetNode<Node3D>("Players").GetChildren().Count().ToString();
+			lobby_menu.GetNode<Label>("numplayers").Text = Multiplayer.GetPeers().Count().ToString();
+		}
+		else{
+			if(IsMultiplayerAuthority() && end_round_time > 0){
+				end_round_time -= (float) delta;
+				//GD.Print(end_round_time);
+				if(end_round_time <= 0){
+					rounds_left -= 1;
+					if(rounds_left == 0){
+						end_game();
+					}
+					else{
+						start_round();
+					}
+				}
+			}
+		}
 	}
 
 	public void start_host(){
@@ -52,6 +86,8 @@ public partial class world : Node
 
 	public void start_client(string address){
 		lobby_menu.GetNode<Button>("start_button").Visible = false;
+		lobby_menu.GetNode<SpinBox>("round_count_selector").Visible = false;
+		lobby_menu.GetNode<SpinBox>("player_count_selector").Visible = false;
 		Error connection = peer.CreateClient(address, PORT);
 		if(connection != Error.Ok){
 			lobby_menu.GetNode<Label>("Label").Text = "connection failed!";
@@ -65,11 +101,18 @@ public partial class world : Node
 		player player = (player) player_scene.Instantiate();
 		player.Name = id.ToString();
 		GetNode<Node3D>("Players").AddChild(player);
-		GD.Print(Multiplayer.GetPeers().Count());
+		player_win_count.Add(0);
 	}
 
 	private void DestroyPlayer(long id){
-		GetNode<Node3D>("Players").GetNode<player>(id.ToString()).QueueFree();
+		for(int i = 0; i < players.GetChildCount(); i++){
+			if(players.GetChild<player>(i).Name == id.ToString()){
+				players.GetChild<player>(i).prepare_destruction();
+				players.GetChild<player>(i).QueueFree();
+				player_win_count.RemoveAt(i);
+			}
+		}
+		//GetNode<Node3D>("Players").GetNode<player>(id.ToString()).QueueFree();
 		GD.Print(Multiplayer.GetPeers().Count());
 	}
 
@@ -92,10 +135,26 @@ public partial class world : Node
 		GD.Print("success, join address: " + upnp.QueryExternalAddress());
 		info_label.Text = "Address: " + upnp.QueryExternalAddress();
 	}
-
+	
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer)]	
 	private void start_game(){
+		total_rounds = (int) lobby_menu.GetNode<SpinBox>("round_count_selector").Value;
+		rounds_left = total_rounds;
 		lobby_menu.Visible = false;
+		hud.Visible = true;
+		if(IsMultiplayerAuthority()){
+			Rpc("start_game");
+			start_round();
+		}
+	}
+
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer)]	
+	private void start_round(){
+		if(IsMultiplayerAuthority()){
+			Rpc("start_round");
+		}
+		hud.GetNode<Label>("winner_label").Visible = false;
+		hud.GetNode<Label>("current_round").Text = "Round " + (total_rounds - rounds_left + 1).ToString();
 		foreach(player p in GetNode<Node3D>("Players").GetChildren()){
 			//set up better spawn system later along with map selection
 			p.spawn_player(new Vector3(0,3,0));
@@ -104,8 +163,9 @@ public partial class world : Node
 	
 	private void _on_start_button_button_up()
 	{
-		Rpc("start_game");
-		start_game();
+		if(IsMultiplayerAuthority()){
+			start_game();
+		}
 	}
 	
 	private void _on_back_button_button_up()
@@ -123,6 +183,63 @@ public partial class world : Node
 				p.set_color(color);
 				//p.set_color(lobby_menu.GetNode<ColorPicker>("ColorPicker").Color);
 			}
+		}
+	}
+
+	public void player_died(){
+		alive_players -= 1;
+
+		if(!IsMultiplayerAuthority()){
+			return;
+		}
+		//check if round is over
+		check_end_round();
+	}
+
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer)]	
+	public void check_end_round(){
+		if(IsMultiplayerAuthority()){
+			Rpc("check_end_round");
+		}
+
+		if(players.GetChildCount() == 1){
+			winner = players.GetChild<player>(0);
+			player_win_count[0]++;
+			end_round();
+		}
+		else{
+			for(int i = 0; i < players.GetChildCount(); i++){
+				if(players.GetChild<player>(i).alive){
+					winner = players.GetChild<player>(i);
+					player_win_count[i]++;
+					end_round();
+				}
+			}
+		}
+	}
+
+	public void end_round(){
+		end_round_time = END_ROUND_TIMER;
+
+		hud.GetNode<Label>("winner_label").Visible = true;
+		hud.GetNode<Label>("winner_label").Text = winner.Name + " wins!";
+	}
+
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer)]	
+	public void end_game(){
+		if(IsMultiplayerAuthority()){
+			Rpc("end_game");
+		}
+
+		lobby_menu.Visible = true;
+		hud.Visible = false;
+		reset_players();
+	}
+
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer)]	
+	public void reset_players(){
+		foreach(player p in players.GetChildren()){
+			p.reset_player();
 		}
 	}
 }

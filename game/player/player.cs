@@ -20,6 +20,7 @@ public partial class player : CharacterBody3D
 	public const float AIR_ROTATE_BUFFER = 0.1f;
 	public PackedScene trail_scene = ResourceLoader.Load<PackedScene>("res://game/world/trail.tscn"); 
 
+	private world world_node;
 	private trail player_trail;
 	public Marker3D trailtop;
 	public Marker3D trailbottom;
@@ -28,7 +29,6 @@ public partial class player : CharacterBody3D
 	private Node3D rotators;
 	private player_camera camera;
 	private Node3D slope_check;
-	private float trail_timer = 0.0f;
 	private Vector3 move_direction = new Vector3(0.0f, 0.0f, 1.0f);
 	private float wheel_position = 0.0f;
 
@@ -63,20 +63,20 @@ public partial class player : CharacterBody3D
 		slope_check = GetNode<Node3D>("slope_check");
 		player_trail = (trail) trail_scene.Instantiate();
 		player_trail.setup(this);
-		GetParent().GetParent().GetNode("Trails").AddChild(player_trail);
+		world_node = GetParent().GetParent<world>();
+		world_node.GetNode("Trails").AddChild(player_trail);
 		camera.toggle_zoomed_in(false);
 
 		camera.camera.Current = IsMultiplayerAuthority();
 	}
 	public override void _PhysicsProcess(double delta)
 	{
-		//no trails if not active or movement
-		if(!active && alive){
+		//rest is movement and controls - synced
+		if(!IsMultiplayerAuthority()){
 			return;
 		}
 
-		//rest is movement and controls - synced
-		if(!IsMultiplayerAuthority()){
+		if(!active || !alive){
 			return;
 		}
 
@@ -188,6 +188,14 @@ public partial class player : CharacterBody3D
 		Velocity = velocity;
 		velocity_magnitude = Velocity.Length();
 		MoveAndSlide();
+
+		for(int i = 0; i < GetSlideCollisionCount(); i++){
+			KinematicCollision3D collision = GetSlideCollision(i);
+			if(collision.GetCollider().HasMethod("draw_mesh")){
+				//dead?
+				die();
+			}
+		}
 	}
 
 	public override void _Input(InputEvent inputEvent){
@@ -213,6 +221,17 @@ public partial class player : CharacterBody3D
 		}
 	}
 	
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer)]	
+	public void die(){
+		if(IsMultiplayerAuthority()){
+			Rpc("die");
+		}
+		alive = false;
+		active = false;
+		Visible = false;
+		world_node.player_died();
+	}
+
 	//moved to trail script
 	/*private void add_trail(float deltaf){
 		//add trail points
@@ -226,14 +245,29 @@ public partial class player : CharacterBody3D
 		}
 	}*/
 
-	private void _on_area_3d_body_entered(Node3D body)
-	{
-		//GD.Print(body);
+	public void spawn_player(Vector3 position){
+		reset_player();
+		active = true;
+		alive = true;
+		Position = position;
 	}
 
-	public void spawn_player(Vector3 position){
-		active = true;
-		Position = position;
+	public void reset_player(){
+		Position = Vector3.Zero;
+		rotators.Rotation = Vector3.Zero;
+		hurtbox.Rotation = Vector3.Zero;
+		move_direction = new Vector3(0,0,1);
+		wheel_position = 0.0f;
+		last_pos = Vector3.Zero;
+		current_normal = new Vector3(0,1,0);
+		Velocity = Vector3.Zero;
+		velocity_magnitude = 1;
+		active = false;
+		alive = false;
+		Visible = true;
+		jump_timer = 0.0f;
+		air_timer = 0.0f;
+		player_trail.reset_trail();
 	}
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer)]	
@@ -244,5 +278,9 @@ public partial class player : CharacterBody3D
 		color = input_color;
 		player_trail.set_color(input_color);
 		mesh.SetInstanceShaderParameter("input_color", color);
+	}
+
+	public void prepare_destruction(){
+		player_trail.QueueFree();
 	}
 }

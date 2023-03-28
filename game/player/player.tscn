@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://by2lxt6065kk5"]
+[gd_scene load_steps=9 format=3 uid="uid://by2lxt6065kk5"]
 
 [ext_resource type="Script" path="res://game/player/player.cs" id="1_oxyv2"]
 [ext_resource type="Script" path="res://game/player/player_camera.cs" id="2_mnuh0"]
@@ -9,9 +9,6 @@ material = ExtResource("2_pxky8")
 size = Vector3(0.5, 1, 2)
 
 [sub_resource type="BoxMesh" id="BoxMesh_rho0k"]
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_hci5h"]
-size = Vector3(0.6, 1, 2.1)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_gdf23"]
 size = Vector3(0.5, 1, 2)
@@ -58,12 +55,6 @@ transform = Transform3D(1.01276, 0, 0, 0, 1.01276, 0, 0, 0, 1.01276, 0, 0.5, 0)
 [node name="trailbottom" type="Marker3D" parent="rotators/mesh"]
 transform = Transform3D(1.01276, 0, 0, 0, 1.01276, 0, 0, 0, 1.01276, 0, -0.5, 0)
 
-[node name="Area3D" type="Area3D" parent="rotators"]
-
-[node name="hurtbox" type="CollisionShape3D" parent="rotators/Area3D"]
-transform = Transform3D(0.999026, 0, 0, 0, 0.999026, 0, 0, 0, 0.999026, 0, 0.05, 0)
-shape = SubResource("BoxShape3D_hci5h")
-
 [node name="hurtbox" type="CollisionShape3D" parent="."]
 transform = Transform3D(0.999026, 0, 0, 0, 0.999026, 0, 0, 0, 0.999026, 0, 0, 0)
 shape = SubResource("BoxShape3D_gdf23")
@@ -104,5 +95,3 @@ mesh = SubResource("BoxMesh_upq8o")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_t5hu2")
-
-[connection signal="body_entered" from="rotators/Area3D" to="." method="_on_area_3d_body_entered"]

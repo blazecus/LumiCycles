@@ -53,6 +53,7 @@ public partial class trail : StaticBody3D
 		if(!parent_player.active || !parent_player.alive){
 			return;
 		}
+		mesh.SetInstanceShaderParameter("input_color", color);
 		float deltaf = (float) delta;
 		trail_timer += deltaf;
 		if(trail_timer > TRAIL_CHECK_INTERVAL){
@@ -246,5 +247,19 @@ public partial class trail : StaticBody3D
 		color = input_color;
 		//imesh.SurfaceSetColor(color);
 		mesh.SetInstanceShaderParameter("input_color", color);
+	}
+
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer)]	
+	public void reset_trail(){
+		trail_timer = -TRAIL_STARTUP;
+		points.Clear();
+		added_points.Clear();
+		imesh.ClearSurfaces();
+		foreach(var child in GetChildren()){
+			if(child is CollisionShape3D){
+				child.QueueFree();
+			}
+		}
+		polygon_counter = 0;
 	}
 }

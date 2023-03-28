@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://clfv5x8b3twc1"]
+[gd_scene load_steps=8 format=3 uid="uid://clfv5x8b3twc1"]
 
 [ext_resource type="Script" path="res://game/world/world.cs" id="1_6e24p"]
 [ext_resource type="PackedScene" uid="uid://bs2waxrg7lr82" path="res://game/world/platform.tscn" id="1_12lab"]
@@ -14,6 +14,20 @@ size = Vector3(100, 100, 100)
 
 [sub_resource type="BoxMesh" id="BoxMesh_jr6as"]
 size = Vector3(100, 100, 100)
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_p2nwh"]
+properties/0/path = NodePath(".:rounds_left")
+properties/0/spawn = true
+properties/0/sync = true
+properties/1/path = NodePath(".:total_rounds")
+properties/1/spawn = true
+properties/1/sync = true
+properties/2/path = NodePath(".:player_count")
+properties/2/spawn = true
+properties/2/sync = true
+properties/3/path = NodePath(".:alive_players")
+properties/3/spawn = true
+properties/3/sync = true
 
 [node name="World" type="Node3D"]
 script = ExtResource("1_6e24p")
@@ -78,47 +92,82 @@ mesh = SubResource("BoxMesh_jr6as")
 
 [node name="Trails" type="Node3D" parent="."]
 
-[node name="CanvasLayer" type="CanvasLayer" parent="."]
+[node name="menu_layer" type="CanvasLayer" parent="."]
 
-[node name="start_button" type="Button" parent="CanvasLayer"]
+[node name="start_button" type="Button" parent="menu_layer"]
 offset_left = 476.0
 offset_top = 448.0
 offset_right = 576.0
 offset_bottom = 479.0
 text = "Start Game!"
 
-[node name="back_button" type="Button" parent="CanvasLayer"]
+[node name="back_button" type="Button" parent="menu_layer"]
 offset_left = 95.0
 offset_top = 90.0
 offset_right = 195.0
 offset_bottom = 121.0
 text = "Back"
 
-[node name="Label" type="Label" parent="CanvasLayer"]
+[node name="Label" type="Label" parent="menu_layer"]
 offset_left = 476.0
 offset_top = 161.0
 offset_right = 516.0
 offset_bottom = 184.0
 
-[node name="numplayers" type="Label" parent="CanvasLayer"]
+[node name="numplayers" type="Label" parent="menu_layer"]
 offset_left = 496.0
 offset_top = 287.0
 offset_right = 536.0
 offset_bottom = 310.0
 
-[node name="debug" type="Label" parent="CanvasLayer"]
+[node name="debug" type="Label" parent="menu_layer"]
 offset_left = 665.0
 offset_top = 205.0
 offset_right = 705.0
 offset_bottom = 228.0
 
-[node name="ColorPickerButton" type="ColorPickerButton" parent="CanvasLayer"]
+[node name="ColorPickerButton" type="ColorPickerButton" parent="menu_layer"]
 offset_left = 799.0
 offset_top = 301.0
 offset_right = 832.0
 offset_bottom = 329.0
 
+[node name="round_count_selector" type="SpinBox" parent="menu_layer"]
+offset_left = 804.0
+offset_top = 126.0
+offset_right = 887.063
+offset_bottom = 157.0
+min_value = 1.0
+value = 1.0
+rounded = true
+
+[node name="player_count_selector" type="SpinBox" parent="menu_layer"]
+offset_left = 903.0
+offset_top = 126.0
+offset_right = 986.063
+offset_bottom = 157.0
+min_value = 1.0
+value = 1.0
+
+[node name="hud_layer" type="CanvasLayer" parent="."]
+
+[node name="winner_label" type="Label" parent="hud_layer"]
+offset_left = 480.0
+offset_top = 178.0
+offset_right = 520.0
+offset_bottom = 201.0
+
+[node name="current_round" type="Label" parent="hud_layer"]
+offset_left = 508.0
+offset_top = 44.0
+offset_right = 548.0
+offset_bottom = 67.0
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_interval = 0.2
+replication_config = SubResource("SceneReplicationConfig_p2nwh")
+
 [connection signal="spawned" from="MultiplayerSpawner" to="." method="_on_multiplayer_spawner_spawned"]
-[connection signal="button_up" from="CanvasLayer/start_button" to="." method="_on_start_button_button_up"]
-[connection signal="button_up" from="CanvasLayer/back_button" to="." method="_on_back_button_button_up"]
-[connection signal="color_changed" from="CanvasLayer/ColorPickerButton" to="." method="_on_color_picker_button_color_changed"]
+[connection signal="button_up" from="menu_layer/start_button" to="." method="_on_start_button_button_up"]
+[connection signal="button_up" from="menu_layer/back_button" to="." method="_on_back_button_button_up"]
+[connection signal="color_changed" from="menu_layer/ColorPickerButton" to="." method="_on_color_picker_button_color_changed"]
