@@ -191,7 +191,7 @@ public partial class player : CharacterBody3D
 
 		for(int i = 0; i < GetSlideCollisionCount(); i++){
 			KinematicCollision3D collision = GetSlideCollision(i);
-			if(collision.GetCollider().HasMethod("draw_mesh")){
+			if(collision.GetCollider().HasMethod("can_kill")){
 				//dead?
 				die();
 			}
@@ -231,19 +231,6 @@ public partial class player : CharacterBody3D
 		Visible = false;
 		world_node.player_died();
 	}
-
-	//moved to trail script
-	/*private void add_trail(float deltaf){
-		//add trail points
-		trail_timer += deltaf;
-		if(trail_timer > TRAIL_CHECK_INTERVAL){
-			if((Position - last_pos).Length() > TRAIL_LENGTH_INTERVAL){
-				player_trail.add_section(trailbottom.GlobalPosition, trailtop.GlobalPosition);
-				last_pos = Position;
-			}
-			trail_timer = 0.0f;
-		}
-	}*/
 
 	public void spawn_player(Vector3 position){
 		reset_player();

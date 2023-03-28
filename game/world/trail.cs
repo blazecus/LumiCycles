@@ -262,4 +262,8 @@ public partial class trail : StaticBody3D
 		}
 		polygon_counter = 0;
 	}
+
+	public bool can_kill(){
+		return true;
+	}
 }

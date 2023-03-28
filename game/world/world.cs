@@ -18,6 +18,7 @@ public partial class world : Node
 	private CanvasLayer hud;
 	private Label info_label;
 	private Node3D players;
+	private map world_map;
 
 	public Godot.Collections.Array<int> player_win_count = new Godot.Collections.Array<int>();
 	private player winner;
@@ -37,6 +38,7 @@ public partial class world : Node
 		hud = GetNode<CanvasLayer>("hud_layer");
 		players = GetNode<Node3D>("Players");
 		info_label = lobby_menu.GetNode<Label>("Label");
+		world_map = GetNode<map>("Map");
 	}
 
 	public override void _Ready()
@@ -88,6 +90,7 @@ public partial class world : Node
 		lobby_menu.GetNode<Button>("start_button").Visible = false;
 		lobby_menu.GetNode<SpinBox>("round_count_selector").Visible = false;
 		lobby_menu.GetNode<SpinBox>("player_count_selector").Visible = false;
+		lobby_menu.GetNode<ColorPickerButton>("ColorPickerButton").Visible = true;
 		Error connection = peer.CreateClient(address, PORT);
 		if(connection != Error.Ok){
 			lobby_menu.GetNode<Label>("Label").Text = "connection failed!";
@@ -155,9 +158,10 @@ public partial class world : Node
 		}
 		hud.GetNode<Label>("winner_label").Visible = false;
 		hud.GetNode<Label>("current_round").Text = "Round " + (total_rounds - rounds_left + 1).ToString();
-		foreach(player p in GetNode<Node3D>("Players").GetChildren()){
+		for(int i = 0; i < players.GetChildCount(); i++){
+			player p = players.GetChild<player>(i);
 			//set up better spawn system later along with map selection
-			p.spawn_player(new Vector3(0,3,0));
+			p.spawn_player(world_map.GetNode<Node3D>("Spawns").GetChild<Marker3D>(i).GlobalPosition);
 		}
 	}
 	
