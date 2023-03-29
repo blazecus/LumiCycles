@@ -24,6 +24,10 @@ script = ExtResource("1_6e24p")
 _spawnable_scenes = PackedStringArray("res://game/player/player.tscn")
 spawn_path = NodePath("../Players")
 
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_interval = 0.2
+replication_config = SubResource("SceneReplicationConfig_p2nwh")
+
 [node name="Players" type="Node3D" parent="."]
 
 [node name="Map" parent="." instance=ExtResource("3_khxse")]
@@ -100,10 +104,6 @@ offset_left = 508.0
 offset_top = 44.0
 offset_right = 548.0
 offset_bottom = 67.0
-
-[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
-replication_interval = 0.2
-replication_config = SubResource("SceneReplicationConfig_p2nwh")
 
 [connection signal="spawned" from="MultiplayerSpawner" to="." method="_on_multiplayer_spawner_spawned"]
 [connection signal="button_up" from="menu_layer/start_button" to="." method="_on_start_button_button_up"]

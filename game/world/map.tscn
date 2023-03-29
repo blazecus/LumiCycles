@@ -354,7 +354,7 @@ transform = Transform3D(1, 0, 0, 0, 0.999999, 0, 0, 0, 0.999999, 0, 0, 0)
 mesh = SubResource("BoxMesh_oth5y")
 
 [node name="OmniLight3D" type="OmniLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 355.862, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 114.944, 0)
 light_color = Color(1, 1, 0.870588, 1)
 light_energy = 50.0
 light_indirect_energy = 50.0

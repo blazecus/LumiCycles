@@ -16,8 +16,9 @@ public partial class trail : StaticBody3D
 	public const float TRAIL_LENGTH_INTERVAL = 0.5f;
 	public const int TRAIL_HITBOX_LAG = 4;
 	public const float TRAIL_STARTUP = 1.5f;
+	public const float UV_SCALING_FACTOR = 1.0f;
 
-	private Material trail_material = GD.Load<Material>("res://assets/materials/bike_material.tres");
+	private Material trail_material = GD.Load<Material>("res://assets/materials/trail_material.tres");
 
 	private MeshInstance3D mesh;
 	private ImmediateMesh imesh;
@@ -69,20 +70,45 @@ public partial class trail : StaticBody3D
 		if(points.Count > 4){
 			imesh.SurfaceBegin(Mesh.PrimitiveType.Triangles, trail_material);
 			for(int i = start_index; i < points.Count - 3; i += 2){
-				imesh.SurfaceAddVertex(points[i]);
-				imesh.SurfaceAddVertex(points[i+1]);
-				imesh.SurfaceAddVertex(points[i+2]);
-
-				imesh.SurfaceAddVertex(points[i+2]);
-				imesh.SurfaceAddVertex(points[i+1]);
+				
+				//triangle 1 front
+				imesh.SurfaceSetUV(new Vector2((i/2) / UV_SCALING_FACTOR, 0));
 				imesh.SurfaceAddVertex(points[i]);
 
+				imesh.SurfaceSetUV(new Vector2((i/2) / UV_SCALING_FACTOR, 1));
 				imesh.SurfaceAddVertex(points[i+1]);
-				imesh.SurfaceAddVertex(points[i+3]);
+
+				imesh.SurfaceSetUV(new Vector2((i/2 + 1) / UV_SCALING_FACTOR,0));
 				imesh.SurfaceAddVertex(points[i+2]);
 
+				//triangle 1 back
+				imesh.SurfaceSetUV(new Vector2((i/2 + 1) / UV_SCALING_FACTOR, 0));
 				imesh.SurfaceAddVertex(points[i+2]);
+				
+				imesh.SurfaceSetUV(new Vector2((i/2) / UV_SCALING_FACTOR, 1));
+				imesh.SurfaceAddVertex(points[i+1]);
+
+				imesh.SurfaceSetUV(new Vector2((i/2) / UV_SCALING_FACTOR, 0));
+				imesh.SurfaceAddVertex(points[i]);
+
+				//triangle 2 front
+				imesh.SurfaceSetUV(new Vector2((i/2) / UV_SCALING_FACTOR, 1));
+				imesh.SurfaceAddVertex(points[i+1]);
+
+				imesh.SurfaceSetUV(new Vector2((i/2 + 1) / UV_SCALING_FACTOR, 1));
 				imesh.SurfaceAddVertex(points[i+3]);
+
+				imesh.SurfaceSetUV(new Vector2((i/2 + 1) / UV_SCALING_FACTOR, 0));
+				imesh.SurfaceAddVertex(points[i+2]);
+
+				//triangle 2 back
+				imesh.SurfaceSetUV(new Vector2((i/2 + 1) / UV_SCALING_FACTOR, 0));
+				imesh.SurfaceAddVertex(points[i+2]);
+
+				imesh.SurfaceSetUV(new Vector2((i/2 + 1) / UV_SCALING_FACTOR, 1));
+				imesh.SurfaceAddVertex(points[i+3]);
+
+				imesh.SurfaceSetUV(new Vector2((i/2) / UV_SCALING_FACTOR, 1));
 				imesh.SurfaceAddVertex(points[i+1]);
 			}
 			imesh.SurfaceEnd();
@@ -93,21 +119,38 @@ public partial class trail : StaticBody3D
 		if(added_points.Count >= 4){
 			imesh.SurfaceBegin(Mesh.PrimitiveType.Triangles, trail_material);
 			int i = added_points.Count - 4;
+			int uv_i = points.Count + added_points.Count - 4;
 
+				//triangle 1 front
+				imesh.SurfaceSetUV(new Vector2((uv_i/2) / UV_SCALING_FACTOR, 0));
 				imesh.SurfaceAddVertex(added_points[i]);
+				imesh.SurfaceSetUV(new Vector2((uv_i/2) / UV_SCALING_FACTOR, 1));
 				imesh.SurfaceAddVertex(added_points[i+1]);
+				imesh.SurfaceSetUV(new Vector2((uv_i/2 + 1) / UV_SCALING_FACTOR,0));
 				imesh.SurfaceAddVertex(added_points[i+2]);
 
+				//triangle 1 back
+				imesh.SurfaceSetUV(new Vector2((uv_i/2 + 1) / UV_SCALING_FACTOR, 0));
 				imesh.SurfaceAddVertex(added_points[i+2]);
+				imesh.SurfaceSetUV(new Vector2((uv_i/2) / UV_SCALING_FACTOR, 1));
 				imesh.SurfaceAddVertex(added_points[i+1]);
+				imesh.SurfaceSetUV(new Vector2((uv_i/2) / UV_SCALING_FACTOR, 0));
 				imesh.SurfaceAddVertex(added_points[i]);
 
+				//triangle 2 front
+				imesh.SurfaceSetUV(new Vector2((uv_i/2) / UV_SCALING_FACTOR, 1));
 				imesh.SurfaceAddVertex(added_points[i+1]);
+				imesh.SurfaceSetUV(new Vector2((uv_i/2 + 1) / UV_SCALING_FACTOR, 1));
 				imesh.SurfaceAddVertex(added_points[i+3]);
+				imesh.SurfaceSetUV(new Vector2((uv_i/2 + 1) / UV_SCALING_FACTOR, 0));
 				imesh.SurfaceAddVertex(added_points[i+2]);
 
+				//triangle 2 back
+				imesh.SurfaceSetUV(new Vector2((uv_i/2 + 1) / UV_SCALING_FACTOR, 0));
 				imesh.SurfaceAddVertex(added_points[i+2]);
+				imesh.SurfaceSetUV(new Vector2((uv_i/2 + 1) / UV_SCALING_FACTOR, 1));
 				imesh.SurfaceAddVertex(added_points[i+3]);
+				imesh.SurfaceSetUV(new Vector2((uv_i/2) / UV_SCALING_FACTOR, 1));
 				imesh.SurfaceAddVertex(added_points[i+1]);
 
 			imesh.SurfaceEnd();
@@ -117,21 +160,38 @@ public partial class trail : StaticBody3D
 				return;
 			}
 			imesh.SurfaceBegin(Mesh.PrimitiveType.Triangles, trail_material);
+				int i = points.Count - 2;
 
+				//triangle 1 front
+				imesh.SurfaceSetUV(new Vector2((i/2) / UV_SCALING_FACTOR, 0));
 				imesh.SurfaceAddVertex(points[points.Count-2]);
+				imesh.SurfaceSetUV(new Vector2((i/2) / UV_SCALING_FACTOR, 1));
 				imesh.SurfaceAddVertex(points[points.Count-1]);
+				imesh.SurfaceSetUV(new Vector2((i/2 + 1) / UV_SCALING_FACTOR,0));
 				imesh.SurfaceAddVertex(added_points[0]);
 
+				//triangle 1 back
+				imesh.SurfaceSetUV(new Vector2((i/2 + 1) / UV_SCALING_FACTOR, 0));
 				imesh.SurfaceAddVertex(added_points[0]);
+				imesh.SurfaceSetUV(new Vector2((i/2) / UV_SCALING_FACTOR, 1));
 				imesh.SurfaceAddVertex(points[points.Count-1]);
+				imesh.SurfaceSetUV(new Vector2((i/2) / UV_SCALING_FACTOR, 0));
 				imesh.SurfaceAddVertex(points[points.Count-2]);
 
+				//triangle 2 front
+				imesh.SurfaceSetUV(new Vector2((i/2) / UV_SCALING_FACTOR, 1));
 				imesh.SurfaceAddVertex(points[points.Count-1]);
+				imesh.SurfaceSetUV(new Vector2((i/2 + 1) / UV_SCALING_FACTOR, 1));
 				imesh.SurfaceAddVertex(added_points[1]);
+				imesh.SurfaceSetUV(new Vector2((i/2 + 1) / UV_SCALING_FACTOR, 0));
 				imesh.SurfaceAddVertex(added_points[0]);
 
+				//triangle 2 back
+				imesh.SurfaceSetUV(new Vector2((i/2 + 1) / UV_SCALING_FACTOR, 0));
 				imesh.SurfaceAddVertex(added_points[0]);
+				imesh.SurfaceSetUV(new Vector2((i/2 + 1) / UV_SCALING_FACTOR, 1));
 				imesh.SurfaceAddVertex(added_points[1]);
+				imesh.SurfaceSetUV(new Vector2((i/2) / UV_SCALING_FACTOR, 1));
 				imesh.SurfaceAddVertex(points[points.Count-1]);
 
 			imesh.SurfaceEnd();
