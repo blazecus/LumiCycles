@@ -34,6 +34,9 @@ void fragment() {
 	
 	color *= step(0.2, fpos.y);
 	
+	color = min(vec3(.6), color);
+	color += .7 + sin(TIME) * 1.3;
+	
 	ALBEDO = vec3((1.0-color) * input_color.xyz);
 	
 }

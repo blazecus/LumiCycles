@@ -2,14 +2,13 @@ using Godot;
 using System;
 public partial class player_camera : Node3D
 {
-	[Export]
 	private const float MIN_ZOOM = 2.0f;
-	[Export]
 	private const float MAX_ZOOM = 10.0f;
-	[Export]
 	private const float CONTROLLER_SENSITIVITY = 3000.0f;
 	private const float DEFAULT_ZOOM = 10.0f;
 	private const float BOOST_ZOOM = 6.0f;
+	private const float CAMERA_CORRECTION_SPEED = 1.2f;
+	private const float DEFAULT_CAMERA_X_ROTATION = -Mathf.Pi/6.0f;
 	private CharacterBody3D player;
 	private Node3D h;
 	private Node3D v;
@@ -31,6 +30,8 @@ public partial class player_camera : Node3D
 	private float goal_zoom = 4.0f;
 	private float current_zoom  = 4.0f;
 	private float zoom_speed = 10.0f;
+
+	public Vector3 goal_rotation = Vector3.Zero;
 
 	public override void _EnterTree(){
 		SetMultiplayerAuthority(Int32.Parse(GetParent().Name));
@@ -108,21 +109,41 @@ public partial class player_camera : Node3D
 
 		if(settings.Instance.controller_toggle){
 			//CONTROLLER CONTROLS
-			crh += controller_right_x * hs * CONTROLLER_SENSITIVITY * (float) delta;
-			crv -= controller_right_y * vs * CONTROLLER_SENSITIVITY * (float) delta;
+			//if(new Vector2(controller_right_x, controller_right_y).Length() < .05f){
+			//	Mathf.Lerp
+			//	crh += CAMERA_CORRECTION_SPEED * (float) delta * Mathf.Sign(goal_rotation_x - crh);
+			//	crv += CAMERA_CORRECTION_SPEED * (float) delta * Mathf.Sign(-40 - crv);
+			//}
+			//else{
+				crh += controller_right_x * hs * CONTROLLER_SENSITIVITY * (float) delta;
+				crv -= controller_right_y * vs * CONTROLLER_SENSITIVITY * (float) delta;
+			//}
 		}
 
 		//CAMERA ROTATION
 		float fdelta = (float) delta;
 		crv = Mathf.Clamp(crv, crv_min, crv_max);
 
-		Vector3 replace_rotation_h = h.Rotation;
-		replace_rotation_h.Y = Mathf.DegToRad(Mathf.Lerp(Mathf.RadToDeg(h.Rotation.Y), crh, fdelta * ha));
-		h.Rotation = replace_rotation_h;
+		if(new Vector2(controller_right_x, controller_right_y).Length() < .05f){
+			Vector3 replace_rotation_h = h.Rotation;
+			replace_rotation_h.Y = Mathf.LerpAngle(replace_rotation_h.Y, goal_rotation.Y, CAMERA_CORRECTION_SPEED * (float) delta);
+			h.Rotation = replace_rotation_h;
+			crh = Mathf.RadToDeg(h.Rotation.Y);
 
-		Vector3 replace_rotation_v = v.Rotation;
-		replace_rotation_v.X = Mathf.DegToRad(Mathf.Lerp(Mathf.RadToDeg(v.Rotation.X), crv, fdelta * va));
-		v.Rotation = replace_rotation_v;
+			Vector3 replace_rotation_v = v.Rotation;
+			replace_rotation_v.X = Mathf.LerpAngle(replace_rotation_v.X, -goal_rotation.X + DEFAULT_CAMERA_X_ROTATION, CAMERA_CORRECTION_SPEED * (float) delta);
+			v.Rotation = replace_rotation_v;
+			crv = Mathf.RadToDeg(v.Rotation.X);
+		}
+		else{
+			Vector3 replace_rotation_h = h.Rotation;
+			replace_rotation_h.Y = Mathf.DegToRad(Mathf.Lerp(Mathf.RadToDeg(h.Rotation.Y), crh, fdelta * ha));
+			h.Rotation = replace_rotation_h;
+
+			Vector3 replace_rotation_v = v.Rotation;
+			replace_rotation_v.X = Mathf.DegToRad(Mathf.Lerp(Mathf.RadToDeg(v.Rotation.X), crv, fdelta * va));
+			v.Rotation = replace_rotation_v;
+		}
 
 		//ZOOM
 		// zoom_direction = Mathf.Clamp(zoom_direction - Mathf.Sign(zoom_direction) * fdelta * 2.0f, (float) Mathf.Min(0, Mathf.Sign(zoom_direction)), (float) Mathf.Max(0, Mathf.Sign(zoom_direction)));
