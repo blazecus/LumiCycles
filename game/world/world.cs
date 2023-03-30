@@ -20,8 +20,11 @@ public partial class world : Node
 	private Node3D players;
 	private map world_map;
 
+	[Export]
 	public Godot.Collections.Array<int> player_win_count = new Godot.Collections.Array<int>();
-	private player winner;
+	
+	[Export]
+	public string winner_name = "";
 	private bool host = true;
 	[Export]
 	private int rounds_left = 1;
@@ -177,7 +180,7 @@ public partial class world : Node
 		GetTree().ChangeSceneToPacked(start_screen);
 	}
 
-	private void _on_multiplayer_spawner_spawned(){
+	public void _on_multiplayer_spawner_spawned(Node spawned_node){
 		lobby_menu.GetNode<Label>("debug").Text = Multiplayer.GetPeers().Count().ToString();
 	}
 
@@ -191,42 +194,47 @@ public partial class world : Node
 	}
 
 	public void player_died(){
-		alive_players -= 1;
-
 		if(!IsMultiplayerAuthority()){
 			return;
 		}
+
 		//check if round is over
 		check_end_round();
 	}
 
-	[Rpc(MultiplayerApi.RpcMode.AnyPeer)]	
+	
 	public void check_end_round(){
-		if(IsMultiplayerAuthority()){
-			Rpc("check_end_round");
-		}
-
 		if(players.GetChildCount() == 1){
-			winner = players.GetChild<player>(0);
+			//winner_name = players.GetChild<player>(0).Name;
 			player_win_count[0]++;
-			end_round();
+			end_round(players.GetChild<player>(0).Name);
 		}
 		else{
+			int alive = 0;
+			int alive_idx = 0;
 			for(int i = 0; i < players.GetChildCount(); i++){
 				if(players.GetChild<player>(i).alive){
-					winner = players.GetChild<player>(i);
-					player_win_count[i]++;
-					end_round();
+					alive++;
+					alive_idx = i;
 				}
+			}
+			if(alive == 1){
+				//winner_name = players.GetChild<player>(alive_idx).Name;
+				player_win_count[alive_idx]++;
+				end_round(players.GetChild<player>(alive_idx).Name);
 			}
 		}
 	}
 
-	public void end_round(){
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer)]	
+	public void end_round(string winner_name){
+		if(IsMultiplayerAuthority()){
+			Rpc("end_round", winner_name);
+		}
 		end_round_time = END_ROUND_TIMER;
 
 		hud.GetNode<Label>("winner_label").Visible = true;
-		hud.GetNode<Label>("winner_label").Text = winner.Name + " wins!";
+		hud.GetNode<Label>("winner_label").Text = winner_name + " wins!";
 	}
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer)]	

@@ -7,7 +7,7 @@ public partial class player_camera : Node3D
 	private const float CONTROLLER_SENSITIVITY = 3000.0f;
 	private const float DEFAULT_ZOOM = 10.0f;
 	private const float BOOST_ZOOM = 6.0f;
-	private const float CAMERA_CORRECTION_SPEED = 1.2f;
+	private const float CAMERA_CORRECTION_SPEED = 1.5f;
 	private const float DEFAULT_CAMERA_X_ROTATION = -Mathf.Pi/6.0f;
 	private CharacterBody3D player;
 	private Node3D h;
@@ -32,6 +32,7 @@ public partial class player_camera : Node3D
 	private float zoom_speed = 10.0f;
 
 	public Vector3 goal_rotation = Vector3.Zero;
+	public bool follow_toggle = true;
 
 	public override void _EnterTree(){
 		SetMultiplayerAuthority(Int32.Parse(GetParent().Name));
@@ -109,22 +110,22 @@ public partial class player_camera : Node3D
 
 		if(settings.Instance.controller_toggle){
 			//CONTROLLER CONTROLS
-			//if(new Vector2(controller_right_x, controller_right_y).Length() < .05f){
-			//	Mathf.Lerp
-			//	crh += CAMERA_CORRECTION_SPEED * (float) delta * Mathf.Sign(goal_rotation_x - crh);
-			//	crv += CAMERA_CORRECTION_SPEED * (float) delta * Mathf.Sign(-40 - crv);
-			//}
-			//else{
-				crh += controller_right_x * hs * CONTROLLER_SENSITIVITY * (float) delta;
-				crv -= controller_right_y * vs * CONTROLLER_SENSITIVITY * (float) delta;
-			//}
+			crh += controller_right_x * hs * CONTROLLER_SENSITIVITY * (float) delta;
+			crv -= controller_right_y * vs * CONTROLLER_SENSITIVITY * (float) delta;
 		}
 
 		//CAMERA ROTATION
 		float fdelta = (float) delta;
 		crv = Mathf.Clamp(crv, crv_min, crv_max);
 
-		if(new Vector2(controller_right_x, controller_right_y).Length() < .05f){
+		if(Input.IsActionJustPressed("camera_reset")){
+			follow_toggle = true;
+		}
+		else if ((new Vector2(controller_right_x, controller_right_y).Length() > 0.1f)){
+			follow_toggle = false;
+		}
+
+		if(follow_toggle){
 			Vector3 replace_rotation_h = h.Rotation;
 			replace_rotation_h.Y = Mathf.LerpAngle(replace_rotation_h.Y, goal_rotation.Y, CAMERA_CORRECTION_SPEED * (float) delta);
 			h.Rotation = replace_rotation_h;

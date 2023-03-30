@@ -71,7 +71,7 @@ public partial class player : CharacterBody3D
 	}
 	public override void _PhysicsProcess(double delta)
 	{
-		//rest is movement and controls - synced
+		//only run process if authority
 		if(!IsMultiplayerAuthority()){
 			return;
 		}
