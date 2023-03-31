@@ -61,10 +61,11 @@ public partial class player : CharacterBody3D
 		trailbottom = GetNode<Marker3D>("rotators/mesh/trailbottom");
 		camera = GetNode<player_camera>("PlayerCamera");
 		slope_check = GetNode<Node3D>("slope_check");
-		player_trail = (trail) trail_scene.Instantiate();
-		player_trail.setup(this);
+		player_trail = GetNode<trail>("trail");
+		//player_trail = (trail) trail_scene.Instantiate();
+		//player_trail.setup(this);
 		world_node = GetParent().GetParent<world>();
-		world_node.GetNode("Trails").AddChild(player_trail);
+		//world_node.GetNode("Trails").AddChild(player_trail);
 		camera.toggle_zoomed_in(false);
 
 		camera.camera.Current = IsMultiplayerAuthority();
@@ -230,7 +231,8 @@ public partial class player : CharacterBody3D
 		}
 		alive = false;
 		active = false;
-		Visible = false;
+		rotators.Visible = false;
+		hurtbox.Disabled = true;
 		world_node.player_died();
 	}
 
@@ -254,6 +256,8 @@ public partial class player : CharacterBody3D
 		active = false;
 		alive = false;
 		Visible = true;
+		rotators.Visible = true;
+		hurtbox.Disabled = false;
 		jump_timer = 0.0f;
 		air_timer = 0.0f;
 		player_trail.reset_trail();

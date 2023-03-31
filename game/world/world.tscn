@@ -13,9 +13,6 @@ properties/1/sync = true
 properties/2/path = NodePath(".:player_win_count")
 properties/2/spawn = true
 properties/2/sync = true
-properties/3/path = NodePath(".:winner_name")
-properties/3/spawn = true
-properties/3/sync = true
 
 [node name="World" type="Node3D"]
 script = ExtResource("1_6e24p")
@@ -31,8 +28,6 @@ replication_config = SubResource("SceneReplicationConfig_p2nwh")
 [node name="Players" type="Node3D" parent="."]
 
 [node name="Map" parent="." instance=ExtResource("3_khxse")]
-
-[node name="Trails" type="Node3D" parent="."]
 
 [node name="menu_layer" type="CanvasLayer" parent="."]
 

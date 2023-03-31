@@ -33,20 +33,22 @@ public partial class trail : StaticBody3D
 	private Vector3 last_player_pos = Vector3.Zero;
 	public Color color = new Color(0.0f, 0.0f, 0.0f, 1.0f);
 
-	public void setup(player player_s){
+	public void setup(){
+
+	}
+
+	public override void _Ready()
+	{
 		mesh = GetNode<MeshInstance3D>("mesh");
 		//imesh = (ImmediateMesh) mesh.Mesh;
 		imesh = new ImmediateMesh();
 		mesh.Mesh = imesh;
 		points = new Godot.Collections.Array<Vector3>();
 		added_points = new Godot.Collections.Array<Vector3>();
-		parent_player = player_s;
+		parent_player = GetParent<player>();
 		network_authority_id = Int32.Parse(parent_player.Name);
 		SetMultiplayerAuthority(network_authority_id);
 		trail_timer = -TRAIL_STARTUP;
-	}
-	public override void _Ready()
-	{
 	}
 
 	public override void _Process(double delta)

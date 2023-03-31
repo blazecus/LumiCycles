@@ -1,9 +1,10 @@
-[gd_scene load_steps=11 format=3 uid="uid://by2lxt6065kk5"]
+[gd_scene load_steps=12 format=3 uid="uid://by2lxt6065kk5"]
 
 [ext_resource type="Script" path="res://game/player/player.cs" id="1_oxyv2"]
 [ext_resource type="Script" path="res://game/player/player_camera.cs" id="2_mnuh0"]
 [ext_resource type="Material" uid="uid://c3txy5w43kvy7" path="res://assets/materials/bike_material.tres" id="2_pxky8"]
 [ext_resource type="Material" uid="uid://cjehqtcjxfx7n" path="res://assets/materials/pixelization_post_processing.tres" id="4_e7s5m"]
+[ext_resource type="PackedScene" uid="uid://b2k6olndq6bwm" path="res://game/world/trail.tscn" id="5_wt6sh"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_k8vaj"]
 material = ExtResource("2_pxky8")
@@ -102,6 +103,9 @@ mesh = SubResource("BoxMesh_upq8o")
 
 [node name="normal_check" type="MeshInstance3D" parent="."]
 mesh = SubResource("BoxMesh_upq8o")
+
+[node name="trail" parent="." instance=ExtResource("5_wt6sh")]
+top_level = true
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_t5hu2")
