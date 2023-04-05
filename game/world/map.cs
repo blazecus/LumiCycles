@@ -56,22 +56,22 @@ public partial class map : Node3D
 		points.Add(start_pos);
 
 		if(dir.X == 1){
-			points.Add(start_pos + new Vector3(0,GRID_EDGE_WIDTH,0));
-			points.Add(start_pos + new Vector3(0,0,GRID_EDGE_WIDTH));
-			points.Add(start_pos + new Vector3(0,GRID_EDGE_WIDTH,GRID_EDGE_WIDTH));
-
 			points.Add(start_pos + new Vector3(total_grid_size,0,0));
+			points.Add(start_pos + new Vector3(0,GRID_EDGE_WIDTH,0));
 			points.Add(start_pos + new Vector3(total_grid_size,GRID_EDGE_WIDTH,0));
+
+			points.Add(start_pos + new Vector3(0,0,GRID_EDGE_WIDTH));
 			points.Add(start_pos + new Vector3(total_grid_size,0,GRID_EDGE_WIDTH));
+			points.Add(start_pos + new Vector3(0,GRID_EDGE_WIDTH,GRID_EDGE_WIDTH));
 			points.Add(start_pos + new Vector3(total_grid_size,GRID_EDGE_WIDTH,GRID_EDGE_WIDTH));
 		}
 		else if(dir.Y == 1){
 			points.Add(start_pos + new Vector3(GRID_EDGE_WIDTH,0,0));
-			points.Add(start_pos + new Vector3(0,0,GRID_EDGE_WIDTH));
-			points.Add(start_pos + new Vector3(GRID_EDGE_WIDTH,0,GRID_EDGE_WIDTH));
-
 			points.Add(start_pos + new Vector3(0,total_grid_size,0));
 			points.Add(start_pos + new Vector3(GRID_EDGE_WIDTH,total_grid_size,0));
+
+			points.Add(start_pos + new Vector3(0,0,GRID_EDGE_WIDTH));
+			points.Add(start_pos + new Vector3(GRID_EDGE_WIDTH,0,GRID_EDGE_WIDTH));
 			points.Add(start_pos + new Vector3(0,total_grid_size,GRID_EDGE_WIDTH));
 			points.Add(start_pos + new Vector3(GRID_EDGE_WIDTH,total_grid_size,GRID_EDGE_WIDTH));
 		}
@@ -91,56 +91,57 @@ public partial class map : Node3D
 
 	private void draw_grid_line(Godot.Collections.Array<Vector3> points){
 		//bottom face
-		imesh.SurfaceAddVertex(points[0]);
-		imesh.SurfaceAddVertex(points[1]);
-		imesh.SurfaceAddVertex(points[2]);
 
+		imesh.SurfaceAddVertex(points[0]);
+		imesh.SurfaceAddVertex(points[4]);
 		imesh.SurfaceAddVertex(points[1]);
-		imesh.SurfaceAddVertex(points[2]);
-		imesh.SurfaceAddVertex(points[3]);
+
+		imesh.SurfaceAddVertex(points[5]);
+		imesh.SurfaceAddVertex(points[1]);
+		imesh.SurfaceAddVertex(points[4]);
 
 		//side faces
 		imesh.SurfaceAddVertex(points[0]);
-		imesh.SurfaceAddVertex(points[1]);
-		imesh.SurfaceAddVertex(points[5]);
+		imesh.SurfaceAddVertex(points[2]);
+		imesh.SurfaceAddVertex(points[4]);
+
+		imesh.SurfaceAddVertex(points[6]);
+		imesh.SurfaceAddVertex(points[4]);
+		imesh.SurfaceAddVertex(points[2]);
+
 
 		imesh.SurfaceAddVertex(points[4]);
+		imesh.SurfaceAddVertex(points[6]);
 		imesh.SurfaceAddVertex(points[5]);
-		imesh.SurfaceAddVertex(points[0]);
+
+		imesh.SurfaceAddVertex(points[7]);
+		imesh.SurfaceAddVertex(points[5]);
+		imesh.SurfaceAddVertex(points[6]);	
 
 
+		imesh.SurfaceAddVertex(points[5]);
+		imesh.SurfaceAddVertex(points[7]);
 		imesh.SurfaceAddVertex(points[1]);
-		imesh.SurfaceAddVertex(points[3]);
-		imesh.SurfaceAddVertex(points[7]);
-
-		imesh.SurfaceAddVertex(points[5]);
-		imesh.SurfaceAddVertex(points[7]);
-		imesh.SurfaceAddVertex(points[1]);	
-
 
 		imesh.SurfaceAddVertex(points[3]);
-		imesh.SurfaceAddVertex(points[2]);
-		imesh.SurfaceAddVertex(points[6]);
-
+		imesh.SurfaceAddVertex(points[1]);
 		imesh.SurfaceAddVertex(points[7]);
-		imesh.SurfaceAddVertex(points[6]);
-		imesh.SurfaceAddVertex(points[3]);
 		
+		imesh.SurfaceAddVertex(points[1]);
+		imesh.SurfaceAddVertex(points[3]);
+		imesh.SurfaceAddVertex(points[0]);
+
 		imesh.SurfaceAddVertex(points[2]);
 		imesh.SurfaceAddVertex(points[0]);
-		imesh.SurfaceAddVertex(points[4]);
-
-		imesh.SurfaceAddVertex(points[6]);
-		imesh.SurfaceAddVertex(points[4]);
-		imesh.SurfaceAddVertex(points[2]);
+		imesh.SurfaceAddVertex(points[3]);
 
 		//top face
-		imesh.SurfaceAddVertex(points[4]);
-		imesh.SurfaceAddVertex(points[5]);
 		imesh.SurfaceAddVertex(points[6]);
-
-		imesh.SurfaceAddVertex(points[5]);
-		imesh.SurfaceAddVertex(points[6]);
+		imesh.SurfaceAddVertex(points[2]);
 		imesh.SurfaceAddVertex(points[7]);
+
+		imesh.SurfaceAddVertex(points[3]);
+		imesh.SurfaceAddVertex(points[7]);
+		imesh.SurfaceAddVertex(points[2]);
 	}
 }

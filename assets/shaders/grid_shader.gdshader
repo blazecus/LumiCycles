@@ -27,7 +27,8 @@ void fragment() {
 	float dist = length(VERTEX - CAMERA_POSITION_WORLD);
 	float alpha_factor = 1.0f - dist / 200.0f;
 	ALPHA = alpha_factor * step(0.0f,alpha_factor);
+	ALPHA = 1.0f;
 	//ALBEDO = input_color.xyz / 2.0f + vec3(col * col * input_color.xyz);
-	ALBEDO = vec3(VERTEX.y);
+	ALBEDO = vec3(1);
 	//ALBEDO = vec3( col * input_color.xyz);
 }
