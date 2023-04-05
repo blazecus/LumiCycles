@@ -1,9 +1,11 @@
-[gd_scene load_steps=8 format=3 uid="uid://biw0elc50uhw3"]
+[gd_scene load_steps=9 format=3 uid="uid://biw0elc50uhw3"]
 
 [ext_resource type="Script" path="res://game/world/map.cs" id="1_egvj7"]
 [ext_resource type="PackedScene" uid="uid://bs2waxrg7lr82" path="res://game/world/platform.tscn" id="2_58t8q"]
 
 [sub_resource type="Environment" id="Environment_a1mh4"]
+
+[sub_resource type="ImmediateMesh" id="ImmediateMesh_ixxyd"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_ojiji"]
 size = Vector3(200, 10, 100)
@@ -25,6 +27,9 @@ environment = SubResource("Environment_a1mh4")
 
 [node name="Platform" parent="." instance=ExtResource("2_58t8q")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+
+[node name="grid" type="MeshInstance3D" parent="."]
+mesh = SubResource("ImmediateMesh_ixxyd")
 
 [node name="Spawns" type="Node3D" parent="."]
 

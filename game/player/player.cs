@@ -197,7 +197,6 @@ public partial class player : CharacterBody3D
 				die();
 			}
 		}
-
 		camera.goal_rotation = new Vector3(rotators.Rotation.X, rotators.Rotation.Y - Mathf.Pi, rotators.Rotation.Z);
 	}
 

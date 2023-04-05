@@ -99,6 +99,9 @@ public partial class player_camera : Node3D
 		if(!IsMultiplayerAuthority()){
 			return;
 		}
+
+		camera.GetNode<MeshInstance3D>("post_processing").SetInstanceShaderParameter("camera_position", GlobalPosition);
+
 		if(goal_zoom != camera.Position.Z){
 			int zoom_goal_direction = MathF.Sign(goal_zoom - camera.Position.Z);
 			current_zoom += zoom_goal_direction * (float) delta * zoom_speed;
