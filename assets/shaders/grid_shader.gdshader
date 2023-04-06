@@ -11,24 +11,8 @@ float random2 (in vec2 st) {
 }
 
 void fragment() {
-	vec3 grid = vec3(4, 4,4);
-	vec3 uvt = VERTEX * grid;
-	
-	vec3 ipos = floor(uvt);
-	vec3 fpos = fract(uvt);
-	
-	float vel = (random(ipos.x) + 0.3) * 15.0f;
-	float len = random(abs(sin(ipos.x + 0.5)) * 6.0f) * 40.0f;
-	
-	//ALBEDO = vec3(vel);
-	float lin = mod(UV.y - TIME * vel, len) / len;
-	vec3 col = vec3(pow(6, lin * 2.0f) / 32.0f + 0.2f);
-	
-	float dist = length(VERTEX - CAMERA_POSITION_WORLD);
-	float alpha_factor = 1.0f - dist / 200.0f;
-	ALPHA = alpha_factor * step(0.0f,alpha_factor);
-	ALPHA = 1.0f;
-	//ALBEDO = input_color.xyz / 2.0f + vec3(col * col * input_color.xyz);
-	ALBEDO = vec3(1);
-	//ALBEDO = vec3( col * input_color.xyz);
+	ALPHA = 0.3f;
+	ALPHA *= step(5, length(CAMERA_POSITION_WORLD - VERTEX));
+	ALBEDO = vec3(length(CAMERA_POSITION_WORLD - VERTEX) / 100.0f);
+	//ALBEDO = vec3(random2(UV));
 }

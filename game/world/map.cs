@@ -4,8 +4,8 @@ using System;
 public partial class map : Node3D
 {
 	const int GRID_SIZE = 20;
-	const float GRID_CELL_SIZE = 40.0f;
-	const float GRID_EDGE_WIDTH = 5.0f;
+	const float GRID_CELL_SIZE = 25.0f;
+	const float GRID_EDGE_WIDTH = 1.5f;
 	private Material grid_material = GD.Load<Material>("res://assets/materials/grid_material.tres");
 	private MeshInstance3D mesh;
 	private ImmediateMesh imesh;

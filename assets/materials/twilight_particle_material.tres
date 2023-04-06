@@ -1,0 +1,7 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://cundg7pqihwg5"]
+
+[ext_resource type="Shader" path="res://assets/shaders/twilight_particle_shader.gdshader" id="1_ug0ue"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_ug0ue")

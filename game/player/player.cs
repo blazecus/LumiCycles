@@ -161,9 +161,10 @@ public partial class player : CharacterBody3D
 		Vector3 lookat_pos = GlobalPosition - move_direction * 3;
 		rotators.LookAt(lookat_pos, current_normal);
 		hurtbox.LookAt(lookat_pos, current_normal); 
-
+		
 		//movement!
 		if(IsOnFloor() && jump_timer > JUMP_BUFFER){
+			rotators.Rotate(move_direction, -rotation_amount * 8.0f);
 			bool boosting = Input.IsActionPressed("boost");
 			camera.toggle_zoomed_in(boosting);
 			if(velocity.Length() >= TOP_SPEED){

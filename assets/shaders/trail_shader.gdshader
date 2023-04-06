@@ -17,8 +17,8 @@ void fragment() {
 	vec2 ipos = floor(uvt);
 	vec2 fpos = fract(uvt);
 	
-	float vel = (random(ipos.y) + 0.3) * 15.0f;
-	float len = random(abs(sin(ipos.y + 0.5)) * 6.0f) * 40.0f;
+	float vel = (random(ipos.y) + 0.3) * 7.5f;
+	float len = random(abs(sin(ipos.y + 0.5)) * 6.0f) * 7.0f;
 	
 	//ALBEDO = vec3(vel);
 	float lin = mod(UV.x - TIME * vel, len) / len;
@@ -26,5 +26,9 @@ void fragment() {
 		
 	ALPHA = 0.85f + col.r / 6.0f;
 	ALBEDO = input_color.xyz / 2.0f + vec3(col * col * input_color.xyz);
-	//ALBEDO = vec3( col * input_color.xyz);
+	
+	float vy = UV.y - sign(UV.y - 0.5f) * random2(UV + VERTEX.xz) * .06f;
+	if(vy < 0.09f || vy > 0.91f){
+	ALBEDO += vec3(0.85f);
+	}
 }
