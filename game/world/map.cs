@@ -9,9 +9,12 @@ public partial class map : Node3D
 	private Material grid_material = GD.Load<Material>("res://assets/materials/grid_material.tres");
 	private MeshInstance3D mesh;
 	private ImmediateMesh imesh;
+	private world world_node;
 
 	public override void _Ready()
 	{
+		world_node = GetParent<world>();
+
 		mesh = GetNode<MeshInstance3D>("grid");
 		imesh = new ImmediateMesh();
 		mesh.Mesh = imesh;
@@ -21,6 +24,7 @@ public partial class map : Node3D
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
+		mesh.SetInstanceShaderParameter("player_position", world_node.authority_player_position);
 	}
 
 

@@ -26,9 +26,10 @@ void fragment() {
 		
 	ALPHA = 0.85f + col.r / 6.0f;
 	ALBEDO = input_color.xyz / 2.0f + vec3(col * col * input_color.xyz);
+	//ALBEDO *= 1.3f;
 	
 	float vy = UV.y - sign(UV.y - 0.5f) * random2(UV + VERTEX.xz) * .06f;
 	if(vy < 0.09f || vy > 0.91f){
-	ALBEDO += vec3(0.85f);
+		ALBEDO += vec3(0.85f);
 	}
 }

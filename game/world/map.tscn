@@ -27,8 +27,6 @@ direction = Vector3(0, 1, 0)
 gravity = Vector3(0, 3, 0)
 initial_velocity_min = 5.0
 initial_velocity_max = 5.0
-angular_velocity_min = 1.54
-angular_velocity_max = 1.54
 
 [sub_resource type="BoxMesh" id="BoxMesh_3rd0x"]
 material = ExtResource("3_2rdbm")
@@ -340,15 +338,6 @@ shape = SubResource("BoxShape3D_c3py4")
 transform = Transform3D(1, 0, 0, 0, 0.999999, 0, 0, 0, 0.999999, 0, 0, 0)
 mesh = SubResource("BoxMesh_oth5y")
 
-[node name="OmniLight3D" type="OmniLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 114.944, 0)
-light_color = Color(1, 1, 0.870588, 1)
-light_energy = 50.0
-light_indirect_energy = 50.0
-light_size = 1.0
-light_specular = 2.0
-omni_range = 735.167
-
 [node name="GPUParticles3D" type="GPUParticles3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 17.3152, 0)
 amount = 2500
@@ -357,3 +346,9 @@ collision_base_size = 0.0
 visibility_aabb = AABB(-250, -250, -250, 500, 500, 500)
 process_material = SubResource("ParticleProcessMaterial_m0edg")
 draw_pass_1 = SubResource("BoxMesh_3rd0x")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.886809, 0.462136, 0, -0.462136, 0.886809, 0, 377.694, 542.598)
+light_energy = 3.441
+light_indirect_energy = 5.701
+shadow_enabled = true

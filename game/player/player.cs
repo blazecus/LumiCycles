@@ -81,6 +81,8 @@ public partial class player : CharacterBody3D
 			return;
 		}
 
+		world_node.authority_player_position = Position;
+
 		float deltaf = (float) delta;
 
 		//trail logic moved to trail script

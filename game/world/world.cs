@@ -35,6 +35,7 @@ public partial class world : Node
 	[Export]
 	private int alive_players = 1;
 	private float end_round_time = 0.0f;
+	public Vector3 authority_player_position = Vector3.Zero;
 
 	public override void _EnterTree(){
 		lobby_menu = GetNode<CanvasLayer>("menu_layer");
