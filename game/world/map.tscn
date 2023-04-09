@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://biw0elc50uhw3"]
+[gd_scene load_steps=13 format=3 uid="uid://biw0elc50uhw3"]
 
 [ext_resource type="Script" path="res://game/world/map.cs" id="1_egvj7"]
 [ext_resource type="PackedScene" uid="uid://bs2waxrg7lr82" path="res://game/world/platform.tscn" id="2_58t8q"]
@@ -6,7 +6,6 @@
 
 [sub_resource type="Environment" id="Environment_a1mh4"]
 ambient_light_color = Color(0.152941, 0.152941, 0.152941, 1)
-glow_enabled = true
 glow_strength = 0.91
 
 [sub_resource type="ImmediateMesh" id="ImmediateMesh_ixxyd"]
@@ -34,6 +33,8 @@ initial_velocity_max = 5.0
 [sub_resource type="BoxMesh" id="BoxMesh_3rd0x"]
 material = ExtResource("3_2rdbm")
 
+[sub_resource type="BoxMesh" id="BoxMesh_0idqi"]
+
 [node name="Map" type="Node3D"]
 script = ExtResource("1_egvj7")
 
@@ -41,16 +42,23 @@ script = ExtResource("1_egvj7")
 environment = SubResource("Environment_a1mh4")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.886809, 0.462136, 0, -0.462136, 0.886809, 0, 377.694, 542.598)
-light_energy = 3.441
-light_indirect_energy = 5.701
+transform = Transform3D(1, 0, 0, 0, 0.886809, 0.462136, 0, -0.462136, 0.886809, 0, 0, 0)
 shadow_enabled = true
+shadow_reverse_cull_face = true
+directional_shadow_split_1 = 0.474
+directional_shadow_split_2 = 0.665
+directional_shadow_split_3 = 0.137
+directional_shadow_blend_splits = true
+directional_shadow_fade_start = 0.341
+directional_shadow_max_distance = 500.0
 
 [node name="Platform" parent="." instance=ExtResource("2_58t8q")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 
 [node name="grid" type="MeshInstance3D" parent="."]
 mesh = SubResource("ImmediateMesh_ixxyd")
+
+[node name="grid_meshes" type="Node3D" parent="."]
 
 [node name="Spawns" type="Node3D" parent="."]
 
@@ -69,7 +77,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 125, 50, 125)
 [node name="Ramps" type="Node3D" parent="."]
 
 [node name="Ramp1" type="StaticBody3D" parent="Ramps"]
-transform = Transform3D(1, 0, 0, 0, 0.879067, 0.476699, 0, -0.476699, 0.879067, 0, 20, 150)
+transform = Transform3D(1, 0, 0, 0, 0.882948, 0.469472, 0, -0.469472, 0.882948, 0, 20, 150)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Ramps/Ramp1"]
 transform = Transform3D(1, 0, 0, 0, 1, -5.96046e-08, 0, 5.96046e-08, 1, 0, 0, 0)
@@ -80,7 +88,7 @@ transform = Transform3D(1, 0, 0, 0, 0.999999, 0, 0, 0, 0.999999, 0, 0, 0)
 mesh = SubResource("BoxMesh_uu81i")
 
 [node name="Ramp2" type="StaticBody3D" parent="Ramps"]
-transform = Transform3D(1, 0, 0, 0, 0.878817, -0.477159, 0, 0.477159, 0.878817, 0, 20, -150)
+transform = Transform3D(1, 0, 0, 0, 0.882948, -0.469472, 0, 0.469472, 0.882948, 0, 20, -150)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Ramps/Ramp2"]
 transform = Transform3D(1, 0, 0, 0, 1, -5.96046e-08, 0, 5.96046e-08, 1, 0, 0, 0)
@@ -91,7 +99,7 @@ transform = Transform3D(1, 0, 0, 0, 0.999999, 0, 0, 0, 0.999999, 0, 0, 0)
 mesh = SubResource("BoxMesh_uu81i")
 
 [node name="Ramp3" type="StaticBody3D" parent="Ramps"]
-transform = Transform3D(-4.37114e-08, -0.477159, -0.878817, 0, 0.878817, -0.477159, 1, -2.08573e-08, -3.84143e-08, 150, 20, 0)
+transform = Transform3D(-4.37114e-08, -0.469472, -0.882948, 0, 0.882948, -0.469472, 1, -2.05213e-08, -3.85949e-08, 150, 20, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Ramps/Ramp3"]
 transform = Transform3D(1, 0, 0, 0, 1, -5.96046e-08, 0, 5.96046e-08, 1, 0, 0, 0)
@@ -102,7 +110,7 @@ transform = Transform3D(1, 0, 0, 0, 0.999999, 0, 0, 0, 0.999999, 0, 0, 0)
 mesh = SubResource("BoxMesh_uu81i")
 
 [node name="Ramp4" type="StaticBody3D" parent="Ramps"]
-transform = Transform3D(-4.37114e-08, 0.477159, -0.878817, 0, 0.878817, 0.477159, 1, 2.08573e-08, -3.84143e-08, -150, 20, 0)
+transform = Transform3D(-4.37114e-08, 0.469472, -0.882948, 0, 0.882948, 0.469472, 1, 2.05213e-08, -3.85949e-08, -150, 20, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Ramps/Ramp4"]
 transform = Transform3D(1, 0, 0, 0, 1, -5.96046e-08, 0, 5.96046e-08, 1, 0, 0, 0)
@@ -113,7 +121,7 @@ transform = Transform3D(1, 0, 0, 0, 0.999999, 0, 0, 0, 0.999999, 0, 0, 0)
 mesh = SubResource("BoxMesh_uu81i")
 
 [node name="Ramp5" type="StaticBody3D" parent="Ramps"]
-transform = Transform3D(0.707107, 0.337402, -0.621418, 0, 0.878817, 0.477159, 0.707107, -0.337402, 0.621418, -117, 20, 117)
+transform = Transform3D(0.707107, 0.331966, -0.624339, 0, 0.882947, 0.469472, 0.707107, -0.331966, 0.624339, -117, 20, 117)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Ramps/Ramp5"]
 transform = Transform3D(1, 0, 0, 0, 1, -5.96046e-08, 0, 5.96046e-08, 1, 0, 0, 0)
@@ -124,7 +132,7 @@ transform = Transform3D(1, 0, 0, 0, 0.999999, 0, 0, 0, 0.999999, 0, 0, 0)
 mesh = SubResource("BoxMesh_uu81i")
 
 [node name="Ramp6" type="StaticBody3D" parent="Ramps"]
-transform = Transform3D(-0.707107, 0.337402, -0.621418, 0, 0.878817, 0.477159, 0.707107, 0.337402, -0.621418, -117, 20, -117)
+transform = Transform3D(-0.707107, 0.331966, -0.624339, 0, 0.882947, 0.469472, 0.707107, 0.331966, -0.624339, -117, 20, -117)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Ramps/Ramp6"]
 transform = Transform3D(1, 0, 0, 0, 1, -5.96046e-08, 0, 5.96046e-08, 1, 0, 0, 0)
@@ -135,7 +143,7 @@ transform = Transform3D(1, 0, 0, 0, 0.999999, 0, 0, 0, 0.999999, 0, 0, 0)
 mesh = SubResource("BoxMesh_uu81i")
 
 [node name="Ramp7" type="StaticBody3D" parent="Ramps"]
-transform = Transform3D(-0.707107, -0.337402, 0.621418, 0, 0.878817, 0.477159, -0.707107, 0.337402, -0.621418, 117, 20, -117)
+transform = Transform3D(-0.707107, -0.331966, 0.624339, 0, 0.882947, 0.469472, -0.707107, 0.331966, -0.624339, 117, 20, -117)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Ramps/Ramp7"]
 transform = Transform3D(1, 0, 0, 0, 1, -5.96046e-08, 0, 5.96046e-08, 1, 0, 0, 0)
@@ -146,7 +154,7 @@ transform = Transform3D(1, 0, 0, 0, 0.999999, 0, 0, 0, 0.999999, 0, 0, 0)
 mesh = SubResource("BoxMesh_uu81i")
 
 [node name="Ramp8" type="StaticBody3D" parent="Ramps"]
-transform = Transform3D(0.707107, -0.337402, 0.621418, 0, 0.878817, 0.477159, -0.707107, -0.337402, 0.621418, 117, 20, 117)
+transform = Transform3D(0.707107, -0.331966, 0.624339, 0, 0.882947, 0.469472, -0.707107, -0.331966, 0.624339, 117, 20, 117)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Ramps/Ramp8"]
 transform = Transform3D(1, 0, 0, 0, 1, -5.96046e-08, 0, 5.96046e-08, 1, 0, 0, 0)
@@ -355,3 +363,6 @@ collision_base_size = 0.0
 visibility_aabb = AABB(-250, -250, -250, 500, 500, 500)
 process_material = SubResource("ParticleProcessMaterial_m0edg")
 draw_pass_1 = SubResource("BoxMesh_3rd0x")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_0idqi")
