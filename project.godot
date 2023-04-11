@@ -23,10 +23,6 @@ Settings="*res://game/settings.cs"
 
 project/assembly_name="Light Bike"
 
-[editor_plugins]
-
-enabled=PackedStringArray()
-
 [input]
 
 forward={

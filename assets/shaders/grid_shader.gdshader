@@ -19,7 +19,7 @@ float random2 (in vec2 st) {
 
 void fragment() {
 	vec3 world_vertex = (INV_VIEW_MATRIX * vec4(VERTEX, 1.0)).xyz;
-	ALBEDO = vec3(0.1f);
+	ALBEDO = vec3(0.4f, 1.0f, 0.4f);
 	float af = length(VERTEX);
 	
 	/*float grid_width = 0.15f;

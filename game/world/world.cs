@@ -6,7 +6,7 @@ using System;
 
 public partial class world : Node
 {
-	const int PORT = 8899;
+	const int PORT = 7799;
 	const float END_ROUND_TIMER = 3.0f;
 
 	private PackedScene start_screen = GD.Load<PackedScene>("res://game/UI/start_screen.tscn");
@@ -165,7 +165,7 @@ public partial class world : Node
 		for(int i = 0; i < players.GetChildCount(); i++){
 			player p = players.GetChild<player>(i);
 			//set up better spawn system later along with map selection
-			p.spawn_player(world_map.GetNode<Node3D>("Spawns").GetChild<Marker3D>(i).GlobalPosition);
+			p.spawn_player(world_map.GetNode<stage>("stage").GetNode<Node3D>("spawns").GetChild<Marker3D>(i).GlobalPosition);
 		}
 	}
 	

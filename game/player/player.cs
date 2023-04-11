@@ -18,6 +18,7 @@ public partial class player : CharacterBody3D
 	public const float MAX_FALLING_FORWARD_ROTATION = Mathf.Pi/4.0f;
 	public const float JUMP_BUFFER = 0.2f;
 	public const float AIR_ROTATE_BUFFER = 0.1f;
+	public const float NORMAL_ROTATION_SPEED = 7.0f;
 	public PackedScene trail_scene = ResourceLoader.Load<PackedScene>("res://game/world/trail.tscn"); 
 
 	private world world_node;
@@ -106,12 +107,21 @@ public partial class player : CharacterBody3D
 		}
 		//if new normal is found, rotate appropriately
 			if(next_normal != current_normal){
+				GD.Print("hello");
 				Vector3 rotate_axis = current_normal.Cross(next_normal).Normalized();
 				float rotate_angle = current_normal.SignedAngleTo(next_normal, rotate_axis);
-				if(rotate_angle < Mathf.Pi/3 || air_timer > JUMP_BUFFER){
-					move_direction = move_direction.Rotated(rotate_axis, rotate_angle).Normalized();
-					current_normal = next_normal;
-				}
+				float fixed_speed = deltaf * Mathf.Sign(rotate_angle) * NORMAL_ROTATION_SPEED;
+				float final_speed = Mathf.Sign(rotate_angle) * Mathf.Min(Mathf.Abs(fixed_speed), Mathf.Abs(rotate_angle));
+				//if(IsOnFloor() || air_timer > JUMP_BUFFER){
+					move_direction = move_direction.Rotated(rotate_axis, final_speed).Normalized();
+					//current_normal = next_normal;
+					if((current_normal - next_normal).Length() < .05f){
+						current_normal = next_normal;
+					}
+					else{
+						current_normal = move_direction.Cross(-rotate_axis).Normalized();
+					}
+				//}
 			}
 		
 
