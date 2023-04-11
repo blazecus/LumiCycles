@@ -42,7 +42,7 @@ script = ExtResource("1_egvj7")
 environment = SubResource("Environment_a1mh4")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.886809, 0.462136, 0, -0.462136, 0.886809, 0, 0, 0)
+transform = Transform3D(0.785565, 0.28596, -0.548739, 0.277141, 0.63029, 0.725209, 0.553245, -0.721777, 0.415883, 0, 0, 0)
 shadow_enabled = true
 shadow_reverse_cull_face = true
 directional_shadow_split_1 = 0.474

@@ -19,7 +19,7 @@ public partial class map : Node3D
 		mesh = GetNode<MeshInstance3D>("grid");
 		imesh = new ImmediateMesh();
 		mesh.Mesh = imesh;
-		set_up_imesh_grid();
+		set_up_cube_mesh_grid();
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -31,49 +31,35 @@ public partial class map : Node3D
 
 	private void set_up_cube_mesh_grid(){
 		BoxMesh z_box_mesh = new BoxMesh();
-		z_box_mesh.Size = new Vector3(GRID_CELL_SIZE, GRID_CELL_SIZE, GRID_CELL_SIZE * GRID_SIZE);
+		z_box_mesh.Size = new Vector3(GRID_EDGE_WIDTH, GRID_EDGE_WIDTH, GRID_CELL_SIZE * GRID_SIZE);
 		z_box_mesh.Material = grid_material;
 		
-		for(int x = -GRID_SIZE + 1; x < GRID_SIZE; x++){
-			for(int y = -GRID_SIZE + 1; y < GRID_SIZE; y++){
-				MeshInstance3D new_box = new MeshInstance3D();
-				new_box.Mesh = z_box_mesh;
-				new_box.Position = new Vector3(x * GRID_CELL_SIZE, y * GRID_CELL_SIZE, -GRID_SIZE * GRID_CELL_SIZE);
-				grid_meshes.AddChild(new_box);
-			}
-		}
-		
-		GD.Print(grid_meshes.GetChildCount());
-
 		BoxMesh x_box_mesh = new BoxMesh();
-		x_box_mesh.Size = new Vector3(GRID_CELL_SIZE * GRID_SIZE, GRID_CELL_SIZE, GRID_CELL_SIZE);
+		x_box_mesh.Size = new Vector3(GRID_CELL_SIZE * GRID_SIZE, GRID_EDGE_WIDTH, GRID_EDGE_WIDTH);
 		x_box_mesh.Material = grid_material;
 
-		for(int y = -GRID_SIZE + 1; y < GRID_SIZE; y++){
-			for(int z = -GRID_SIZE + 1; z < GRID_SIZE; z++){
-				MeshInstance3D new_box = new MeshInstance3D();
-				new_box.Mesh = x_box_mesh;
-				new_box.Position = new Vector3(-GRID_SIZE * GRID_CELL_SIZE, y *GRID_CELL_SIZE, z * GRID_CELL_SIZE);
-				grid_meshes.AddChild(new_box);
-			}
-		}
-
-		GD.Print(grid_meshes.GetChildCount());
-
 		BoxMesh y_box_mesh = new BoxMesh();
-		y_box_mesh.Size = new Vector3(GRID_CELL_SIZE, GRID_CELL_SIZE * GRID_SIZE, GRID_CELL_SIZE);
+		y_box_mesh.Size = new Vector3(GRID_EDGE_WIDTH, GRID_CELL_SIZE * GRID_SIZE, GRID_EDGE_WIDTH);
 		y_box_mesh.Material = grid_material;
 
-		for(int x = -GRID_SIZE + 1; x < GRID_SIZE; x++){
-			for(int z = -GRID_SIZE + 1; z < GRID_SIZE; z++){
+		for(int i = -GRID_SIZE + 1; i < GRID_SIZE; i++){
+			for(int j = -GRID_SIZE + 1; j < GRID_SIZE; j++){
 				MeshInstance3D new_box = new MeshInstance3D();
-				new_box.Mesh = y_box_mesh;
-				new_box.Position = new Vector3(x * GRID_CELL_SIZE, -GRID_SIZE * GRID_CELL_SIZE, z * GRID_CELL_SIZE);
+				new_box.Mesh = z_box_mesh;
+				new_box.Position = new Vector3(i * GRID_CELL_SIZE, j * GRID_CELL_SIZE, 0);
 				grid_meshes.AddChild(new_box);
+
+				MeshInstance3D new_box2 = new MeshInstance3D();
+				new_box2.Mesh = x_box_mesh;
+				new_box2.Position = new Vector3(0, i *GRID_CELL_SIZE, j * GRID_CELL_SIZE);
+				grid_meshes.AddChild(new_box2);
+
+				MeshInstance3D new_box3 = new MeshInstance3D();
+				new_box3.Mesh = y_box_mesh;
+				new_box3.Position = new Vector3(i * GRID_CELL_SIZE, 0, j * GRID_CELL_SIZE);
+				grid_meshes.AddChild(new_box3);
 			}
 		}
-		
-		GD.Print(grid_meshes.GetChildCount());
 	}
 
 	private void set_up_imesh_grid(){
