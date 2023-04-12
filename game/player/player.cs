@@ -18,7 +18,7 @@ public partial class player : CharacterBody3D
 	public const float MAX_FALLING_FORWARD_ROTATION = Mathf.Pi/4.0f;
 	public const float JUMP_BUFFER = 0.2f;
 	public const float AIR_ROTATE_BUFFER = 0.1f;
-	public const float NORMAL_ROTATION_SPEED = 7.0f;
+	public const float NORMAL_ROTATION_SPEED = 4.5f;
 	public PackedScene trail_scene = ResourceLoader.Load<PackedScene>("res://game/world/trail.tscn"); 
 
 	private world world_node;
@@ -61,7 +61,7 @@ public partial class player : CharacterBody3D
 		trailtop = GetNode<Marker3D>("rotators/mesh/trailtop");
 		trailbottom = GetNode<Marker3D>("rotators/mesh/trailbottom");
 		camera = GetNode<player_camera>("PlayerCamera");
-		slope_check = GetNode<Node3D>("slope_check");
+		slope_check = hurtbox.GetNode<Node3D>("slope_check");
 		player_trail = GetNode<trail>("trail");
 		//player_trail = (trail) trail_scene.Instantiate();
 		//player_trail.setup(this);
@@ -97,6 +97,7 @@ public partial class player : CharacterBody3D
 
 		//check for new normal - only below is relevant if already on ground, else it will check around too (for weird landing angles)
 		Vector3 next_normal = current_normal;
+		//GD.Print(jump_timer);
 		if(jump_timer > JUMP_BUFFER){
 			foreach(RayCast3D raycast in slope_check.GetChildren()){
 				if(raycast.IsColliding() && raycast.GetCollisionPoint().Y < Position.Y){
@@ -106,25 +107,26 @@ public partial class player : CharacterBody3D
 			}
 		}
 		//if new normal is found, rotate appropriately
-			if(next_normal != current_normal){
-				GD.Print("hello");
-				Vector3 rotate_axis = current_normal.Cross(next_normal).Normalized();
-				float rotate_angle = current_normal.SignedAngleTo(next_normal, rotate_axis);
-				float fixed_speed = deltaf * Mathf.Sign(rotate_angle) * NORMAL_ROTATION_SPEED;
-				float final_speed = Mathf.Sign(rotate_angle) * Mathf.Min(Mathf.Abs(fixed_speed), Mathf.Abs(rotate_angle));
-				//if(IsOnFloor() || air_timer > JUMP_BUFFER){
-					move_direction = move_direction.Rotated(rotate_axis, final_speed).Normalized();
-					//current_normal = next_normal;
-					if((current_normal - next_normal).Length() < .05f){
-						current_normal = next_normal;
-					}
-					else{
-						current_normal = move_direction.Cross(-rotate_axis).Normalized();
-					}
-				//}
-			}
+		if((next_normal - current_normal).Length() < 0.02f){
+			current_normal = next_normal;
+		}
 		
+		if(next_normal != current_normal){
+			Vector3 rotate_axis = current_normal.Cross(next_normal).Normalized();
+			float rotate_angle = current_normal.SignedAngleTo(next_normal, rotate_axis);
+			float fixed_speed = deltaf * Mathf.Sign(rotate_angle) * NORMAL_ROTATION_SPEED;
+			float final_speed = Mathf.Sign(rotate_angle) * Mathf.Min(Mathf.Abs(fixed_speed), Mathf.Abs(rotate_angle));
+			//if(IsOnFloor() || air_timer > JUMP_BUFFER){
+			//move_direction = move_direction.Rotated(rotate_axis, final_speed).Normalized();
+			//current_normal = next_normal;
+			current_normal = current_normal.Rotated(rotate_axis, final_speed).Normalized();
 
+			//}
+		}
+		Vector3 md_axis = current_normal.Cross(move_direction).Normalized();
+		float md_angle = current_normal.SignedAngleTo(move_direction, md_axis);
+		move_direction = move_direction.Rotated(md_axis, Mathf.Pi/2.0f - md_angle).Normalized();
+		
 		Vector3 velocity = Velocity;
 
 		// rotate forwards while falling, but only to a certain point

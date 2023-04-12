@@ -60,6 +60,24 @@ transform = Transform3D(1.01276, 0, 0, 0, 1.01276, 0, 0, 0, 1.01276, 0, -0.5, 0)
 transform = Transform3D(0.999026, 0, 0, 0, 0.999026, 0, 0, 0, 0.999026, 0, 0, 0)
 shape = SubResource("BoxShape3D_gdf23")
 
+[node name="slope_check" type="Node3D" parent="hurtbox"]
+transform = Transform3D(1.00097, 0, 0, 0, 1.00097, 0, 0, 0, 1.00097, 0, 0, 0)
+
+[node name="down" type="RayCast3D" parent="hurtbox/slope_check"]
+transform = Transform3D(1, 0, 0, 0, 1.5, 0, 0, 0, 1, 0, 0, 0.617619)
+
+[node name="forward" type="RayCast3D" parent="hurtbox/slope_check"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0.617619)
+target_position = Vector3(0, 0, 1)
+
+[node name="left" type="RayCast3D" parent="hurtbox/slope_check"]
+transform = Transform3D(2, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.617619)
+target_position = Vector3(1, 0, 0)
+
+[node name="right" type="RayCast3D" parent="hurtbox/slope_check"]
+transform = Transform3D(2, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.617619)
+target_position = Vector3(-1, 0, 0)
+
 [node name="PlayerCamera" type="Node3D" parent="."]
 script = ExtResource("2_mnuh0")
 
@@ -75,23 +93,6 @@ near = 0.001
 [node name="post_processing" type="MeshInstance3D" parent="PlayerCamera/h/v/Camera"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.287928)
 visible = false
-
-[node name="slope_check" type="Node3D" parent="."]
-
-[node name="down" type="RayCast3D" parent="slope_check"]
-transform = Transform3D(1, 0, 0, 0, 1.5, 0, 0, 0, 1, 0, 0, 0.617619)
-
-[node name="forward" type="RayCast3D" parent="slope_check"]
-transform = Transform3D(1, 0, 0, 0, 1.5, 0, 0, 0, 1, 0, 0, 0.617619)
-target_position = Vector3(0, 0, 1)
-
-[node name="left" type="RayCast3D" parent="slope_check"]
-transform = Transform3D(1, 0, 0, 0, 1.5, 0, 0, 0, 1, 0, 0, 0.617619)
-target_position = Vector3(1, 0, 0)
-
-[node name="right" type="RayCast3D" parent="slope_check"]
-transform = Transform3D(1, 0, 0, 0, 1.5, 0, 0, 0, 1, 0, 0, 0.617619)
-target_position = Vector3(-1, 0, 0)
 
 [node name="move_direction_check" type="MeshInstance3D" parent="."]
 mesh = SubResource("BoxMesh_upq8o")
