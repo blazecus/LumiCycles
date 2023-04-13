@@ -1,11 +1,14 @@
 shader_type spatial;
 render_mode world_vertex_coords;
 
+uniform sampler2D letters;
+uniform float columns = 8;
+
 void vertex() {
     //VERTEX = (MODELVIEW_MATRIX * vec4(VERTEX, 1.0)).xyz;
     //NORMAL = normalize((MODELVIEW_MATRIX * vec4(NORMAL, 0.0)).xyz);
     // same as above for binormal and tangent, if normal mapping is used
-	VERTEX += vec3(sin(TIME), sin(TIME), sin(TIME));
+	//VERTEX += vec3(sin(TIME), sin(TIME), sin(TIME));
 }
 
 uniform vec4 input_color = vec4(0.7f,0.7f,1.0f,1.0f);
@@ -35,16 +38,26 @@ void fragment() {
 		ALPHA = 0.0f;
 	}*/
 	
-	float min_cutoff = abs(sin(TIME + random2(world_vertex.xy))) * 30.0f;
+	//float min_cutoff = abs(sin(TIME + random2(world_vertex.xy))) * 30.0f;
 	//float max_cutoff = abs(sin(TIME)) * 5.0f + 15.0f;
-	float max_cutoff = 70.0f;
+	//float max_cutoff = 70.0f;
 	
-	float chance = smoothstep(min_cutoff, max_cutoff, world_vertex.y);
+	//float chance = smoothstep(min_cutoff, max_cutoff, world_vertex.y);
 	
-	vec3 cubes = floor(world_vertex / 0.3f) + vec3(0.05f);
+	/*vec3 cubes = floor(world_vertex / 0.3f) + vec3(0.05f);
 	float check = abs(random(random2(cubes.xy) * random(cubes.z)));
-	ALPHA = step(check, chance);
+	ALPHA = step(check, 0.3f);
 	
-	ALPHA *= (1.0f - smoothstep(0, 200.0f, af)) * smoothstep(25.0f, 50.0f, af);
+	ALPHA *= (1.0f - smoothstep(0, 200.0f, af)) * smoothstep(25.0f, 50.0f, af);*/
+	
+	float xmod = mod(world_vertex.x, 1.5f/columns);
+	float column = floor(world_vertex.x / (1.5f/columns));
+	float velocity = random(column) * 1.5f;
+	float ny = world_vertex.y + TIME * velocity;
+	float sample_letter = floor(random2(vec2(column, floor(ny * columns))) * 90.0f);
+	float xuv = (xmod * (columns / 1.5f) / 90.0f) + sample_letter / 90.0f;
+	vec4 sample = texture(letters, vec2(xuv, 1.0f - fract(ny * columns)));
+	ALBEDO = vec3((vec3(1) - sample.xyz) * vec3(0.3f,1.0f,0.3f));
+	//ALPHA = step(sample.r, -1);
 }
 
