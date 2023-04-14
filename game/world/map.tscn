@@ -53,3 +53,10 @@ collision_base_size = 0.0
 visibility_aabb = AABB(-250, -250, -250, 500, 500, 500)
 process_material = SubResource("ParticleProcessMaterial_m0edg")
 draw_pass_1 = SubResource("BoxMesh_3rd0x")
+
+[node name="OmniLight3D" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.9961, 8.21158, -9.71331)
+visible = false
+light_energy = 16.0
+light_indirect_energy = 13.385
+omni_range = 838.553

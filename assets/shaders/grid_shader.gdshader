@@ -50,14 +50,23 @@ void fragment() {
 	
 	ALPHA *= (1.0f - smoothstep(0, 200.0f, af)) * smoothstep(25.0f, 50.0f, af);*/
 	
-	float xmod = mod(world_vertex.x, 1.5f/columns);
-	float column = floor(world_vertex.x / (1.5f/columns));
-	float velocity = random(column) * 1.5f;
-	float ny = world_vertex.y + TIME * velocity;
-	float sample_letter = floor(random2(vec2(column, floor(ny * columns))) * 90.0f);
+	vec3 uv = vec3(UV.x, UV.y, world_vertex.z);
+	
+	float xmod = mod(uv.x, 1.5f/columns);
+	float column = floor(uv.x / (1.5f/columns));
+
+	float velocity = (random(column) + 0.2f) * -1.5f;
+	float fall = TIME * velocity;
+	float streak_length = (1.0f/columns) * 16.0f;//random2(vec2(column, 0.7f));
+	float brightness = 1.0f - smoothstep(0, streak_length/2.0f, mod(uv.y - mod(uv.y, 1.0f/columns) - mod(fall, streak_length), streak_length));
+	
+	float sample_letter = floor(random2(vec2(column, floor(uv.y * columns))) * 45.0f + random(floor((TIME * -velocity + uv.y + streak_length / 2.0f) / (streak_length / -velocity))) * 45.0f);
 	float xuv = (xmod * (columns / 1.5f) / 90.0f) + sample_letter / 90.0f;
-	vec4 sample = texture(letters, vec2(xuv, 1.0f - fract(ny * columns)));
-	ALBEDO = vec3((vec3(1) - sample.xyz) * vec3(0.3f,1.0f,0.3f));
+	vec4 sample = texture(letters, vec2(xuv, 1.0f - fract(uv.y * columns)));
+	ALBEDO = vec3((vec3(1) - sample.xyz) * (vec3(brightness/3.0f,brightness,brightness/3.0f) + vec3(step(0.95f, brightness)) ));
+	//ALPHA = brightness + 0.8f;
+	//ALPHA *= (1.0f - smoothstep(0, 200.0f, af)) * smoothstep(25.0f, 50.0f, af);
+	//ALBEDO = vec3(UV.x, UV.y, 1.0f);
 	//ALPHA = step(sample.r, -1);
 }
 

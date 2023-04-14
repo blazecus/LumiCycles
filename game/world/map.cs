@@ -19,7 +19,8 @@ public partial class map : Node3D
 		mesh = GetNode<MeshInstance3D>("grid");
 		imesh = new ImmediateMesh();
 		mesh.Mesh = imesh;
-		set_up_cube_mesh_grid();
+		set_up_imesh_grid();
+		//set_up_cube_mesh_grid();
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -34,13 +35,13 @@ public partial class map : Node3D
 		z_box_mesh.Size = new Vector3(GRID_EDGE_WIDTH, GRID_EDGE_WIDTH, GRID_CELL_SIZE * GRID_SIZE);
 		z_box_mesh.Material = grid_material;
 		
-		BoxMesh x_box_mesh = new BoxMesh();
+		/*BoxMesh x_box_mesh = new BoxMesh();
 		x_box_mesh.Size = new Vector3(GRID_CELL_SIZE * GRID_SIZE, GRID_EDGE_WIDTH, GRID_EDGE_WIDTH);
 		x_box_mesh.Material = grid_material;
 
 		BoxMesh y_box_mesh = new BoxMesh();
 		y_box_mesh.Size = new Vector3(GRID_EDGE_WIDTH, GRID_CELL_SIZE * GRID_SIZE, GRID_EDGE_WIDTH);
-		y_box_mesh.Material = grid_material;
+		y_box_mesh.Material = grid_material;*/
 
 		for(int i = -GRID_SIZE + 1; i < GRID_SIZE; i++){
 			for(int j = -GRID_SIZE + 1; j < GRID_SIZE; j++){
@@ -50,13 +51,15 @@ public partial class map : Node3D
 				grid_meshes.AddChild(new_box);
 
 				MeshInstance3D new_box2 = new MeshInstance3D();
-				new_box2.Mesh = x_box_mesh;
+				new_box2.Mesh = z_box_mesh;
 				new_box2.Position = new Vector3(0, i *GRID_CELL_SIZE, j * GRID_CELL_SIZE);
+				new_box2.Rotate(Vector3.Up, Mathf.Pi/2.0f);
 				grid_meshes.AddChild(new_box2);
 
 				MeshInstance3D new_box3 = new MeshInstance3D();
-				new_box3.Mesh = y_box_mesh;
+				new_box3.Mesh = z_box_mesh;
 				new_box3.Position = new Vector3(i * GRID_CELL_SIZE, 0, j * GRID_CELL_SIZE);
+				new_box3.Rotate(Vector3.Right, Mathf.Pi/2.0f);
 				grid_meshes.AddChild(new_box3);
 			}
 		}
@@ -161,9 +164,9 @@ public partial class map : Node3D
 		imesh.SurfaceAddVertex(points[2]);
 
 
-		imesh.SurfaceSetUV(new Vector2(points[5].X - points[5].X, 0));
+		imesh.SurfaceSetUV(new Vector2(points[5].X - points[4].X, 0));
 		imesh.SurfaceAddVertex(points[4]);
-		imesh.SurfaceSetUV(new Vector2(points[5].X - points[5].X, points[7].Y - points[5].Y));
+		imesh.SurfaceSetUV(new Vector2(points[5].X - points[4].X, points[7].Y - points[5].Y));
 		imesh.SurfaceAddVertex(points[6]);
 		imesh.SurfaceSetUV(Vector2.Zero);
 		imesh.SurfaceAddVertex(points[5]);
@@ -172,7 +175,7 @@ public partial class map : Node3D
 		imesh.SurfaceAddVertex(points[7]);
 		imesh.SurfaceSetUV(Vector2.Zero);
 		imesh.SurfaceAddVertex(points[5]);
-		imesh.SurfaceSetUV(new Vector2(points[5].X - points[5].X, points[7].Y - points[5].Y));
+		imesh.SurfaceSetUV(new Vector2(points[5].X - points[4].X, points[7].Y - points[5].Y));
 		imesh.SurfaceAddVertex(points[6]);	
 
 
