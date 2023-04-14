@@ -3,8 +3,8 @@ using System;
 
 public partial class map : Node3D
 {
-	const int GRID_SIZE = 20;
-	const float GRID_CELL_SIZE = 25.0f;
+	const int GRID_SIZE = 7;
+	const float GRID_CELL_SIZE = 30.0f;
 	const float GRID_EDGE_WIDTH = 1.5f;
 	private Material grid_material = GD.Load<Material>("res://assets/materials/grid_material.tres");
 	private Node3D grid_meshes;
@@ -71,6 +71,8 @@ public partial class map : Node3D
 		for(int x = -GRID_SIZE + 1; x < GRID_SIZE; x++){
 			for(int y = -GRID_SIZE + 1; y < GRID_SIZE; y++){
 				draw_grid_line(generate_grid_line(new Vector3(x * GRID_CELL_SIZE, y * GRID_CELL_SIZE, -GRID_SIZE * GRID_CELL_SIZE), new Vector3(0,0,1)));
+				//draw_grid_line(generate_grid_line(new Vector3(-GRID_SIZE * GRID_CELL_SIZE, x * GRID_CELL_SIZE, y * GRID_CELL_SIZE), new Vector3(1,0,0)));
+				//draw_grid_line(generate_grid_line(new Vector3(x * GRID_CELL_SIZE, -GRID_SIZE * GRID_CELL_SIZE, y * GRID_CELL_SIZE), new Vector3(0,1,0)));
 			}
 		}
 

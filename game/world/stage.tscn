@@ -1,8 +1,10 @@
-[gd_scene load_steps=6 format=3 uid="uid://cvenq11ckwtcv"]
+[gd_scene load_steps=7 format=3 uid="uid://cvenq11ckwtcv"]
 
 [ext_resource type="Script" path="res://game/world/stage.cs" id="1_2w553"]
+[ext_resource type="Material" uid="uid://c35i7mpkcye4v" path="res://assets/materials/platform.tres" id="2_wlgsx"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_706kp"]
+material = ExtResource("2_wlgsx")
 size = Vector3(50, 2, 50)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_04n8o"]

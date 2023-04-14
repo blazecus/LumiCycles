@@ -1,7 +1,9 @@
 [gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://cundg7pqihwg5"]
 
-[ext_resource type="Shader" path="res://assets/shaders/twilight_particle_shader.gdshader" id="1_ug0ue"]
+[ext_resource type="Shader" path="res://assets/shaders/grid_shader.gdshader" id="1_hilct"]
 
 [resource]
 render_priority = 0
-shader = ExtResource("1_ug0ue")
+shader = ExtResource("1_hilct")
+shader_parameter/columns = 8.0
+shader_parameter/input_color = Quaternion(0.7, 0.7, 1, 1)
