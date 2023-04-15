@@ -165,7 +165,7 @@ public partial class world : Node
 		for(int i = 0; i < players.GetChildCount(); i++){
 			player p = players.GetChild<player>(i);
 			//set up better spawn system later along with map selection
-			p.spawn_player(world_map.GetNode<stage>("stage").GetNode<Node3D>("spawns").GetChild<Marker3D>(i).GlobalPosition);
+			p.spawn_player(world_map.GetNode<stage2>("stage").GetNode<Node3D>("spawns").GetChild<Marker3D>(i).GlobalPosition);
 		}
 	}
 	

@@ -3,7 +3,7 @@ using System;
 
 public partial class map : Node3D
 {
-	const int GRID_SIZE = 7;
+	const int GRID_SIZE = 12;
 	const float GRID_CELL_SIZE = 50.0f;
 	const float GRID_EDGE_WIDTH = 2.5f;
 	private Material grid_material = GD.Load<Material>("res://assets/materials/grid_material.tres");

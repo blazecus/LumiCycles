@@ -61,16 +61,17 @@ void fragment() {
 	float velocity = (random(column) + 0.2f) * -1.5f;
 	float fall = TIME * velocity;
 	float streak_length = (1.0f/columns) * sl;//random2(vec2(column, 0.7f));
-	float brightness = 1.0f - smoothstep(0, streak_length/sl_portion, mod(uv.y - mod(uv.y, xwidth/columns) - mod(fall, streak_length), streak_length));
+	float new_y = uv.y + ((random(floor(uv.x * xwidth/columns)) - 0.5f) * 2.0f) * streak_length;
+	float brightness = 1.0f - smoothstep(0, streak_length/sl_portion, mod(new_y - mod(new_y, xwidth/columns) - mod(fall, streak_length), streak_length));
 	
-	float sample_letter = floor(random2(vec2(column, floor(uv.y * columns / xwidth))) * 45.0f + random(floor((TIME * -velocity + uv.y + streak_length / sl_portion) / (streak_length / -velocity))) * 45.0f);
-	float xuv = (xmod * (columns / xwidth) / 90.0f) + sample_letter / 90.0f;
-	vec4 sample = texture(letters, vec2(xuv, 1.0f - fract(uv.y * columns / xwidth)));
+	float sample_letter = floor(random2(vec2(column, floor(new_y * columns / xwidth))) * 45.0f + random(floor((TIME * -velocity + new_y + streak_length / sl_portion) / (streak_length / -velocity))) * 45.0f);
+	float xuv = ((1.0f - xmod * (columns / xwidth)) / 90.0f) + sample_letter / 90.0f;
+	vec4 sample = texture(letters, vec2(xuv, 1.0f - fract(new_y * columns / xwidth)));
 	ALBEDO = vec3((vec3(1) - sample.xyz) * (vec3(brightness/3.0f,brightness,brightness/3.0f) + vec3(step(0.967f, brightness)) ));
 	//ALPHA = brightness + 0.8f;
 	//ALPHA = (1.0f - smoothstep(50.0f, 200.0f, af));// * smoothstep(25.0f, 50.0f, af);
 	ALPHA = step(0.2f, brightness);
-	ALPHA_SCISSOR_THRESHOLD = 0.1f;
+	ALPHA_SCISSOR_THRESHOLD = 0.5f;
 	EMISSION = ALBEDO * 16.0f / max(10.0f,af);
 	RADIANCE = vec4(ALBEDO,0.5f);
 	//ALBEDO = vec3(UV.x, UV.y, 1.0f);
