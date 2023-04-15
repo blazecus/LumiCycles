@@ -8,13 +8,13 @@ background_mode = 2
 ambient_light_color = Color(0.235294, 0.235294, 0.235294, 1)
 ambient_light_sky_contribution = 0.23
 ambient_light_energy = 3.0
-glow_strength = 0.91
+glow_enabled = true
 
 [sub_resource type="ImmediateMesh" id="ImmediateMesh_ixxyd"]
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_m0edg"]
 emission_shape = 3
-emission_box_extents = Vector3(100, 50, 100)
+emission_box_extents = Vector3(200, 50, 200)
 direction = Vector3(0, 1, 0)
 gravity = Vector3(0, 3, 0)
 initial_velocity_min = 5.0
@@ -32,7 +32,6 @@ environment = SubResource("Environment_a1mh4")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.785565, 0.28596, -0.548739, 0.277141, 0.63029, 0.725209, 0.553245, -0.721777, 0.415883, 0, 0, 0)
-visible = false
 shadow_enabled = true
 shadow_reverse_cull_face = true
 directional_shadow_split_1 = 0.474
@@ -49,7 +48,7 @@ mesh = SubResource("ImmediateMesh_ixxyd")
 
 [node name="GPUParticles3D" type="GPUParticles3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -16.244, 0)
-amount = 2000
+amount = 1000
 lifetime = 7.0
 collision_base_size = 0.0
 visibility_aabb = AABB(-250, -250, -250, 500, 500, 500)

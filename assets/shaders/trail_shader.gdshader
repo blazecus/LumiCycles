@@ -32,4 +32,7 @@ void fragment() {
 	if(vy < 0.09f || vy > 0.91f){
 		ALBEDO += vec3(0.85f);
 	}
+	
+	EMISSION = ALBEDO;
+	RADIANCE = vec4(ALBEDO, 1.0f);
 }

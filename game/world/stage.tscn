@@ -20,7 +20,7 @@ size = Vector3(25, 2, 25)
 script = ExtResource("1_2w553")
 
 [node name="platforms" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -7.99992, -9.67117)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -4.7599, 0)
 
 [node name="1" type="Node3D" parent="platforms"]
 
@@ -507,3 +507,41 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, 60)
 
 [node name="spawn4" type="Marker3D" parent="spawns"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, -60)
+
+[node name="lights" type="Node3D" parent="."]
+visible = false
+
+[node name="OmniLight3D" type="OmniLight3D" parent="lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.16909, 0)
+light_energy = 2.718
+light_indirect_energy = 3.489
+shadow_enabled = true
+omni_range = 27.145
+
+[node name="OmniLight3D5" type="OmniLight3D" parent="lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.16909, -60.936)
+light_energy = 2.718
+light_indirect_energy = 3.489
+shadow_enabled = true
+omni_range = 27.145
+
+[node name="OmniLight3D4" type="OmniLight3D" parent="lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 64.4088, 6.16909, 0)
+light_energy = 2.718
+light_indirect_energy = 3.489
+shadow_enabled = true
+omni_range = 27.145
+
+[node name="OmniLight3D3" type="OmniLight3D" parent="lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -64.1985, 6.16909, 0)
+light_energy = 2.718
+light_indirect_energy = 3.489
+shadow_enabled = true
+omni_range = 27.145
+
+[node name="OmniLight3D2" type="OmniLight3D" parent="lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.16909, 63.3364)
+light_energy = 2.718
+light_indirect_energy = 3.489
+shadow_enabled = true
+omni_range = 27.145
