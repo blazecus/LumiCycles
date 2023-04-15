@@ -34,12 +34,12 @@ environment = SubResource("Environment_a1mh4")
 transform = Transform3D(0.785565, 0.28596, -0.548739, 0.277141, 0.63029, 0.725209, 0.553245, -0.721777, 0.415883, 0, 0, 0)
 shadow_enabled = true
 shadow_reverse_cull_face = true
-directional_shadow_split_1 = 0.474
+directional_shadow_split_1 = 0.433
 directional_shadow_split_2 = 0.665
 directional_shadow_split_3 = 0.137
 directional_shadow_blend_splits = true
-directional_shadow_fade_start = 0.341
-directional_shadow_max_distance = 500.0
+directional_shadow_fade_start = 0.569
+directional_shadow_max_distance = 280.0
 
 [node name="grid" type="MeshInstance3D" parent="."]
 mesh = SubResource("ImmediateMesh_ixxyd")

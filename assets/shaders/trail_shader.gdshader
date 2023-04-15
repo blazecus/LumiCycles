@@ -24,7 +24,8 @@ void fragment() {
 	float lin = mod(UV.x - TIME * vel, len) / len;
 	vec3 col = vec3(pow(6, lin * 2.0f) / 32.0f + 0.2f);
 		
-	ALPHA = 0.85f + col.r / 6.0f;
+	//ALPHA = 0.85f + col.r / 6.0f;
+	ALPHA_SCISSOR_THRESHOLD = 0.2f;
 	ALBEDO = input_color.xyz / 2.0f + vec3(col * col * input_color.xyz);
 	//ALBEDO *= 1.3f;
 	

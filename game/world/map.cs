@@ -5,7 +5,7 @@ public partial class map : Node3D
 {
 	const int GRID_SIZE = 7;
 	const float GRID_CELL_SIZE = 50.0f;
-	const float GRID_EDGE_WIDTH = 1.5f;
+	const float GRID_EDGE_WIDTH = 2.5f;
 	private Material grid_material = GD.Load<Material>("res://assets/materials/grid_material.tres");
 	private Node3D grid_meshes;
 	private MeshInstance3D mesh;
@@ -19,6 +19,7 @@ public partial class map : Node3D
 		mesh = GetNode<MeshInstance3D>("grid");
 		imesh = new ImmediateMesh();
 		mesh.Mesh = imesh;
+		mesh.SetInstanceShaderParameter("xwidth", GRID_EDGE_WIDTH);
 		set_up_imesh_grid();
 		//set_up_cube_mesh_grid();
 	}
