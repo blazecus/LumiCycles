@@ -1,7 +1,9 @@
-[gd_scene load_steps=7 format=3 uid="uid://biw0elc50uhw3"]
+[gd_scene load_steps=9 format=3 uid="uid://biw0elc50uhw3"]
 
 [ext_resource type="Script" path="res://game/world/map.cs" id="1_egvj7"]
-[ext_resource type="PackedScene" uid="uid://bhs5hngah0v0r" path="res://game/world/stage2.tscn" id="2_xr4u3"]
+[ext_resource type="PackedScene" uid="uid://f2csca4lth31" path="res://game/world/stages/stage3.tscn" id="2_860v5"]
+[ext_resource type="ArrayMesh" uid="uid://2p7wa6hl7of7" path="res://assets/meshes/globe.obj" id="3_oaj8d"]
+[ext_resource type="Material" uid="uid://ca0qw181f6fta" path="res://assets/materials/grid_material.tres" id="4_hgbxp"]
 
 [sub_resource type="Environment" id="Environment_a1mh4"]
 background_mode = 2
@@ -60,4 +62,9 @@ light_energy = 16.0
 light_indirect_energy = 13.385
 omni_range = 838.553
 
-[node name="stage" parent="." instance=ExtResource("2_xr4u3")]
+[node name="stage" parent="." instance=ExtResource("2_860v5")]
+
+[node name="skybox" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -1, 8.74228e-08, 0, -8.74228e-08, -1, 0, 0, 0)
+mesh = ExtResource("3_oaj8d")
+surface_material_override/0 = ExtResource("4_hgbxp")

@@ -1,0 +1,21 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://dlp31cagkkhmc"
+path="res://.godot/imported/disc.obj-8ef70b87ffa452815d29182bb936a30e.mesh"
+
+[deps]
+
+files=["res://.godot/imported/disc.obj-8ef70b87ffa452815d29182bb936a30e.mesh"]
+
+source_file="res://assets/maps/disc.obj"
+dest_files=["res://.godot/imported/disc.obj-8ef70b87ffa452815d29182bb936a30e.mesh", "res://.godot/imported/disc.obj-8ef70b87ffa452815d29182bb936a30e.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true

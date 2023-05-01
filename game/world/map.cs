@@ -20,7 +20,7 @@ public partial class map : Node3D
 		imesh = new ImmediateMesh();
 		mesh.Mesh = imesh;
 		mesh.SetInstanceShaderParameter("xwidth", GRID_EDGE_WIDTH);
-		set_up_imesh_grid();
+		//set_up_imesh_grid();
 		//set_up_cube_mesh_grid();
 	}
 

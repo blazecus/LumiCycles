@@ -1,0 +1,21 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://2p7wa6hl7of7"
+path="res://.godot/imported/globe.obj-e13825427b0c91fec600a919189392ba.mesh"
+
+[deps]
+
+files=["res://.godot/imported/globe.obj-e13825427b0c91fec600a919189392ba.mesh"]
+
+source_file="res://assets/meshes/globe.obj"
+dest_files=["res://.godot/imported/globe.obj-e13825427b0c91fec600a919189392ba.mesh", "res://.godot/imported/globe.obj-e13825427b0c91fec600a919189392ba.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true

@@ -3,7 +3,7 @@ render_mode world_vertex_coords;
 
 uniform sampler2D letters;
 //uniform float columns = 8;
-instance uniform vec2 UV_scaling =  vec2(1.0f,1.0f);
+instance uniform vec2 UV_scaling =  vec2(80.0f,80.0f);
 instance uniform float xwidth = 1.5f;
 uniform float sl = 200.0f;
 uniform float sl_portion = 3.0f;
