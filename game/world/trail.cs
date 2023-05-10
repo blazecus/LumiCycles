@@ -14,7 +14,7 @@ public partial class trail : StaticBody3D
 	private const int CHUNK_SIZE = 10;
 	public const float TRAIL_CHECK_INTERVAL = 0.1f;
 	public const float TRAIL_LENGTH_INTERVAL = 0.5f;
-	public const int TRAIL_HITBOX_LAG = 4;
+	public const int TRAIL_HITBOX_LAG = 3;
 	public const float TRAIL_STARTUP = 1.5f;
 	public const float UV_SCALING_FACTOR = 1.0f;
 

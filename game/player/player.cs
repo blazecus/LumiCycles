@@ -4,13 +4,13 @@ using System;
 
 public partial class player : CharacterBody3D
 {
-	public const float TOP_SPEED = 10.0f;
-	public const float ACCELERATION = 6.0f;
-	public const float BOOST_TOP_SPEED = 22.0f;
-	public const float BOOST_ACCELERATION = 15.0f;
-	public const float JUMP_VELOCITY = 6.1f;
-	public const float WHEEL_SPEED = 0.8f;
-	public const float MOVE_DIRECTION_ROTATION_SPEED = 1.5f;
+	public const float TOP_SPEED = 17.0f;
+	public const float ACCELERATION = 10.0f;
+	public const float BOOST_TOP_SPEED = 34.0f;
+	public const float BOOST_ACCELERATION = 24.0f;
+	public const float JUMP_VELOCITY = 5.9f;
+	public const float WHEEL_SPEED = 1.2f;
+	public const float MOVE_DIRECTION_ROTATION_SPEED = 1.7f;
 	public const float DRAG_COEFF = 0.4f;
 	public const float TRAIL_CHECK_INTERVAL = 0.1f;
 	public const float TRAIL_LENGTH_INTERVAL = 0.5f;
@@ -207,7 +207,7 @@ public partial class player : CharacterBody3D
 
 		for(int i = 0; i < GetSlideCollisionCount(); i++){
 			KinematicCollision3D collision = GetSlideCollision(i);
-			if(collision.GetCollider().HasMethod("can_kill")){
+			if(collision.GetCollider().HasMethod("can_kill") && collision.GetColliderShapeIndex() < ((Node3D)collision.GetCollider()).GetChildCount() - 5){
 				//dead?
 				die();
 			}
@@ -289,5 +289,9 @@ public partial class player : CharacterBody3D
 
 	public void prepare_destruction(){
 		player_trail.QueueFree();
+	}
+
+	public bool can_kill(){
+		return true;
 	}
 }

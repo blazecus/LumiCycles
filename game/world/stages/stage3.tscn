@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://f2csca4lth31"]
 
 [ext_resource type="Script" path="res://game/world/stages/stage3.cs" id="1_614si"]
-[ext_resource type="PackedScene" uid="uid://b2cvhs618vxxd" path="res://assets/maps/disc.glb" id="2_i5nel"]
+[ext_resource type="PackedScene" uid="uid://ckbssdtav8b65" path="res://game/world/disc.tscn" id="2_7bub3"]
 
 [node name="stage3" type="Node3D"]
 script = ExtResource("1_614si")
@@ -27,4 +27,4 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, -90)
 [node name="lights" type="Node3D" parent="."]
 visible = false
 
-[node name="disc" parent="." instance=ExtResource("2_i5nel")]
+[node name="disc" parent="." instance=ExtResource("2_7bub3")]

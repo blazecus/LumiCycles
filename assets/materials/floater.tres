@@ -1,0 +1,15 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://b2osltm8cfo1q"]
+
+[ext_resource type="Shader" path="res://assets/shaders/floater.gdshader" id="1_82rrx"]
+[ext_resource type="Texture2D" uid="uid://cub1ajh154jex" path="res://assets/textures/fontsample.png" id="2_8qiaa"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_82rrx")
+shader_parameter/UV_scaling = Vector2(1, 4)
+shader_parameter/xwidth = 1.0
+shader_parameter/sl = 8.0
+shader_parameter/sl_portion = 1.0
+shader_parameter/columns = 4.0
+shader_parameter/input_color = Quaternion(0.7, 0.7, 1, 1)
+shader_parameter/letters = ExtResource("2_8qiaa")

@@ -47,11 +47,10 @@ mesh = SubResource("ImmediateMesh_ixxyd")
 [node name="grid_meshes" type="Node3D" parent="."]
 
 [node name="GPUParticles3D" type="GPUParticles3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -16.244, 0)
-amount = 1500
-lifetime = 9.0
+amount = 3000
+lifetime = 14.0
 collision_base_size = 0.0
-visibility_aabb = AABB(-300, -300, -300, 600, 600, 500)
+visibility_aabb = AABB(-300, -300, -300, 600, 600, 600)
 process_material = SubResource("ParticleProcessMaterial_m0edg")
 draw_pass_1 = SubResource("BoxMesh_3rd0x")
 

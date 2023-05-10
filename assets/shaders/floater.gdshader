@@ -2,11 +2,11 @@ shader_type spatial;
 render_mode world_vertex_coords;
 
 uniform sampler2D letters;
-instance uniform vec2 UV_scaling =  vec2(80.0f,80.0f);
-instance uniform float xwidth = 1.5f;
-uniform float sl = 200.0f;
+uniform vec2 UV_scaling =  vec2(1.0f,1.0f);
+uniform float xwidth = 1.0f;
+uniform float sl = 1.0f;
 uniform float sl_portion = 3.0f;
-uniform float columns = 5.0f;
+uniform float columns = 8.0f;
 void vertex() {
     //VERTEX = (MODELVIEW_MATRIX * vec4(VERTEX, 1.0)).xyz;
     //NORMAL = normalize((MODELVIEW_MATRIX * vec4(NORMAL, 0.0)).xyz);

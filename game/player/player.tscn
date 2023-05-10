@@ -1,8 +1,9 @@
-[gd_scene load_steps=10 format=3 uid="uid://by2lxt6065kk5"]
+[gd_scene load_steps=13 format=3 uid="uid://by2lxt6065kk5"]
 
 [ext_resource type="Script" path="res://game/player/player.cs" id="1_oxyv2"]
 [ext_resource type="Script" path="res://game/player/player_camera.cs" id="2_mnuh0"]
 [ext_resource type="Material" uid="uid://c3txy5w43kvy7" path="res://assets/materials/bike_material.tres" id="2_pxky8"]
+[ext_resource type="Shader" path="res://assets/shaders/outline.gdshader" id="4_ywq8c"]
 [ext_resource type="PackedScene" uid="uid://b2k6olndq6bwm" path="res://game/world/trail.tscn" id="5_wt6sh"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_k8vaj"]
@@ -13,6 +14,17 @@ size = Vector3(0.5, 1, 2)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_gdf23"]
 size = Vector3(0.5, 1, 2)
+
+[sub_resource type="QuadMesh" id="QuadMesh_mw4k7"]
+size = Vector2(2, 2)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_n831k"]
+render_priority = 0
+shader = ExtResource("4_ywq8c")
+shader_parameter/outline_color = Color(0, 0.337255, 0.847059, 1)
+shader_parameter/distance_falloff = 1.0
+shader_parameter/smoothing_cutoff = 0.1
+shader_parameter/smoothing_max = 0.1
 
 [sub_resource type="BoxMesh" id="BoxMesh_upq8o"]
 size = Vector3(0.5, 0.5, 0.5)
@@ -91,8 +103,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4)
 near = 0.001
 
 [node name="post_processing" type="MeshInstance3D" parent="PlayerCamera/h/v/Camera"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.287928)
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, -0.409405)
 visible = false
+mesh = SubResource("QuadMesh_mw4k7")
+surface_material_override/0 = SubResource("ShaderMaterial_n831k")
 
 [node name="move_direction_check" type="MeshInstance3D" parent="."]
 mesh = SubResource("BoxMesh_upq8o")
