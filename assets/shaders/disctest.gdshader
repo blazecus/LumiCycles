@@ -64,8 +64,6 @@ void fragment() {
 	vec4 big_emission = line_intensity(big, big_thickness);
 	vec4 small_emission = line_intensity(small, small_thickness);
 	
-	float dfactor = 1.0f - min(1.0f, length(CAMERA_POSITION_WORLD - world_vertex) / 40.0f);
-	rfactor *= dfactor;
 	EMISSION = rfactor * big_emission.xyz;
 	RADIANCE = rfactor * big_emission;
 	if(big_emission.w == 0.0f){
