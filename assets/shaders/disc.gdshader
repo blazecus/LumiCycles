@@ -1,10 +1,10 @@
 shader_type spatial;
 render_mode world_vertex_coords;
 
-uniform float big_cell_size = 0.01f;
-uniform float big_thickness = 0.001f;
-uniform float small_cell_size = 0.001f;
-uniform float small_thickness = 0.0002f;
+uniform float big_cell_size = 0.06f;
+uniform float big_thickness = 0.007;
+uniform float small_cell_size = 0.003f;
+uniform float small_thickness = 0.0005f;
 uniform float tiny_cell_size = 0.002f;
 uniform float tiny_thickness = 0.0004f;
 
@@ -31,8 +31,10 @@ vec4 line_intensity(vec2 uvc, float thickness){
 	if(abs(uvc.y) < thickness){
 		ly_factor = uvb.y;
 	}
-	float line_factor = max(lx_factor,ly_factor) * 1.4f;
+	float line_factor = max(lx_factor,ly_factor) * 1.8f;
 	float fake_alpha = float(line_factor > 0.0f);
+	
+	line_factor -= mod(line_factor, 0.5f);
 	
 	return vec4(line_factor * line_factor * line_factor * default_albedo,fake_alpha);
 
@@ -65,7 +67,9 @@ void fragment() {
 	vec4 small_emission = line_intensity(small, small_thickness);
 	
 	float dfactor = 1.0f - min(1.0f, length(CAMERA_POSITION_WORLD - world_vertex) / 40.0f);
-	rfactor *= dfactor;
+	rfactor *= dfactor * 0.5f;
+	//big_emission -= mod(big_emission, 0.3f);
+	//small_emission -= mod(small_emission, 0.3f);
 	EMISSION = rfactor * big_emission.xyz;
 	RADIANCE = rfactor * big_emission;
 	if(big_emission.w == 0.0f){
