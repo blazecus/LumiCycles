@@ -2,8 +2,8 @@ shader_type spatial;
 render_mode world_vertex_coords;
 
 uniform float big_cell_size = 0.06f;
-uniform float big_thickness = 0.007;
-uniform float small_cell_size = 0.003f;
+uniform float big_thickness = 0.003;
+uniform float small_cell_size = 0.009f;
 uniform float small_thickness = 0.0005f;
 uniform float tiny_cell_size = 0.002f;
 uniform float tiny_thickness = 0.0004f;
@@ -43,12 +43,15 @@ vec4 line_intensity(vec2 uvc, float thickness){
 void fragment() {
 	vec3 world_vertex = (INV_VIEW_MATRIX * vec4(VERTEX, 1.0)).xyz;
 	
-	vec2 big = mod(UV, big_cell_size);
-	vec2 small = mod(UV, small_cell_size);
+	vec2 tuv = vec2(world_vertex.x, world_vertex.z+world_vertex.y) / 500.0f;
+	//vec2 tuv = UV;
+	
+	vec2 big = mod(tuv, big_cell_size);
+	vec2 small = mod(tuv, small_cell_size);
 	//vec2 tiny = mod(UV, tiny_cell_size);
 	
 	vec3 tempa = vec3(0.1f);
-	ALPHA = 0.5f;
+	//ALPHA = 0.1f;
 	float rfactor = 1.0f;// sin(TIME + world_vertex.x / 10.0f);
 
 	
@@ -61,6 +64,8 @@ void fragment() {
 		ALBEDO = small_color.xyz;
 		ALPHA = small_color.w;
 	}
+	ALPHA = max(ALPHA, 0.5f);
+	ALBEDO.b = max(ALBEDO.b, 0.3f);
 	
 	
 	vec4 big_emission = line_intensity(big, big_thickness);
@@ -77,7 +82,7 @@ void fragment() {
 		RADIANCE = rfactor * small_emission;
 	}
 	
-	ALPHA_SCISSOR_THRESHOLD = 0.6f;
+	//ALPHA_SCISSOR_THRESHOLD = 0.6f;
 }
 
 
