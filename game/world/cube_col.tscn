@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://c6cycpr05344g"]
+
+[ext_resource type="PackedScene" uid="uid://dfbyrwj7t6i5l" path="res://assets/maps/cube-col.glb" id="1_6s146"]
+[ext_resource type="Material" uid="uid://bkeaudbibljwb" path="res://assets/materials/disc.tres" id="2_d1ons"]
+
+[node name="cube-col" instance=ExtResource("1_6s146")]
+
+[node name="Cube" parent="." index="0"]
+surface_material_override/0 = ExtResource("2_d1ons")
