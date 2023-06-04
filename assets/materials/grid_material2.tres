@@ -1,0 +1,15 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://1o2etws1r6op"]
+
+[ext_resource type="Shader" path="res://assets/shaders/grid_shader.gdshader" id="1_usq01"]
+[ext_resource type="Texture2D" uid="uid://cub1ajh154jex" path="res://assets/textures/fontsample.png" id="2_sueyp"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_usq01")
+shader_parameter/sl = 200.0
+shader_parameter/sl_portion = 3.0
+shader_parameter/columns = 3.0
+shader_parameter/time_offset = 200.0
+shader_parameter/random_offset = 0.0
+shader_parameter/input_color = Quaternion(0.7, 0.7, 1, 1)
+shader_parameter/letters = ExtResource("2_sueyp")

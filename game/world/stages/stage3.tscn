@@ -27,8 +27,5 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, -90)
 [node name="lights" type="Node3D" parent="."]
 visible = false
 
-[node name="cube-col" parent="." instance=ExtResource("2_1oxga")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -20.9492, 0)
-
 [node name="cube-col2" parent="." instance=ExtResource("2_1oxga")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -13.3063, 0)

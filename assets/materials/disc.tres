@@ -5,7 +5,7 @@
 [resource]
 render_priority = 0
 shader = ExtResource("1_7m3cp")
-shader_parameter/big_cell_size = 0.06
+shader_parameter/big_cell_size = 0.05
 shader_parameter/big_thickness = 0.003
 shader_parameter/small_cell_size = 0.01
 shader_parameter/small_thickness = 0.0005

@@ -1,0 +1,21 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://c3barpop1ntaj"
+path="res://.godot/imported/uvcube.obj-50cbbf4e9ebbbe1b45802fcdd7a8573d.mesh"
+
+[deps]
+
+files=["res://.godot/imported/uvcube.obj-50cbbf4e9ebbbe1b45802fcdd7a8573d.mesh"]
+
+source_file="res://assets/meshes/uvcube.obj"
+dest_files=["res://.godot/imported/uvcube.obj-50cbbf4e9ebbbe1b45802fcdd7a8573d.mesh", "res://.godot/imported/uvcube.obj-50cbbf4e9ebbbe1b45802fcdd7a8573d.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true

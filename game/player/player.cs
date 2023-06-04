@@ -207,7 +207,9 @@ public partial class player : CharacterBody3D
 
 		for(int i = 0; i < GetSlideCollisionCount(); i++){
 			KinematicCollision3D collision = GetSlideCollision(i);
-			if(collision.GetCollider().HasMethod("can_kill") && collision.GetColliderShapeIndex() < ((Node3D)collision.GetCollider()).GetChildCount() - 5){
+			bool check_trail_collision = (collision.GetColliderShapeIndex() < ((Node3D)collision.GetCollider()).GetChildCount() - 5)
+			 						  || (((Node3D)collision.GetCollider()).GetChildCount() == 1);
+			if(collision.GetCollider().HasMethod("can_kill") && check_trail_collision){
 				//dead?
 				die();
 			}

@@ -1,9 +1,9 @@
-[gd_scene load_steps=9 format=3 uid="uid://biw0elc50uhw3"]
+[gd_scene load_steps=10 format=3 uid="uid://biw0elc50uhw3"]
 
 [ext_resource type="Script" path="res://game/world/map.cs" id="1_egvj7"]
 [ext_resource type="PackedScene" uid="uid://f2csca4lth31" path="res://game/world/stages/stage3.tscn" id="2_860v5"]
-[ext_resource type="ArrayMesh" uid="uid://2p7wa6hl7of7" path="res://assets/meshes/globe.obj" id="3_oaj8d"]
-[ext_resource type="Material" uid="uid://ca0qw181f6fta" path="res://assets/materials/grid_material.tres" id="4_hgbxp"]
+[ext_resource type="Shader" path="res://assets/shaders/grid_floater.gdshader" id="2_kjo7x"]
+[ext_resource type="PackedScene" uid="uid://dapvc56m5hi0p" path="res://game/world/skybox.tscn" id="5_ylfm3"]
 
 [sub_resource type="Environment" id="Environment_a1mh4"]
 background_mode = 2
@@ -18,13 +18,36 @@ volumetric_fog_density = 0.0345
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_m0edg"]
 emission_shape = 3
-emission_box_extents = Vector3(300, 50, 300)
+emission_box_extents = Vector3(600, 50, 600)
 direction = Vector3(0, 1, 0)
 gravity = Vector3(0, 3, 0)
 initial_velocity_min = 5.0
 initial_velocity_max = 5.0
 
-[sub_resource type="BoxMesh" id="BoxMesh_3rd0x"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_blfru"]
+render_priority = 0
+shader = ExtResource("2_kjo7x")
+shader_parameter/big_cell_size = 0.2
+shader_parameter/big_thickness = 0.05
+shader_parameter/small_cell_size = 0.05
+shader_parameter/small_thickness = 0.01
+shader_parameter/tiny_cell_size = 0.002
+shader_parameter/tiny_thickness = 0.0004
+shader_parameter/edge_thickness = 0.2
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_ebqtl"]
+_surfaces = [{
+"aabb": AABB(-1, -1, -1, 2, 2.00001, 2),
+"attribute_data": PackedByteArray(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 63, 0, 0, 128, 63, 0, 0, 128, 63, 0, 0, 128, 63, 0, 0, 0, 0, 0, 0, 128, 63, 0, 0, 128, 63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 63, 0, 0, 128, 63, 0, 0, 0, 0, 0, 0, 128, 63, 0, 0, 128, 63, 0, 0, 128, 63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 63, 0, 0, 128, 63, 0, 0, 0, 0, 0, 0, 128, 63, 0, 0, 128, 63, 0, 0, 0, 0, 0, 0, 128, 63, 0, 0, 128, 63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 63, 0, 0, 128, 63, 0, 0, 0, 0, 0, 0, 128, 63, 0, 0, 128, 63),
+"format": 4119,
+"index_count": 36,
+"index_data": PackedByteArray(0, 0, 1, 0, 2, 0, 2, 0, 1, 0, 3, 0, 4, 0, 5, 0, 6, 0, 6, 0, 5, 0, 7, 0, 8, 0, 9, 0, 10, 0, 10, 0, 9, 0, 11, 0, 12, 0, 13, 0, 14, 0, 14, 0, 13, 0, 15, 0, 16, 0, 17, 0, 18, 0, 18, 0, 17, 0, 19, 0, 20, 0, 21, 0, 22, 0, 22, 0, 21, 0, 23, 0),
+"material": SubResource("ShaderMaterial_blfru"),
+"name": "Material",
+"primitive": 3,
+"vertex_count": 24,
+"vertex_data": PackedByteArray(0, 0, 128, 191, 0, 0, 128, 63, 0, 0, 128, 191, 255, 127, 255, 255, 255, 255, 255, 191, 0, 0, 128, 63, 0, 0, 128, 63, 0, 0, 128, 191, 255, 127, 255, 255, 255, 255, 255, 191, 0, 0, 128, 191, 0, 0, 128, 63, 0, 0, 128, 63, 255, 127, 255, 255, 255, 255, 255, 191, 0, 0, 128, 63, 0, 0, 128, 63, 0, 0, 128, 63, 255, 127, 255, 255, 255, 255, 255, 191, 0, 0, 128, 63, 0, 0, 128, 63, 0, 0, 128, 63, 255, 127, 255, 127, 255, 255, 255, 191, 0, 0, 128, 63, 0, 0, 128, 191, 0, 0, 128, 63, 255, 127, 255, 127, 255, 255, 255, 191, 0, 0, 128, 191, 0, 0, 128, 63, 0, 0, 128, 63, 255, 127, 255, 127, 255, 255, 255, 191, 0, 0, 128, 191, 0, 0, 128, 191, 0, 0, 128, 63, 255, 127, 255, 127, 255, 255, 255, 191, 0, 0, 128, 191, 0, 0, 128, 63, 0, 0, 128, 63, 0, 0, 255, 127, 255, 255, 0, 0, 0, 0, 128, 191, 0, 0, 128, 191, 0, 0, 128, 63, 0, 0, 255, 127, 255, 255, 0, 0, 0, 0, 128, 191, 0, 0, 128, 63, 0, 0, 128, 191, 0, 0, 255, 127, 255, 255, 0, 0, 0, 0, 128, 191, 0, 0, 128, 191, 0, 0, 128, 191, 0, 0, 255, 127, 255, 255, 0, 0, 0, 0, 128, 63, 0, 0, 128, 191, 0, 0, 128, 191, 255, 127, 0, 0, 255, 255, 255, 63, 0, 0, 128, 191, 0, 0, 128, 191, 0, 0, 128, 191, 255, 127, 0, 0, 255, 255, 255, 63, 0, 0, 128, 63, 0, 0, 128, 191, 0, 0, 128, 63, 255, 127, 0, 0, 255, 255, 255, 63, 0, 0, 128, 191, 0, 0, 128, 191, 0, 0, 128, 63, 255, 127, 0, 0, 255, 255, 255, 63, 0, 0, 128, 63, 0, 0, 128, 63, 0, 0, 128, 191, 255, 255, 255, 127, 255, 255, 255, 255, 0, 0, 128, 63, 0, 0, 128, 191, 0, 0, 128, 191, 255, 255, 255, 127, 255, 255, 255, 255, 0, 0, 128, 63, 0, 0, 128, 63, 0, 0, 128, 63, 255, 255, 255, 127, 255, 255, 255, 255, 0, 0, 128, 63, 0, 0, 128, 191, 0, 0, 128, 63, 255, 255, 255, 127, 255, 255, 255, 255, 0, 0, 128, 191, 0, 0, 128, 63, 0, 0, 128, 191, 255, 255, 255, 255, 255, 255, 255, 63, 0, 0, 128, 191, 0, 0, 128, 191, 0, 0, 128, 191, 255, 255, 255, 255, 255, 255, 255, 63, 0, 0, 128, 63, 0, 0, 128, 63, 0, 0, 128, 191, 255, 255, 255, 255, 255, 255, 255, 63, 0, 0, 128, 63, 0, 0, 128, 191, 0, 0, 128, 191, 255, 255, 255, 255, 255, 255, 255, 63)
+}]
 
 [node name="Map" type="Node3D"]
 script = ExtResource("1_egvj7")
@@ -44,17 +67,19 @@ directional_shadow_fade_start = 0.569
 directional_shadow_max_distance = 280.0
 
 [node name="grid" type="MeshInstance3D" parent="."]
+visible = false
 mesh = SubResource("ImmediateMesh_ixxyd")
 
 [node name="grid_meshes" type="Node3D" parent="."]
+visible = false
 
 [node name="GPUParticles3D" type="GPUParticles3D" parent="."]
-amount = 3000
+amount = 4000
 lifetime = 14.0
 collision_base_size = 0.0
-visibility_aabb = AABB(-300, -300, -300, 600, 600, 600)
+visibility_aabb = AABB(-600, -300, -600, 1200, 900, 1200)
 process_material = SubResource("ParticleProcessMaterial_m0edg")
-draw_pass_1 = SubResource("BoxMesh_3rd0x")
+draw_pass_1 = SubResource("ArrayMesh_ebqtl")
 
 [node name="OmniLight3D" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.9961, 8.21158, -9.71331)
@@ -65,7 +90,4 @@ omni_range = 838.553
 
 [node name="stage" parent="." instance=ExtResource("2_860v5")]
 
-[node name="skybox" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, -1, 8.74228e-08, 0, -8.74228e-08, -1, 0, 0, 0)
-mesh = ExtResource("3_oaj8d")
-surface_material_override/0 = ExtResource("4_hgbxp")
+[node name="skybox" parent="." instance=ExtResource("5_ylfm3")]

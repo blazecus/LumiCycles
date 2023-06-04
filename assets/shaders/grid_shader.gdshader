@@ -7,6 +7,9 @@ instance uniform float xwidth = 1.5f;
 uniform float sl = 200.0f;
 uniform float sl_portion = 3.0f;
 uniform float columns = 5.0f;
+uniform float time_offset = 0.0f;
+uniform float random_offset = 0.0f;
+
 void vertex() {
     //VERTEX = (MODELVIEW_MATRIX * vec4(VERTEX, 1.0)).xyz;
     //NORMAL = normalize((MODELVIEW_MATRIX * vec4(NORMAL, 0.0)).xyz);
@@ -54,6 +57,7 @@ void fragment() {
 	ALPHA *= (1.0f - smoothstep(0, 200.0f, af)) * smoothstep(25.0f, 50.0f, af);*/
 	//float columns = 5.0f;
 	
+	float to = TIME + time_offset;
 	
 	vec3 uv = vec3(UV.x * UV_scaling.x, UV.y * UV_scaling.y, world_vertex.z);
 	
@@ -61,12 +65,12 @@ void fragment() {
 	float column = floor(uv.x / (xwidth/columns));
 
 	float velocity = (random(column) + 0.2f) * -1.5f;
-	float fall = TIME * velocity;
+	float fall = to * velocity;
 	float streak_length = (1.0f/columns) * sl;//random2(vec2(column, 0.7f));
 	float new_y = uv.y + ((random(floor(uv.x * xwidth/columns)) - 0.5f) * 2.0f) * streak_length;
 	float brightness = 1.0f - smoothstep(0, streak_length/sl_portion, mod(new_y - mod(new_y, xwidth/columns) - mod(fall, streak_length), streak_length));
 	
-	float sample_letter = floor(random2(vec2(column, floor(new_y * columns / xwidth))) * 45.0f + random(floor((TIME * -velocity + new_y + streak_length / sl_portion) / (streak_length / -velocity))) * 45.0f);
+	float sample_letter = floor(random2(vec2(column, floor(new_y * columns / xwidth))) * 45.0f + random(floor((to * -velocity + new_y + streak_length / sl_portion) / (streak_length / -velocity))) * 45.0f);
 	float xuv = ((xmod * (columns / xwidth)) / 90.0f) + sample_letter / 90.0f;
 	vec4 sample = texture(letters, vec2(xuv, 1.0f - fract(new_y * columns / xwidth)));
 	ALBEDO = vec3((vec3(1) - sample.xyz) * (vec3(brightness/3.0f,brightness,brightness/3.0f) + vec3(step(0.967f, brightness)) ));
