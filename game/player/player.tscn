@@ -1,19 +1,38 @@
-[gd_scene load_steps=13 format=3 uid="uid://by2lxt6065kk5"]
+[gd_scene load_steps=17 format=3 uid="uid://by2lxt6065kk5"]
 
 [ext_resource type="Script" path="res://game/player/player.cs" id="1_oxyv2"]
 [ext_resource type="Script" path="res://game/player/player_camera.cs" id="2_mnuh0"]
 [ext_resource type="Material" uid="uid://c3txy5w43kvy7" path="res://assets/materials/bike_material.tres" id="2_pxky8"]
+[ext_resource type="ArrayMesh" uid="uid://bxm3nhe5b07h3" path="res://assets/meshes/bike_frame.obj" id="3_aavr1"]
+[ext_resource type="ArrayMesh" uid="uid://hfobick66h5f" path="res://assets/meshes/bike_glow.obj" id="4_eqt36"]
 [ext_resource type="Shader" path="res://assets/shaders/outline.gdshader" id="4_ywq8c"]
+[ext_resource type="Shader" path="res://assets/shaders/bike_glow.gdshader" id="5_3vy0v"]
 [ext_resource type="PackedScene" uid="uid://b2k6olndq6bwm" path="res://game/world/trail.tscn" id="5_wt6sh"]
 
-[sub_resource type="BoxMesh" id="BoxMesh_k8vaj"]
-material = ExtResource("2_pxky8")
-size = Vector3(0.5, 1, 2)
-
-[sub_resource type="BoxMesh" id="BoxMesh_rho0k"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_w4jxi"]
+render_priority = 0
+shader = ExtResource("5_3vy0v")
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_gdf23"]
-size = Vector3(0.5, 1, 2)
+size = Vector3(0.9, 1.4, 3)
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_bybvh"]
+emission_shape = 3
+emission_box_extents = Vector3(1, 1, 1)
+direction = Vector3(1, 0.5, 0)
+spread = 25.0
+initial_velocity_min = 25.0
+initial_velocity_max = 65.0
+angular_velocity_min = -30.0
+angular_velocity_max = 30.0
+angle_min = -15.0
+angle_max = 15.0
+collision_mode = 1
+collision_friction = 0.11
+collision_bounce = 0.55
+collision_use_scale = true
+
+[sub_resource type="BoxMesh" id="BoxMesh_8fqpr"]
 
 [sub_resource type="QuadMesh" id="QuadMesh_mw4k7"]
 size = Vector2(2, 2)
@@ -53,27 +72,28 @@ script = ExtResource("1_oxyv2")
 
 [node name="rotators" type="Node3D" parent="."]
 
-[node name="mesh" type="MeshInstance3D" parent="rotators"]
-mesh = SubResource("BoxMesh_k8vaj")
-skeleton = NodePath("../..")
+[node name="bike_frame" type="MeshInstance3D" parent="rotators"]
+transform = Transform3D(0.7, 0, 0, 0, 0.7, 0, 0, 0, 0.7, 0, 0, 0)
+mesh = ExtResource("3_aavr1")
+surface_material_override/0 = ExtResource("2_pxky8")
 
-[node name="mesh2" type="MeshInstance3D" parent="rotators/mesh"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.50638)
-mesh = SubResource("BoxMesh_rho0k")
-skeleton = NodePath("../../..")
+[node name="trailtop" type="Marker3D" parent="rotators/bike_frame"]
+transform = Transform3D(1.42857, 0, 0, 0, 1.42857, 0, 0, 0, 1.42857, 0, 0.714286, 0)
 
-[node name="trailtop" type="Marker3D" parent="rotators/mesh"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+[node name="trailbottom" type="Marker3D" parent="rotators/bike_frame"]
+transform = Transform3D(1.42857, 0, 0, 0, 1.42857, 0, 0, 0, 1.42857, 0, -0.714286, 0)
 
-[node name="trailbottom" type="Marker3D" parent="rotators/mesh"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+[node name="bike_frame2" type="MeshInstance3D" parent="rotators"]
+transform = Transform3D(0.7, 0, 0, 0, 0.7, 0, 0, 0, 0.7, 0, 0, 0)
+mesh = ExtResource("4_eqt36")
+surface_material_override/0 = SubResource("ShaderMaterial_w4jxi")
 
 [node name="hurtbox" type="CollisionShape3D" parent="."]
 transform = Transform3D(0.999026, 0, 0, 0, 0.999026, 0, 0, 0, 0.999026, 0, 0, 0)
 shape = SubResource("BoxShape3D_gdf23")
 
 [node name="slope_check" type="Node3D" parent="hurtbox"]
-transform = Transform3D(1.00097, 0, 0, 0, 1.00097, 0, 0, 0, 1.00097, 0, 0, 0)
+transform = Transform3D(1.00097, 0, 0, 0, 1.00097, 0, 0, 0, 1.00097, 0, 0, 0.423415)
 
 [node name="down" type="RayCast3D" parent="hurtbox/slope_check"]
 transform = Transform3D(1, 0, 0, 0, 1.5, 0, 0, 0, 1, 0, 0, 0.617619)
@@ -90,6 +110,18 @@ target_position = Vector3(1, 0, 0)
 transform = Transform3D(2, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.617619)
 target_position = Vector3(-1, 0, 0)
 
+[node name="GPUParticles3D" type="GPUParticles3D" parent="hurtbox"]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 0, 0, 0)
+emitting = false
+amount = 50
+lifetime = 5.0
+one_shot = true
+explosiveness = 0.99
+randomness = 0.24
+visibility_aabb = AABB(-200, -200, -200, 400, 400, 400)
+process_material = SubResource("ParticleProcessMaterial_bybvh")
+draw_pass_1 = SubResource("BoxMesh_8fqpr")
+
 [node name="PlayerCamera" type="Node3D" parent="."]
 script = ExtResource("2_mnuh0")
 
@@ -101,6 +133,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)
 [node name="Camera" type="Camera3D" parent="PlayerCamera/h/v"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4)
 near = 0.001
+far = 20000.0
 
 [node name="post_processing" type="MeshInstance3D" parent="PlayerCamera/h/v/Camera"]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, -0.409405)
@@ -109,9 +142,11 @@ mesh = SubResource("QuadMesh_mw4k7")
 surface_material_override/0 = SubResource("ShaderMaterial_n831k")
 
 [node name="move_direction_check" type="MeshInstance3D" parent="."]
+visible = false
 mesh = SubResource("BoxMesh_upq8o")
 
 [node name="normal_check" type="MeshInstance3D" parent="."]
+visible = false
 mesh = SubResource("BoxMesh_upq8o")
 
 [node name="trail" parent="." instance=ExtResource("5_wt6sh")]

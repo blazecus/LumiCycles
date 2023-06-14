@@ -83,7 +83,7 @@ void fragment() {
 	}
 	//ALPHA_SCISSOR_THRESHOLD = 0.6f;
 	
-		if(UV.x < edge_thickness || UV.y < edge_thickness)
+	if(UV.x < edge_thickness || UV.y < edge_thickness)
 	{
 		vec2 uvb = ((edge_thickness - UV) / edge_thickness) * 2.0f;
 		uvb = uvb * uvb * 2.0f;

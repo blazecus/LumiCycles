@@ -56,10 +56,10 @@ public partial class player : CharacterBody3D
 
 	public override void _Ready(){
 		rotators = GetNode<Node3D>("rotators");
-		mesh = GetNode<MeshInstance3D>("rotators/mesh");
+		mesh = GetNode<MeshInstance3D>("rotators/bike_frame");
 		hurtbox = GetNode<CollisionShape3D>("hurtbox");
-		trailtop = GetNode<Marker3D>("rotators/mesh/trailtop");
-		trailbottom = GetNode<Marker3D>("rotators/mesh/trailbottom");
+		trailtop = GetNode<Marker3D>("rotators/bike_frame/trailtop");
+		trailbottom = GetNode<Marker3D>("rotators/bike_frame/trailbottom");
 		camera = GetNode<player_camera>("PlayerCamera");
 		slope_check = hurtbox.GetNode<Node3D>("slope_check");
 		player_trail = GetNode<trail>("trail");
@@ -250,6 +250,7 @@ public partial class player : CharacterBody3D
 		rotators.Visible = false;
 		hurtbox.Disabled = true;
 		world_node.player_died();
+		hurtbox.GetNode<GpuParticles3D>("GPUParticles3D").Emitting = true;
 	}
 
 	public void spawn_player(Vector3 position){
@@ -277,6 +278,8 @@ public partial class player : CharacterBody3D
 		jump_timer = 0.0f;
 		air_timer = 0.0f;
 		player_trail.reset_trail();
+		hurtbox.GetNode<GpuParticles3D>("GPUParticles3D").Restart();
+		hurtbox.GetNode<GpuParticles3D>("GPUParticles3D").Emitting = false;
 	}
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer)]	

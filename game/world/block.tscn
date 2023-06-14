@@ -1,0 +1,32 @@
+[gd_scene load_steps=5 format=3 uid="uid://b4r8vuykpgn7b"]
+
+[ext_resource type="ArrayMesh" uid="uid://c3barpop1ntaj" path="res://assets/meshes/uvcube.obj" id="1_tuyyy"]
+[ext_resource type="Shader" path="res://assets/shaders/disc.gdshader" id="2_o1c1a"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_y0aav"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_8gohj"]
+render_priority = 0
+shader = ExtResource("2_o1c1a")
+shader_parameter/big_cell_size = 0.08
+shader_parameter/big_thickness = 0.01
+shader_parameter/small_cell_size = 0.02
+shader_parameter/small_thickness = 0.003
+shader_parameter/tiny_cell_size = 0.002
+shader_parameter/tiny_thickness = 0.0004
+shader_parameter/edge_thickness = 0.1
+
+[node name="Block" type="StaticBody3D"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
+shape = SubResource("BoxShape3D_y0aav")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 0, 0, 0)
+mesh = ExtResource("1_tuyyy")
+surface_material_override/0 = SubResource("ShaderMaterial_8gohj")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = ExtResource("1_tuyyy")
+surface_material_override/0 = SubResource("ShaderMaterial_8gohj")

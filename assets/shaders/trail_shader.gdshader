@@ -2,6 +2,9 @@ shader_type spatial;
 
 instance uniform vec4 input_color = vec4(0.0f);
 
+uniform float edge_thickness_base = 0.25f;
+uniform float edge_thickness_minimum = 0.15f;
+
 float random (in float x) {
     return fract(sin(x)*1e4);
 }
@@ -29,10 +32,63 @@ void fragment() {
 	ALBEDO = input_color.xyz / 2.0f + vec3(col * col * input_color.xyz);
 	//ALBEDO *= 1.3f;
 	
-	float vy = UV.y - sign(UV.y - 0.5f) * random2(UV + VERTEX.xz) * .06f;
-	if(vy < 0.09f || vy > 0.91f){
-		ALBEDO += vec3(0.85f);
-	}
+	//float vy = UV.y - sign(UV.y - 0.5f) * random2(UV + VERTEX.xz) * .06f;
+	//if(vy < 0.09f || vy > 0.91f){
+	//	ALBEDO += vec3(0.85f);
+	//}
 	EMISSION = ALBEDO;
+	
+	/*
+	float ya = 0.2f;
+	if(UV.y > .5f){
+		ya = 0.8f;
+	}
+	float edge_thickness = random2(vec2(UV.x / 10000000.0f, ya * TIME / 15000000.0f));
+	edge_thickness += random2(vec2((UV.x + 1000.0f) / 32342400.0f, ya/2.0f * (TIME + 500.0f) / 30000000.0f));
+	edge_thickness += random2(vec2((UV.x + 1500.0f) / 86435600.0f, ya/3.0f * (TIME + 1500.0f) / 60000000.0f));
+	edge_thickness *= edge_thickness_base / 3.0f + edge_thickness_minimum;
+	*/
+	float edge_thickness = 0.3f;
+	
+	if(UV.x < edge_thickness || UV.y < edge_thickness)
+	{
+		vec2 uvb = ((edge_thickness - UV) / edge_thickness) * 2.0f;
+		uvb = uvb * uvb * 2.0f;
+		float lx_factor = 0.0f;
+		float ly_factor = 0.0f;
+		if(UV.x < edge_thickness){
+			lx_factor = uvb.x;
+		}
+		if(UV.y < edge_thickness){
+			ly_factor = uvb.y;
+		}
+		float line_factor = max(lx_factor,ly_factor) * 1.8f;
+		line_factor -= mod(line_factor, 2.0f);
+		vec3 check_emission = vec3(0.1f,0.1f,1.5f) * line_factor;
+		//if(check_emission.x > 0.075f){
+		//	EMISSION = check_emission;			
+		//}
+		EMISSION += check_emission;
+	}
+	if(UV.y > 1.0f - edge_thickness){
+		vec2 uvb = ((edge_thickness - (1.0f - UV)) / edge_thickness) * 2.0f;
+		uvb = uvb * uvb * 2.0f;
+		float lx_factor = 0.0f;
+		float ly_factor = 0.0f;
+		if(UV.y > 1.0f- edge_thickness){
+			ly_factor = uvb.y;
+		}
+		float line_factor = max(lx_factor,ly_factor) * 1.8f;
+		line_factor -= mod(line_factor, 2.0f);
+		if(UV.y > 1.0f-UV.x){
+			vec3 check_emission = vec3(0.1f,0.1f,1.5f) * line_factor;
+			//if(check_emission.x > 0.075f){
+			//	EMISSION = check_emission;			
+			//}
+			EMISSION += check_emission;
+		}
+
+	}
+	
 	RADIANCE = vec4(ALBEDO, 1.0f);
 }

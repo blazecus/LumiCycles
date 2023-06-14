@@ -29,3 +29,7 @@ visible = false
 
 [node name="cube-col2" parent="." instance=ExtResource("2_1oxga")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -13.3063, 0)
+
+[node name="GPUParticlesCollisionBox3D" type="GPUParticlesCollisionBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -13.306, 0)
+size = Vector3(1200, 20, 1200)

@@ -1,12 +1,23 @@
-[gd_scene load_steps=10 format=3 uid="uid://biw0elc50uhw3"]
+[gd_scene load_steps=13 format=3 uid="uid://biw0elc50uhw3"]
 
 [ext_resource type="Script" path="res://game/world/map.cs" id="1_egvj7"]
 [ext_resource type="PackedScene" uid="uid://f2csca4lth31" path="res://game/world/stages/stage3.tscn" id="2_860v5"]
 [ext_resource type="Shader" path="res://assets/shaders/grid_floater.gdshader" id="2_kjo7x"]
+[ext_resource type="Shader" path="res://assets/shaders/sky.gdshader" id="2_ws00h"]
 [ext_resource type="PackedScene" uid="uid://dapvc56m5hi0p" path="res://game/world/skybox.tscn" id="5_ylfm3"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_msshq"]
+shader = ExtResource("2_ws00h")
+shader_parameter/grid_size = 0.008
+shader_parameter/grid_width = 0.00025
+shader_parameter/x_scale = 1.5
+
+[sub_resource type="Sky" id="Sky_hltkv"]
+sky_material = SubResource("ShaderMaterial_msshq")
 
 [sub_resource type="Environment" id="Environment_a1mh4"]
 background_mode = 2
+sky = SubResource("Sky_hltkv")
 ambient_light_color = Color(0.235294, 0.235294, 0.235294, 1)
 ambient_light_sky_contribution = 0.23
 ambient_light_energy = 3.0
@@ -80,13 +91,6 @@ collision_base_size = 0.0
 visibility_aabb = AABB(-600, -300, -600, 1200, 900, 1200)
 process_material = SubResource("ParticleProcessMaterial_m0edg")
 draw_pass_1 = SubResource("ArrayMesh_ebqtl")
-
-[node name="OmniLight3D" type="OmniLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.9961, 8.21158, -9.71331)
-visible = false
-light_energy = 16.0
-light_indirect_energy = 13.385
-omni_range = 838.553
 
 [node name="stage" parent="." instance=ExtResource("2_860v5")]
 
