@@ -5,3 +5,5 @@
 [resource]
 render_priority = 0
 shader = ExtResource("1_yfdfb")
+shader_parameter/time_cycle = 9.0
+shader_parameter/box_size = 0.1

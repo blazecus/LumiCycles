@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://f2csca4lth31"]
+[gd_scene load_steps=4 format=3 uid="uid://f2csca4lth31"]
 
 [ext_resource type="Script" path="res://game/world/stages/stage3.cs" id="1_614si"]
 [ext_resource type="PackedScene" uid="uid://c6cycpr05344g" path="res://game/world/cube_col.tscn" id="2_1oxga"]
+[ext_resource type="PackedScene" uid="uid://bi63ry3svvg1d" path="res://game/world/interactables/booster.tscn" id="3_14vnf"]
 
 [node name="stage3" type="Node3D"]
 script = ExtResource("1_614si")
@@ -33,3 +34,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -13.3063, 0)
 [node name="GPUParticlesCollisionBox3D" type="GPUParticlesCollisionBox3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -13.306, 0)
 size = Vector3(1200, 20, 1200)
+
+[node name="Booster" parent="." instance=ExtResource("3_14vnf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.479271, -79.2678)

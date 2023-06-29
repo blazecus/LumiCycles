@@ -1,0 +1,49 @@
+[gd_scene load_steps=5 format=3 uid="uid://bi63ry3svvg1d"]
+
+[ext_resource type="Script" path="res://game/world/interactables/booster.cs" id="1_1damo"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_gqppu"]
+size = Vector3(10, 10, 10)
+
+[sub_resource type="BoxMesh" id="BoxMesh_labm4"]
+size = Vector3(1, 1, 10)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_t7iue"]
+
+[node name="Booster" type="Area3D"]
+script = ExtResource("1_1damo")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape3D_gqppu")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 0, 0)
+mesh = SubResource("BoxMesh_labm4")
+surface_material_override/0 = SubResource("ShaderMaterial_t7iue")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 4, 0)
+mesh = SubResource("BoxMesh_labm4")
+surface_material_override/0 = SubResource("ShaderMaterial_t7iue")
+
+[node name="MeshInstance3D3" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, -4, 0)
+mesh = SubResource("BoxMesh_labm4")
+surface_material_override/0 = SubResource("ShaderMaterial_t7iue")
+
+[node name="MeshInstance3D4" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 0, 0)
+mesh = SubResource("BoxMesh_labm4")
+surface_material_override/0 = SubResource("ShaderMaterial_t7iue")
+
+[node name="MeshInstance3D5" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 4, 0)
+mesh = SubResource("BoxMesh_labm4")
+surface_material_override/0 = SubResource("ShaderMaterial_t7iue")
+
+[node name="MeshInstance3D6" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, -4, 0)
+mesh = SubResource("BoxMesh_labm4")
+surface_material_override/0 = SubResource("ShaderMaterial_t7iue")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

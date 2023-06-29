@@ -19,6 +19,7 @@ public partial class player : CharacterBody3D
 	public const float JUMP_BUFFER = 0.2f;
 	public const float AIR_ROTATE_BUFFER = 0.1f;
 	public const float NORMAL_ROTATION_SPEED = 4.5f;
+	public const float SPEED_BOOST_DURATION = 3.0f;
 	public PackedScene trail_scene = ResourceLoader.Load<PackedScene>("res://game/world/trail.tscn"); 
 
 	private world world_node;
@@ -43,6 +44,7 @@ public partial class player : CharacterBody3D
 	private float velocity_magnitude = 1.0f;
 	private float jump_timer = 0.0f;
 	private float air_timer = 0.0f;
+	private float boosting = 0.02f;
 	public Color color = new Color(0.0f, 0.0f, 0.0f, 1.0f);
 
 	[Export]
@@ -181,6 +183,8 @@ public partial class player : CharacterBody3D
 			rotators.Rotate(move_direction, -rotation_amount * 8.0f);
 			bool boosting = Input.IsActionPressed("boost");
 			camera.toggle_zoomed_in(boosting);
+
+			//velocity determination
 			if(velocity.Length() >= TOP_SPEED){
 				velocity = move_direction * (boosting ? BOOST_TOP_SPEED : TOP_SPEED);
 			}
@@ -290,6 +294,7 @@ public partial class player : CharacterBody3D
 		color = input_color;
 		player_trail.set_color(input_color);
 		mesh.SetInstanceShaderParameter("input_color", color);
+		//hurtbox.GetNode<GpuParticles3D>("GPUParticles3D").DrawPass1.SetInstanceShaderParameter("input_color", color);
 	}
 
 	public void prepare_destruction(){
@@ -297,6 +302,11 @@ public partial class player : CharacterBody3D
 	}
 
 	public bool can_kill(){
+		return true;
+	}
+
+	public bool speed_up(){
+		boosting = 1;
 		return true;
 	}
 }
