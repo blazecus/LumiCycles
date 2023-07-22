@@ -1,6 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://bi63ry3svvg1d"]
+[gd_scene load_steps=6 format=3 uid="uid://bi63ry3svvg1d"]
 
 [ext_resource type="Script" path="res://game/world/interactables/booster.cs" id="1_1damo"]
+[ext_resource type="Shader" path="res://assets/shaders/booster.gdshader" id="2_qh1b5"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_gqppu"]
 size = Vector3(10, 10, 10)
@@ -9,6 +10,8 @@ size = Vector3(10, 10, 10)
 size = Vector3(1, 1, 10)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_t7iue"]
+render_priority = 0
+shader = ExtResource("2_qh1b5")
 
 [node name="Booster" type="Area3D"]
 script = ExtResource("1_1damo")

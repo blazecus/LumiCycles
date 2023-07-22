@@ -7,12 +7,15 @@
 properties/0/path = NodePath(".:rounds_left")
 properties/0/spawn = true
 properties/0/sync = true
+properties/0/watch = false
 properties/1/path = NodePath(".:total_rounds")
 properties/1/spawn = true
 properties/1/sync = true
+properties/1/watch = false
 properties/2/path = NodePath(".:player_win_count")
 properties/2/spawn = true
 properties/2/sync = true
+properties/2/watch = false
 
 [node name="World" type="Node3D"]
 script = ExtResource("1_6e24p")

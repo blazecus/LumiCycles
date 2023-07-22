@@ -11,5 +11,5 @@ shader_parameter/sl_portion = 3.0
 shader_parameter/columns = 3.0
 shader_parameter/time_offset = 200.0
 shader_parameter/random_offset = 0.0
-shader_parameter/input_color = Quaternion(0.7, 0.7, 1, 1)
+shader_parameter/input_color = Vector4(0.7, 0.7, 1, 1)
 shader_parameter/letters = ExtResource("2_sueyp")
