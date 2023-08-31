@@ -4,13 +4,15 @@ using System;
 
 public partial class player : CharacterBody3D
 {
-	public const float TOP_SPEED = 17.0f;
-	public const float ACCELERATION = 10.0f;
-	public const float BOOST_TOP_SPEED = 34.0f;
-	public const float BOOST_ACCELERATION = 24.0f;
+	public const float SPEED = 25.0f;
+	public const float ACCELERATION = 1.5f;
+	public const float BOOST_ADDITIONAL_SPEED = 17.0f;
+	public const float BOOST_ADDITIONAL_ACCELERATION = 4.5f;
+	public const float SKATE_ADDITIONAL_SPEED = 20.0f;
+	public const float SKATE_ADDITIONAL_ACCELERATION = -0.75f;
 	public const float JUMP_VELOCITY = 5.9f;
 	public const float WHEEL_SPEED = 1.2f;
-	public const float MOVE_DIRECTION_ROTATION_SPEED = 1.7f;
+	public const float MOVE_DIRECTION_ROTATION_SPEED = 3.3f;
 	public const float DRAG_COEFF = 0.4f;
 	public const float TRAIL_CHECK_INTERVAL = 0.1f;
 	public const float TRAIL_LENGTH_INTERVAL = 0.5f;
@@ -31,6 +33,7 @@ public partial class player : CharacterBody3D
 	private Node3D rotators;
 	private player_camera camera;
 	private Node3D slope_check;
+	private trail skating_trail;
 	private Vector3 move_direction = new Vector3(0.0f, 0.0f, 1.0f);
 	private float wheel_position = 0.0f;
 
@@ -45,6 +48,7 @@ public partial class player : CharacterBody3D
 	private float jump_timer = 0.0f;
 	private float air_timer = 0.0f;
 	private float boosting = 0.02f;
+	private float current_speed = SPEED;
 	public Color color = new Color(0.0f, 0.0f, 0.0f, 1.0f);
 
 	[Export]
@@ -69,12 +73,12 @@ public partial class player : CharacterBody3D
 		//player_trail.setup(this);
 		world_node = GetParent().GetParent<world>();
 		//world_node.GetNode("Trails").AddChild(player_trail);
-		camera.toggle_zoomed_in(false);
 
 		camera.camera.Current = IsMultiplayerAuthority();
 	}
 	public override void _PhysicsProcess(double delta)
 	{
+		GD.Print(current_speed);
 		//only run process if authority
 		if(!IsMultiplayerAuthority()){
 			return;
@@ -158,7 +162,8 @@ public partial class player : CharacterBody3D
 		wheel_position = -controller_left_x;
 
 		//turning
-		float rotation_amount = wheel_position * deltaf * (velocity.Length() / TOP_SPEED) * MOVE_DIRECTION_ROTATION_SPEED;
+		//consider changing this algorithm - seems to work decently but using velocity.length is weird + it ranges froms omething like .5 to 1 which is also weird
+		float rotation_amount = wheel_position * deltaf * (velocity.Length() / (SPEED + SKATE_ADDITIONAL_SPEED + BOOST_ADDITIONAL_SPEED)) * MOVE_DIRECTION_ROTATION_SPEED;
 		if(velocity.Length() < 1 || !IsOnFloor()){
 			rotation_amount = wheel_position * deltaf * MOVE_DIRECTION_ROTATION_SPEED * 0.5f;
 		}
@@ -178,19 +183,15 @@ public partial class player : CharacterBody3D
 		rotators.LookAt(lookat_pos, current_normal);
 		hurtbox.LookAt(lookat_pos, current_normal); 
 		
+		//determine speed
+		float goal_speed = SPEED + (Input.IsActionPressed("boost") ? 1 : 0) * BOOST_ADDITIONAL_SPEED + (skating_trail != null ? 1 : 0) * SKATE_ADDITIONAL_SPEED;
+		float current_acceleration = ACCELERATION + (Input.IsActionPressed("boost") ? 1 : 0) * BOOST_ADDITIONAL_ACCELERATION + (skating_trail != null ? 1 : 0) * SKATE_ADDITIONAL_ACCELERATION;
+		current_speed = Mathf.Lerp(current_speed, goal_speed, current_acceleration * deltaf);
+
 		//movement!
 		if(IsOnFloor() && jump_timer > JUMP_BUFFER){
 			rotators.Rotate(move_direction, -rotation_amount * 8.0f);
-			bool boosting = Input.IsActionPressed("boost");
-			camera.toggle_zoomed_in(boosting);
-
-			//velocity determination
-			if(velocity.Length() >= TOP_SPEED){
-				velocity = move_direction * (boosting ? BOOST_TOP_SPEED : TOP_SPEED);
-			}
-			else{
-			 	velocity = move_direction * (velocity_magnitude + (boosting ? BOOST_ACCELERATION : ACCELERATION) * deltaf);
-			}
+			velocity = move_direction * current_speed;
 		}
 
 		// Handle Jump.
@@ -295,6 +296,22 @@ public partial class player : CharacterBody3D
 		player_trail.set_color(input_color);
 		mesh.SetInstanceShaderParameter("input_color", color);
 		//hurtbox.GetNode<GpuParticles3D>("GPUParticles3D").DrawPass1.SetInstanceShaderParameter("input_color", color);
+	}
+
+	public void _on_skate_check_body_entered(Node3D body){
+		if(body.HasMethod("reset_trail") && skating_trail == null){
+			skating_trail = (trail)body;
+		}
+	}
+
+	public void _on_skate_check_body_exited(Node3D body){
+		if(body.HasMethod("reset_trail") && (trail)body == skating_trail){
+			skating_trail = null;
+		}
+	}
+
+	public float get_current_zoom(float min_zoom, float max_zoom){
+		return max_zoom - ((current_speed - SPEED) / (BOOST_ADDITIONAL_SPEED + SKATE_ADDITIONAL_SPEED)) * (max_zoom - min_zoom);
 	}
 
 	public void prepare_destruction(){

@@ -25,7 +25,7 @@ public partial class trail : StaticBody3D
 	public Godot.Collections.Array<Vector3> points;
 	public Godot.Collections.Array<Vector3> added_points;
 	public int added_count = 0;
-	private player parent_player;
+	public player parent_player;
 	private int polygon_counter = 0;
 	private int start_index = 0;
 	private int network_authority_id = 0;

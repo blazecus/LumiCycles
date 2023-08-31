@@ -1,5 +1,6 @@
-[gd_scene load_steps=5 format=3 uid="uid://b4r8vuykpgn7b"]
+[gd_scene load_steps=6 format=3 uid="uid://b4r8vuykpgn7b"]
 
+[ext_resource type="Script" path="res://game/world/block.cs" id="1_cljiu"]
 [ext_resource type="ArrayMesh" uid="uid://c3barpop1ntaj" path="res://assets/meshes/uvcube.obj" id="1_tuyyy"]
 [ext_resource type="Shader" path="res://assets/shaders/disc.gdshader" id="2_o1c1a"]
 
@@ -17,6 +18,7 @@ shader_parameter/tiny_thickness = 0.0004
 shader_parameter/edge_thickness = 0.1
 
 [node name="Block" type="StaticBody3D"]
+script = ExtResource("1_cljiu")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)

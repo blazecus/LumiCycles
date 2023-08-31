@@ -1,10 +1,11 @@
-[gd_scene load_steps=13 format=3 uid="uid://biw0elc50uhw3"]
+[gd_scene load_steps=14 format=3 uid="uid://biw0elc50uhw3"]
 
 [ext_resource type="Script" path="res://game/world/map.cs" id="1_egvj7"]
 [ext_resource type="PackedScene" uid="uid://f2csca4lth31" path="res://game/world/stages/stage3.tscn" id="2_860v5"]
 [ext_resource type="Shader" path="res://assets/shaders/grid_floater.gdshader" id="2_kjo7x"]
 [ext_resource type="Shader" path="res://assets/shaders/sky.gdshader" id="2_ws00h"]
 [ext_resource type="PackedScene" uid="uid://dapvc56m5hi0p" path="res://game/world/skybox.tscn" id="5_ylfm3"]
+[ext_resource type="PackedScene" uid="uid://b4r8vuykpgn7b" path="res://game/world/block.tscn" id="6_mpnfp"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_msshq"]
 shader = ExtResource("2_ws00h")
@@ -95,3 +96,23 @@ draw_pass_1 = SubResource("ArrayMesh_ebqtl")
 [node name="stage" parent="." instance=ExtResource("2_860v5")]
 
 [node name="skybox" parent="." instance=ExtResource("5_ylfm3")]
+
+[node name="Platforms" type="Node" parent="."]
+
+[node name="Block0" parent="Platforms" instance=ExtResource("6_mpnfp")]
+
+[node name="Block1" parent="Platforms" instance=ExtResource("6_mpnfp")]
+
+[node name="Block2" parent="Platforms" instance=ExtResource("6_mpnfp")]
+
+[node name="Block3" parent="Platforms" instance=ExtResource("6_mpnfp")]
+
+[node name="Block4" parent="Platforms" instance=ExtResource("6_mpnfp")]
+
+[node name="Block5" parent="Platforms" instance=ExtResource("6_mpnfp")]
+
+[node name="Block6" parent="Platforms" instance=ExtResource("6_mpnfp")]
+
+[node name="Block7" parent="Platforms" instance=ExtResource("6_mpnfp")]
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]

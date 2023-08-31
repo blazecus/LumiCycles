@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://by2lxt6065kk5"]
+[gd_scene load_steps=18 format=3 uid="uid://by2lxt6065kk5"]
 
 [ext_resource type="Script" path="res://game/player/player.cs" id="1_oxyv2"]
 [ext_resource type="Script" path="res://game/player/player_camera.cs" id="2_mnuh0"]
@@ -13,6 +13,9 @@
 render_priority = 0
 shader = ExtResource("5_3vy0v")
 shader_parameter/time_cycle = 5.0
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_18vjj"]
+size = Vector3(3, 1, 2)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_gdf23"]
 size = Vector3(0.9, 1.4, 3)
@@ -98,15 +101,22 @@ mesh = ExtResource("3_aavr1")
 surface_material_override/0 = ExtResource("2_pxky8")
 
 [node name="trailtop" type="Marker3D" parent="rotators/bike_frame"]
-transform = Transform3D(1.42857, 0, 0, 0, 1.42857, 0, 0, 0, 1.42857, 0, 0.714286, 0)
+transform = Transform3D(1.42857, 0, 0, 0, 1.42857, 0, 0, 0, 1.42857, 0, 0.714, -1)
 
 [node name="trailbottom" type="Marker3D" parent="rotators/bike_frame"]
-transform = Transform3D(1.42857, 0, 0, 0, 1.42857, 0, 0, 0, 1.42857, 0, -0.714286, 0)
+transform = Transform3D(1.42857, 0, 0, 0, 1.42857, 0, 0, 0, 1.42857, 0, -0.714, -1)
 
 [node name="bike_frame2" type="MeshInstance3D" parent="rotators"]
 transform = Transform3D(0.7, 0, 0, 0, 0.7, 0, 0, 0, 0.7, 0, 0, 0)
 mesh = ExtResource("4_eqt36")
 surface_material_override/0 = SubResource("ShaderMaterial_w4jxi")
+
+[node name="skate_check" type="Area3D" parent="rotators"]
+transform = Transform3D(0.999026, 0, 0, 0, 0.999026, 0, 0, 0, 0.999026, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="rotators/skate_check"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.832467)
+shape = SubResource("BoxShape3D_18vjj")
 
 [node name="hurtbox" type="CollisionShape3D" parent="."]
 transform = Transform3D(0.999026, 0, 0, 0, 0.999026, 0, 0, 0, 0.999026, 0, 0, 0)
@@ -175,3 +185,6 @@ top_level = true
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_t5hu2")
+
+[connection signal="body_entered" from="rotators/skate_check" to="." method="_on_skate_check_body_entered"]
+[connection signal="body_exited" from="rotators/skate_check" to="." method="_on_skate_check_body_exited"]

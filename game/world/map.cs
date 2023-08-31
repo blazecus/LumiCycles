@@ -6,6 +6,19 @@ public partial class map : Node3D
 	const int GRID_SIZE = 12;
 	const float GRID_CELL_SIZE = 50.0f;
 	const float GRID_EDGE_WIDTH = 2.5f;
+	const int BLOCK_COUNT = 8;
+	const int BLOCK_SCALE_MIN = 40;
+	const int BLOCK_SCALE_MAX = 160;
+	const int BLOCK_X_BOUND = 500;
+	const int BLOCK_Y_BOUND = 500;
+	const int BLOCK_Z_MIN = 100;
+	const int BLOCK_Z_MAX = 200;
+	public int network_authority_id = 0;
+	private RandomNumberGenerator rng;
+	public Godot.Collections.Array<Vector3> block_position_array;
+	public Godot.Collections.Array<Vector3> block_scale_array;
+	public Godot.Collections.Array<Vector3> block_dir_array;
+	public Godot.Collections.Array<float> block_speed_array;
 	private Material grid_material = GD.Load<Material>("res://assets/materials/grid_material.tres");
 	private Node3D grid_meshes;
 	private MeshInstance3D mesh;
@@ -14,17 +27,54 @@ public partial class map : Node3D
 
 	public override void _Ready()
 	{
+		GD.Seed(2397458);
+		rng = new RandomNumberGenerator();
+
 		world_node = GetParent<world>();
 		grid_meshes = GetNode<Node3D>("grid_meshes");
 		mesh = GetNode<MeshInstance3D>("grid");
 		imesh = new ImmediateMesh();
 		mesh.Mesh = imesh;
 		mesh.SetInstanceShaderParameter("xwidth", GRID_EDGE_WIDTH);
+		for(int i = 0; i < BLOCK_COUNT; i++){
+			block_position_array.Add(Vector3.Zero);
+			block_scale_array.Add(Vector3.Zero);
+			block_dir_array.Add(Vector3.Zero);
+			block_speed_array.Add(0);
+			reset_block(i);
+		}
+
 		//set_up_imesh_grid();
 		//set_up_cube_mesh_grid();
 	}
 
-	// Called every frame. 'delta' is the elapsed time since the previous frame.
+	public void reset_block(int i){
+		int seed = rng.RandiRange(0,3);
+		int dsign = Mathf.Sign(seed - 1.5f);
+		block_dir_array[i] = new Vector3(seed%2==0 ? dsign : 0, seed%2==1 ? dsign : 0, 0);
+		
+	}
+
+	public void update_blocks(float delta){
+		//blocks controlled here to make sync easy
+		for(int i = 0; i < BLOCK_COUNT; i++){
+			block_position_array[i] += block_dir_array[i] * block_speed_array[i] * delta;
+
+			//out of bounds
+			if( block_position_array[i].X < -BLOCK_X_BOUND || block_position_array[i].X > BLOCK_X_BOUND || 
+			    block_position_array[i].Y < -BLOCK_Y_BOUND || block_position_array[i].Y > BLOCK_Y_BOUND){
+					reset_block(i);
+			}
+
+			block cblock = (block)GetNode<Node>("Platforms").GetChildren()[i];
+			cblock.GlobalPosition = block_position_array[i];
+		}
+	}
+	public void multiplayer_setup(int net_id){
+		network_authority_id = net_id;
+		SetMultiplayerAuthority(network_authority_id);
+	}
+
 	public override void _Process(double delta)
 	{
 		mesh.SetInstanceShaderParameter("player_position", world_node.authority_player_position);

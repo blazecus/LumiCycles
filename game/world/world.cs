@@ -86,7 +86,10 @@ public partial class world : Node
 		// listen to peer disconnections, and destroy their players
 		Multiplayer.PeerDisconnected += DestroyPlayer;	
 
-		CreatePlayer(Multiplayer.GetUniqueId());
+		int temp_id = Multiplayer.GetUniqueId();
+		CreatePlayer(temp_id);
+		//GetNode<map>("Map").set_mu
+		
 		upnp_setup();
 	}
 
