@@ -5,11 +5,11 @@ using System;
 public partial class player : CharacterBody3D
 {
 	public const float SPEED = 25.0f;
-	public const float ACCELERATION = 1.5f;
+	public const float ACCELERATION = 0.8f;
 	public const float BOOST_ADDITIONAL_SPEED = 17.0f;
-	public const float BOOST_ADDITIONAL_ACCELERATION = 4.5f;
+	public const float BOOST_ADDITIONAL_ACCELERATION = 0.3f;
 	public const float SKATE_ADDITIONAL_SPEED = 20.0f;
-	public const float SKATE_ADDITIONAL_ACCELERATION = -0.75f;
+	public const float SKATE_ADDITIONAL_ACCELERATION = -0.3f;
 	public const float JUMP_VELOCITY = 5.9f;
 	public const float WHEEL_SPEED = 1.2f;
 	public const float MOVE_DIRECTION_ROTATION_SPEED = 3.3f;
@@ -23,11 +23,12 @@ public partial class player : CharacterBody3D
 	public const float NORMAL_ROTATION_SPEED = 4.5f;
 	public const float SPEED_BOOST_DURATION = 3.0f;
 	public PackedScene trail_scene = ResourceLoader.Load<PackedScene>("res://game/world/trail.tscn"); 
-
 	private world world_node;
 	private trail player_trail;
 	public Marker3D trailtop;
 	public Marker3D trailbottom;
+	public Marker3D topfront;
+	public Marker3D bottomfront;
 	private MeshInstance3D mesh;
 	private CollisionShape3D hurtbox;
 	private Node3D rotators;
@@ -66,6 +67,8 @@ public partial class player : CharacterBody3D
 		hurtbox = GetNode<CollisionShape3D>("hurtbox");
 		trailtop = GetNode<Marker3D>("rotators/bike_frame/trailtop");
 		trailbottom = GetNode<Marker3D>("rotators/bike_frame/trailbottom");
+		topfront = GetNode<Marker3D>("rotators/bike_frame/topfront");
+		bottomfront = GetNode<Marker3D>("rotators/bike_frame/bottomfront");
 		camera = GetNode<player_camera>("PlayerCamera");
 		slope_check = hurtbox.GetNode<Node3D>("slope_check");
 		player_trail = GetNode<trail>("trail");
@@ -78,7 +81,6 @@ public partial class player : CharacterBody3D
 	}
 	public override void _PhysicsProcess(double delta)
 	{
-		GD.Print(current_speed);
 		//only run process if authority
 		if(!IsMultiplayerAuthority()){
 			return;
@@ -255,7 +257,7 @@ public partial class player : CharacterBody3D
 		rotators.Visible = false;
 		hurtbox.Disabled = true;
 		world_node.player_died();
-		hurtbox.GetNode<GpuParticles3D>("GPUParticles3D").Emitting = true;
+		hurtbox.GetNode<GpuParticles3D>("death_particles").Emitting = true;
 	}
 
 	public void spawn_player(Vector3 position){
@@ -283,8 +285,8 @@ public partial class player : CharacterBody3D
 		jump_timer = 0.0f;
 		air_timer = 0.0f;
 		player_trail.reset_trail();
-		hurtbox.GetNode<GpuParticles3D>("GPUParticles3D").Restart();
-		hurtbox.GetNode<GpuParticles3D>("GPUParticles3D").Emitting = false;
+		hurtbox.GetNode<GpuParticles3D>("death_particles").Restart();
+		hurtbox.GetNode<GpuParticles3D>("death_particles").Emitting = false;
 	}
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer)]	

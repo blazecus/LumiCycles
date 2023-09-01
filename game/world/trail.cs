@@ -18,7 +18,7 @@ public partial class trail : StaticBody3D
 	public const float TRAIL_STARTUP = 1.5f;
 	public const float UV_SCALING_FACTOR = 1.0f;
 
-	private Material trail_material = GD.Load<Material>("res://assets/materials/trail_material.tres");
+	public Material trail_material = GD.Load<Material>("res://assets/materials/trail_material.tres");
 
 	private MeshInstance3D mesh;
 	private ImmediateMesh imesh;

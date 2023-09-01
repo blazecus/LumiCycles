@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://by2lxt6065kk5"]
+[gd_scene load_steps=21 format=3 uid="uid://by2lxt6065kk5"]
 
 [ext_resource type="Script" path="res://game/player/player.cs" id="1_oxyv2"]
 [ext_resource type="Script" path="res://game/player/player_camera.cs" id="2_mnuh0"]
@@ -9,13 +9,26 @@
 [ext_resource type="Shader" path="res://assets/shaders/bike_glow.gdshader" id="5_3vy0v"]
 [ext_resource type="PackedScene" uid="uid://b2k6olndq6bwm" path="res://game/world/trail.tscn" id="5_wt6sh"]
 
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_o7cyf"]
+lifetime_randomness = 1.0
+emission_shape = 3
+emission_box_extents = Vector3(0.19, 0.6, 0.2)
+gravity = Vector3(0, 0, 0)
+scale_min = 0.5
+scale_max = 1.5
+
+[sub_resource type="BoxMesh" id="BoxMesh_grqwo"]
+size = Vector3(0.3, 0.3, 0.4)
+
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_w4jxi"]
 render_priority = 0
 shader = ExtResource("5_3vy0v")
 shader_parameter/time_cycle = 5.0
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_18vjj"]
-size = Vector3(3, 1, 2)
+size = Vector3(5, 1, 2)
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_5xj4i"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_gdf23"]
 size = Vector3(0.9, 1.4, 3)
@@ -95,16 +108,30 @@ script = ExtResource("1_oxyv2")
 
 [node name="rotators" type="Node3D" parent="."]
 
+[node name="trail_particles" type="GPUParticles3D" parent="rotators"]
+transform = Transform3D(0.999999, 0, 0, 0, 0.999999, 0, 0, 0, 0.999999, 0, 0.0975776, -1.65317)
+amount = 250
+lifetime = 0.5
+collision_base_size = 0.0
+process_material = SubResource("ParticleProcessMaterial_o7cyf")
+draw_pass_1 = SubResource("BoxMesh_grqwo")
+
 [node name="bike_frame" type="MeshInstance3D" parent="rotators"]
 transform = Transform3D(0.7, 0, 0, 0, 0.7, 0, 0, 0, 0.7, 0, 0, 0)
 mesh = ExtResource("3_aavr1")
 surface_material_override/0 = ExtResource("2_pxky8")
 
 [node name="trailtop" type="Marker3D" parent="rotators/bike_frame"]
-transform = Transform3D(1.42857, 0, 0, 0, 1.42857, 0, 0, 0, 1.42857, 0, 0.714, -1)
+transform = Transform3D(1.42857, 0, 0, 0, 1.42857, 0, 0, 0, 1.42857, 0, 0.714, -2.34139)
 
 [node name="trailbottom" type="Marker3D" parent="rotators/bike_frame"]
-transform = Transform3D(1.42857, 0, 0, 0, 1.42857, 0, 0, 0, 1.42857, 0, -0.714, -1)
+transform = Transform3D(1.42857, 0, 0, 0, 1.42857, 0, 0, 0, 1.42857, 0, -0.714, -2.34139)
+
+[node name="topfront" type="Marker3D" parent="rotators/bike_frame"]
+transform = Transform3D(1.42857, 0, 0, 0, 1.42857, 0, 0, 0, 1.42857, 0, 0.714, 4.40728)
+
+[node name="bottomfront" type="Marker3D" parent="rotators/bike_frame"]
+transform = Transform3D(1.42857, 0, 0, 0, 1.42857, 0, 0, 0, 1.42857, 0, -0.714, 4.40728)
 
 [node name="bike_frame2" type="MeshInstance3D" parent="rotators"]
 transform = Transform3D(0.7, 0, 0, 0, 0.7, 0, 0, 0, 0.7, 0, 0, 0)
@@ -117,6 +144,11 @@ transform = Transform3D(0.999026, 0, 0, 0, 0.999026, 0, 0, 0, 0.999026, 0, 0, 0)
 [node name="CollisionShape3D" type="CollisionShape3D" parent="rotators/skate_check"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.832467)
 shape = SubResource("BoxShape3D_18vjj")
+
+[node name="back_mesh" type="MeshInstance3D" parent="rotators"]
+top_level = true
+mesh = SubResource("ArrayMesh_5xj4i")
+skeleton = NodePath("../..")
 
 [node name="hurtbox" type="CollisionShape3D" parent="."]
 transform = Transform3D(0.999026, 0, 0, 0, 0.999026, 0, 0, 0, 0.999026, 0, 0, 0)
@@ -140,7 +172,7 @@ target_position = Vector3(1, 0, 0)
 transform = Transform3D(2, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.617619)
 target_position = Vector3(-1, 0, 0)
 
-[node name="GPUParticles3D" type="GPUParticles3D" parent="hurtbox"]
+[node name="death_particles" type="GPUParticles3D" parent="hurtbox"]
 transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 0, 0, 0)
 emitting = false
 amount = 200
