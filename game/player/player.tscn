@@ -1,6 +1,7 @@
-[gd_scene load_steps=21 format=3 uid="uid://by2lxt6065kk5"]
+[gd_scene load_steps=22 format=3 uid="uid://by2lxt6065kk5"]
 
 [ext_resource type="Script" path="res://game/player/player.cs" id="1_oxyv2"]
+[ext_resource type="Shader" path="res://assets/shaders/trail_emitting.gdshader" id="2_apdol"]
 [ext_resource type="Script" path="res://game/player/player_camera.cs" id="2_mnuh0"]
 [ext_resource type="Material" uid="uid://c3txy5w43kvy7" path="res://assets/materials/bike_material.tres" id="2_pxky8"]
 [ext_resource type="ArrayMesh" uid="uid://bxm3nhe5b07h3" path="res://assets/meshes/bike_frame.obj" id="3_aavr1"]
@@ -12,13 +13,25 @@
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_o7cyf"]
 lifetime_randomness = 1.0
 emission_shape = 3
-emission_box_extents = Vector3(0.19, 0.6, 0.2)
+emission_box_extents = Vector3(0.15, 0.4, 0.2)
 gravity = Vector3(0, 0, 0)
-scale_min = 0.5
-scale_max = 1.5
+scale_min = 0.25
+scale_max = 1.2
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_j2nxi"]
+render_priority = 0
+shader = ExtResource("2_apdol")
+shader_parameter/big_cell_size = 0.2
+shader_parameter/big_thickness = 0.05
+shader_parameter/small_cell_size = 0.05
+shader_parameter/small_thickness = 0.01
+shader_parameter/tiny_cell_size = 0.002
+shader_parameter/tiny_thickness = 0.0004
+shader_parameter/edge_thickness = 0.2
 
 [sub_resource type="BoxMesh" id="BoxMesh_grqwo"]
-size = Vector3(0.3, 0.3, 0.4)
+material = SubResource("ShaderMaterial_j2nxi")
+size = Vector3(0.4, 0.3, 0.3)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_w4jxi"]
 render_priority = 0
@@ -28,10 +41,19 @@ shader_parameter/time_cycle = 5.0
 [sub_resource type="BoxShape3D" id="BoxShape3D_18vjj"]
 size = Vector3(5, 1, 2)
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_5xj4i"]
-
 [sub_resource type="BoxShape3D" id="BoxShape3D_gdf23"]
 size = Vector3(0.9, 1.4, 3)
+
+[sub_resource type="QuadMesh" id="QuadMesh_mw4k7"]
+size = Vector2(2, 2)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_n831k"]
+render_priority = 0
+shader = ExtResource("4_ywq8c")
+shader_parameter/outline_color = Color(0, 0.337255, 0.847059, 1)
+shader_parameter/distance_falloff = 1.0
+shader_parameter/smoothing_cutoff = 0.1
+shader_parameter/smoothing_max = 0.1
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_bybvh"]
 emission_shape = 3
@@ -64,17 +86,6 @@ _surfaces = [{
 "vertex_count": 24,
 "vertex_data": PackedByteArray(0, 0, 128, 191, 0, 0, 128, 63, 0, 0, 128, 191, 255, 127, 255, 255, 255, 255, 255, 191, 0, 0, 128, 63, 0, 0, 128, 63, 0, 0, 128, 191, 255, 127, 255, 255, 255, 255, 255, 191, 0, 0, 128, 191, 0, 0, 128, 63, 0, 0, 128, 63, 255, 127, 255, 255, 255, 255, 255, 191, 0, 0, 128, 63, 0, 0, 128, 63, 0, 0, 128, 63, 255, 127, 255, 255, 255, 255, 255, 191, 0, 0, 128, 63, 0, 0, 128, 63, 0, 0, 128, 63, 255, 127, 255, 127, 255, 255, 255, 191, 0, 0, 128, 63, 0, 0, 128, 191, 0, 0, 128, 63, 255, 127, 255, 127, 255, 255, 255, 191, 0, 0, 128, 191, 0, 0, 128, 63, 0, 0, 128, 63, 255, 127, 255, 127, 255, 255, 255, 191, 0, 0, 128, 191, 0, 0, 128, 191, 0, 0, 128, 63, 255, 127, 255, 127, 255, 255, 255, 191, 0, 0, 128, 191, 0, 0, 128, 63, 0, 0, 128, 63, 0, 0, 255, 127, 255, 255, 0, 0, 0, 0, 128, 191, 0, 0, 128, 191, 0, 0, 128, 63, 0, 0, 255, 127, 255, 255, 0, 0, 0, 0, 128, 191, 0, 0, 128, 63, 0, 0, 128, 191, 0, 0, 255, 127, 255, 255, 0, 0, 0, 0, 128, 191, 0, 0, 128, 191, 0, 0, 128, 191, 0, 0, 255, 127, 255, 255, 0, 0, 0, 0, 128, 63, 0, 0, 128, 191, 0, 0, 128, 191, 255, 127, 0, 0, 255, 255, 255, 63, 0, 0, 128, 191, 0, 0, 128, 191, 0, 0, 128, 191, 255, 127, 0, 0, 255, 255, 255, 63, 0, 0, 128, 63, 0, 0, 128, 191, 0, 0, 128, 63, 255, 127, 0, 0, 255, 255, 255, 63, 0, 0, 128, 191, 0, 0, 128, 191, 0, 0, 128, 63, 255, 127, 0, 0, 255, 255, 255, 63, 0, 0, 128, 63, 0, 0, 128, 63, 0, 0, 128, 191, 255, 255, 255, 127, 255, 255, 255, 255, 0, 0, 128, 63, 0, 0, 128, 191, 0, 0, 128, 191, 255, 255, 255, 127, 255, 255, 255, 255, 0, 0, 128, 63, 0, 0, 128, 63, 0, 0, 128, 63, 255, 255, 255, 127, 255, 255, 255, 255, 0, 0, 128, 63, 0, 0, 128, 191, 0, 0, 128, 63, 255, 255, 255, 127, 255, 255, 255, 255, 0, 0, 128, 191, 0, 0, 128, 63, 0, 0, 128, 191, 255, 255, 255, 255, 255, 255, 255, 63, 0, 0, 128, 191, 0, 0, 128, 191, 0, 0, 128, 191, 255, 255, 255, 255, 255, 255, 255, 63, 0, 0, 128, 63, 0, 0, 128, 63, 0, 0, 128, 191, 255, 255, 255, 255, 255, 255, 255, 63, 0, 0, 128, 63, 0, 0, 128, 191, 0, 0, 128, 191, 255, 255, 255, 255, 255, 255, 255, 63)
 }]
-
-[sub_resource type="QuadMesh" id="QuadMesh_mw4k7"]
-size = Vector2(2, 2)
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_n831k"]
-render_priority = 0
-shader = ExtResource("4_ywq8c")
-shader_parameter/outline_color = Color(0, 0.337255, 0.847059, 1)
-shader_parameter/distance_falloff = 1.0
-shader_parameter/smoothing_cutoff = 0.1
-shader_parameter/smoothing_max = 0.1
 
 [sub_resource type="BoxMesh" id="BoxMesh_upq8o"]
 size = Vector3(0.5, 0.5, 0.5)
@@ -109,9 +120,25 @@ script = ExtResource("1_oxyv2")
 [node name="rotators" type="Node3D" parent="."]
 
 [node name="trail_particles" type="GPUParticles3D" parent="rotators"]
-transform = Transform3D(0.999999, 0, 0, 0, 0.999999, 0, 0, 0, 0.999999, 0, 0.0975776, -1.65317)
-amount = 250
-lifetime = 0.5
+transform = Transform3D(0.999999, 0, 0, 0, 0.999999, 0, 0, 0, 0.999999, 0, 0.0975776, -1.98936)
+amount = 150
+lifetime = 0.3
+collision_base_size = 0.0
+process_material = SubResource("ParticleProcessMaterial_o7cyf")
+draw_pass_1 = SubResource("BoxMesh_grqwo")
+
+[node name="trail_particles2" type="GPUParticles3D" parent="rotators"]
+transform = Transform3D(0.999999, 0, 0, 0, 0.999999, 0, 0, 0, 0.999999, 0, 0.0975776, -1.98936)
+amount = 50
+lifetime = 0.15
+collision_base_size = 0.0
+process_material = SubResource("ParticleProcessMaterial_o7cyf")
+draw_pass_1 = SubResource("BoxMesh_grqwo")
+
+[node name="trail_particles3" type="GPUParticles3D" parent="rotators"]
+transform = Transform3D(0.999999, 0, 0, 0, 0.999999, 0, 0, 0, 0.999999, 0, 0.0975776, -1.98936)
+amount = 30
+lifetime = 0.1
 collision_base_size = 0.0
 process_material = SubResource("ParticleProcessMaterial_o7cyf")
 draw_pass_1 = SubResource("BoxMesh_grqwo")
@@ -145,11 +172,6 @@ transform = Transform3D(0.999026, 0, 0, 0, 0.999026, 0, 0, 0, 0.999026, 0, 0, 0)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.832467)
 shape = SubResource("BoxShape3D_18vjj")
 
-[node name="back_mesh" type="MeshInstance3D" parent="rotators"]
-top_level = true
-mesh = SubResource("ArrayMesh_5xj4i")
-skeleton = NodePath("../..")
-
 [node name="hurtbox" type="CollisionShape3D" parent="."]
 transform = Transform3D(0.999026, 0, 0, 0, 0.999026, 0, 0, 0, 0.999026, 0, 0, 0)
 shape = SubResource("BoxShape3D_gdf23")
@@ -172,19 +194,6 @@ target_position = Vector3(1, 0, 0)
 transform = Transform3D(2, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.617619)
 target_position = Vector3(-1, 0, 0)
 
-[node name="death_particles" type="GPUParticles3D" parent="hurtbox"]
-transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 0, 0, 0)
-emitting = false
-amount = 200
-lifetime = 5.0
-one_shot = true
-explosiveness = 0.99
-randomness = 0.24
-collision_base_size = 1.0
-visibility_aabb = AABB(-200, -200, -200, 400, 400, 400)
-process_material = SubResource("ParticleProcessMaterial_bybvh")
-draw_pass_1 = SubResource("ArrayMesh_h0gnw")
-
 [node name="PlayerCamera" type="Node3D" parent="."]
 script = ExtResource("2_mnuh0")
 
@@ -203,6 +212,19 @@ transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 
 visible = false
 mesh = SubResource("QuadMesh_mw4k7")
 surface_material_override/0 = SubResource("ShaderMaterial_n831k")
+
+[node name="death_particles" type="GPUParticles3D" parent="."]
+transform = Transform3D(-4.36688e-08, 0, -0.999026, 0, 0.999026, 0, 0.999026, 0, -4.36688e-08, 0, 0, 0)
+emitting = false
+amount = 200
+lifetime = 5.0
+one_shot = true
+explosiveness = 0.99
+randomness = 0.24
+collision_base_size = 1.0
+visibility_aabb = AABB(-200, -200, -200, 400, 400, 400)
+process_material = SubResource("ParticleProcessMaterial_bybvh")
+draw_pass_1 = SubResource("ArrayMesh_h0gnw")
 
 [node name="move_direction_check" type="MeshInstance3D" parent="."]
 visible = false

@@ -5,11 +5,13 @@ using System;
 public partial class player : CharacterBody3D
 {
 	public const float SPEED = 25.0f;
-	public const float ACCELERATION = 0.8f;
-	public const float BOOST_ADDITIONAL_SPEED = 17.0f;
-	public const float BOOST_ADDITIONAL_ACCELERATION = 0.3f;
-	public const float SKATE_ADDITIONAL_SPEED = 20.0f;
-	public const float SKATE_ADDITIONAL_ACCELERATION = -0.3f;
+	public const float ACCELERATION = 0.07f;
+	public const float BOOST_ADDITIONAL_SPEED = 30.0f;
+	public const float BOOST_ADDITIONAL_ACCELERATION = 2.0f;
+	public const float SKATE_ADDITIONAL_SPEED = 25.0f;
+	public const float SKATE_ADDITIONAL_ACCELERATION = 5.0f;
+	public const float TECH_ADDITIONAL_SPEED = 35.0f;
+	public const float TECH_ADDITIONAL_ACCELERATION = 20.0f;
 	public const float JUMP_VELOCITY = 5.9f;
 	public const float WHEEL_SPEED = 1.2f;
 	public const float MOVE_DIRECTION_ROTATION_SPEED = 3.3f;
@@ -22,6 +24,9 @@ public partial class player : CharacterBody3D
 	public const float AIR_ROTATE_BUFFER = 0.1f;
 	public const float NORMAL_ROTATION_SPEED = 4.5f;
 	public const float SPEED_BOOST_DURATION = 3.0f;
+	public const float TECH_WINDOW = 0.1f;
+	public const float TECH_COOLDOWN = 0.1f;
+	public const float TECH_DURATION = 0.15f;
 	public PackedScene trail_scene = ResourceLoader.Load<PackedScene>("res://game/world/trail.tscn"); 
 	private world world_node;
 	private trail player_trail;
@@ -45,11 +50,14 @@ public partial class player : CharacterBody3D
 	private float controller_left_y = 0.0f;
 	public Vector3 last_pos = Vector3.Zero;
 	private Vector3 current_normal = new Vector3(0.0f, 1.0f, 0.0f);
+	private Vector3 last_velocity = Vector3.Zero;
 	private float velocity_magnitude = 1.0f;
 	private float jump_timer = 0.0f;
 	private float air_timer = 0.0f;
 	private float boosting = 0.02f;
 	private float current_speed = SPEED;
+	private float tech_counter = 0.0f;
+	private float teching = 0.0f;
 	public Color color = new Color(0.0f, 0.0f, 0.0f, 1.0f);
 
 	[Export]
@@ -72,10 +80,7 @@ public partial class player : CharacterBody3D
 		camera = GetNode<player_camera>("PlayerCamera");
 		slope_check = hurtbox.GetNode<Node3D>("slope_check");
 		player_trail = GetNode<trail>("trail");
-		//player_trail = (trail) trail_scene.Instantiate();
-		//player_trail.setup(this);
 		world_node = GetParent().GetParent<world>();
-		//world_node.GetNode("Trails").AddChild(player_trail);
 
 		camera.camera.Current = IsMultiplayerAuthority();
 	}
@@ -93,9 +98,6 @@ public partial class player : CharacterBody3D
 		world_node.authority_player_position = Position;
 
 		float deltaf = (float) delta;
-
-		//trail logic moved to trail script
-		//add_trail(deltaf);
 
 		jump_timer += deltaf;
 
@@ -128,9 +130,8 @@ public partial class player : CharacterBody3D
 			//move_direction = move_direction.Rotated(rotate_axis, final_speed).Normalized();
 			//current_normal = next_normal;
 			current_normal = current_normal.Rotated(rotate_axis, final_speed).Normalized();
-
-			//}
 		}
+
 		Vector3 md_axis = current_normal.Cross(move_direction).Normalized();
 		float md_angle = current_normal.SignedAngleTo(move_direction, md_axis);
 		move_direction = move_direction.Rotated(md_axis, Mathf.Pi/2.0f - md_angle).Normalized();
@@ -186,8 +187,15 @@ public partial class player : CharacterBody3D
 		hurtbox.LookAt(lookat_pos, current_normal); 
 		
 		//determine speed
-		float goal_speed = SPEED + (Input.IsActionPressed("boost") ? 1 : 0) * BOOST_ADDITIONAL_SPEED + (skating_trail != null ? 1 : 0) * SKATE_ADDITIONAL_SPEED;
-		float current_acceleration = ACCELERATION + (Input.IsActionPressed("boost") ? 1 : 0) * BOOST_ADDITIONAL_ACCELERATION + (skating_trail != null ? 1 : 0) * SKATE_ADDITIONAL_ACCELERATION;
+		float goal_speed = SPEED + 
+			(Input.IsActionPressed("boost") ? 1 : 0) * BOOST_ADDITIONAL_SPEED + 
+			(skating_trail != null ? 1 : 0) * SKATE_ADDITIONAL_SPEED + 
+			(teching > 0 ? 1 : 0) * TECH_ADDITIONAL_SPEED;
+		float current_acceleration = ACCELERATION + 
+			(Input.IsActionPressed("boost") ? 1 : 0) * BOOST_ADDITIONAL_ACCELERATION + 
+			(skating_trail != null ? 1 : 0) * SKATE_ADDITIONAL_ACCELERATION + 
+			(teching > 0 ? 1 : 0) * TECH_ADDITIONAL_ACCELERATION;
+
 		current_speed = Mathf.Lerp(current_speed, goal_speed, current_acceleration * deltaf);
 
 		//movement!
@@ -212,13 +220,25 @@ public partial class player : CharacterBody3D
 		velocity_magnitude = Velocity.Length();
 		MoveAndSlide();
 
+		//check for tech
+		tech_counter -= deltaf;
+		teching -= deltaf;
+		if(Input.IsActionJustPressed("tech") && tech_counter <= TECH_COOLDOWN){
+			tech_counter = TECH_WINDOW;			
+		}
+
 		for(int i = 0; i < GetSlideCollisionCount(); i++){
 			KinematicCollision3D collision = GetSlideCollision(i);
 			bool check_trail_collision = (collision.GetColliderShapeIndex() < ((Node3D)collision.GetCollider()).GetChildCount() - 5)
 			 						  || (((Node3D)collision.GetCollider()).GetChildCount() == 1);
 			if(collision.GetCollider().HasMethod("can_kill") && check_trail_collision){
 				//dead?
-				die();
+				if(tech_counter > 0){
+					reflect(collision.GetNormal());
+				}
+				else if(teching <= 0){
+					die();
+				}
 			}
 		}
 		camera.goal_rotation = new Vector3(rotators.Rotation.X, rotators.Rotation.Y - Mathf.Pi, rotators.Rotation.Z);
@@ -257,7 +277,18 @@ public partial class player : CharacterBody3D
 		rotators.Visible = false;
 		hurtbox.Disabled = true;
 		world_node.player_died();
-		hurtbox.GetNode<GpuParticles3D>("death_particles").Emitting = true;
+		GetNode<GpuParticles3D>("death_particles").LookAt((new Vector3(-last_velocity.Z, -last_velocity.Y, -last_velocity.X)).Normalized());
+		GetNode<GpuParticles3D>("death_particles").Emitting = true;
+	}
+
+	public void reflect(Vector3 normal){
+		teching = TECH_DURATION;
+		tech_counter = 0.0f;
+		normal.Y = 0;
+		normal = normal.Normalized();
+		//Vector3 mdt = (new Vector3(move_direction.X, 0, move_direction.Z)).Normalized();
+		move_direction = move_direction.Bounce(normal).Normalized();
+		Velocity = move_direction * current_speed;
 	}
 
 	public void spawn_player(Vector3 position){
@@ -284,9 +315,10 @@ public partial class player : CharacterBody3D
 		hurtbox.Disabled = false;
 		jump_timer = 0.0f;
 		air_timer = 0.0f;
+		current_speed = SPEED;
 		player_trail.reset_trail();
-		hurtbox.GetNode<GpuParticles3D>("death_particles").Restart();
-		hurtbox.GetNode<GpuParticles3D>("death_particles").Emitting = false;
+		GetNode<GpuParticles3D>("death_particles").Restart();
+		GetNode<GpuParticles3D>("death_particles").Emitting = false;
 	}
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer)]	
@@ -297,7 +329,10 @@ public partial class player : CharacterBody3D
 		color = input_color;
 		player_trail.set_color(input_color);
 		mesh.SetInstanceShaderParameter("input_color", color);
-		//hurtbox.GetNode<GpuParticles3D>("GPUParticles3D").DrawPass1.SetInstanceShaderParameter("input_color", color);
+		rotators.GetNode<GpuParticles3D>("trail_particles").SetInstanceShaderParameter("input_color", color);
+		rotators.GetNode<GpuParticles3D>("trail_particles2").SetInstanceShaderParameter("input_color", color);
+		rotators.GetNode<GpuParticles3D>("trail_particles3").SetInstanceShaderParameter("input_color", color);
+		GetNode<GpuParticles3D>("death_particles").SetInstanceShaderParameter("input_color", color);
 	}
 
 	public void _on_skate_check_body_entered(Node3D body){
@@ -313,6 +348,9 @@ public partial class player : CharacterBody3D
 	}
 
 	public float get_current_zoom(float min_zoom, float max_zoom){
+		if(teching > 0){
+			return max_zoom - ((current_speed - SPEED) / (BOOST_ADDITIONAL_SPEED + SKATE_ADDITIONAL_SPEED + TECH_ADDITIONAL_SPEED)) * (max_zoom - min_zoom);
+		}
 		return max_zoom - ((current_speed - SPEED) / (BOOST_ADDITIONAL_SPEED + SKATE_ADDITIONAL_SPEED)) * (max_zoom - min_zoom);
 	}
 
