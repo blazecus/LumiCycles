@@ -5,13 +5,17 @@ using System;
 public partial class player : CharacterBody3D
 {
 	public const float SPEED = 25.0f;
-	public const float ACCELERATION = 0.07f;
+	public const float ACCELERATION = 0.12f;
+	public const float NEGATIVE_ACCELERATION = 0.25f;
 	public const float BOOST_ADDITIONAL_SPEED = 30.0f;
 	public const float BOOST_ADDITIONAL_ACCELERATION = 2.0f;
+	public const float BOOST_NEGATIVE_ACCELERATION = -0.18f;
 	public const float SKATE_ADDITIONAL_SPEED = 25.0f;
 	public const float SKATE_ADDITIONAL_ACCELERATION = 5.0f;
-	public const float TECH_ADDITIONAL_SPEED = 35.0f;
-	public const float TECH_ADDITIONAL_ACCELERATION = 20.0f;
+	public const float SKATE_NEGATIVE_ACCELERATION = -0.04f;
+	public const float TECH_ADDITIONAL_SPEED = 15.0f;
+	public const float TECH_ADDITIONAL_ACCELERATION = 40.0f;
+	public const float TECH_NEGATIVE_ACCELERATION = -0.03f;
 	public const float JUMP_VELOCITY = 5.9f;
 	public const float WHEEL_SPEED = 1.2f;
 	public const float MOVE_DIRECTION_ROTATION_SPEED = 3.3f;
@@ -25,8 +29,8 @@ public partial class player : CharacterBody3D
 	public const float NORMAL_ROTATION_SPEED = 4.5f;
 	public const float SPEED_BOOST_DURATION = 3.0f;
 	public const float TECH_WINDOW = 0.1f;
-	public const float TECH_COOLDOWN = 0.1f;
-	public const float TECH_DURATION = 0.15f;
+	public const float TECH_COOLDOWN = 0.04f;
+	public const float TECH_DURATION = 0.1f;
 	public PackedScene trail_scene = ResourceLoader.Load<PackedScene>("res://game/world/trail.tscn"); 
 	private world world_node;
 	private trail player_trail;
@@ -94,6 +98,8 @@ public partial class player : CharacterBody3D
 		if(!active || !alive){
 			return;
 		}
+
+		GetNode<MeshInstance3D>("last_velocity").Position = last_velocity.Normalized() * 3;
 
 		world_node.authority_player_position = Position;
 
@@ -195,6 +201,12 @@ public partial class player : CharacterBody3D
 			(Input.IsActionPressed("boost") ? 1 : 0) * BOOST_ADDITIONAL_ACCELERATION + 
 			(skating_trail != null ? 1 : 0) * SKATE_ADDITIONAL_ACCELERATION + 
 			(teching > 0 ? 1 : 0) * TECH_ADDITIONAL_ACCELERATION;
+		float negative_acceleration = NEGATIVE_ACCELERATION + 
+			(Input.IsActionPressed("boost") ? 1 : 0) * BOOST_NEGATIVE_ACCELERATION + 
+			(skating_trail != null ? 1 : 0) * SKATE_NEGATIVE_ACCELERATION + 
+			(teching > 0 ? 1 : 0) * TECH_NEGATIVE_ACCELERATION;
+		
+		current_acceleration = current_speed < goal_speed ? current_acceleration : negative_acceleration;
 
 		current_speed = Mathf.Lerp(current_speed, goal_speed, current_acceleration * deltaf);
 
@@ -233,7 +245,7 @@ public partial class player : CharacterBody3D
 			 						  || (((Node3D)collision.GetCollider()).GetChildCount() == 1);
 			if(collision.GetCollider().HasMethod("can_kill") && check_trail_collision){
 				//dead?
-				if(tech_counter > 0){
+				if(tech_counter > 0 && collision.GetCollider().HasMethod("reset_trail")){
 					reflect(collision.GetNormal());
 				}
 				else if(teching <= 0){
@@ -242,6 +254,7 @@ public partial class player : CharacterBody3D
 			}
 		}
 		camera.goal_rotation = new Vector3(rotators.Rotation.X, rotators.Rotation.Y - Mathf.Pi, rotators.Rotation.Z);
+		last_velocity = Velocity;
 	}
 
 	public override void _Input(InputEvent inputEvent){
@@ -277,7 +290,7 @@ public partial class player : CharacterBody3D
 		rotators.Visible = false;
 		hurtbox.Disabled = true;
 		world_node.player_died();
-		GetNode<GpuParticles3D>("death_particles").LookAt((new Vector3(-last_velocity.Z, -last_velocity.Y, -last_velocity.X)).Normalized());
+		GetNode<GpuParticles3D>("death_particles").LookAt(GlobalPosition + last_velocity.Normalized());
 		GetNode<GpuParticles3D>("death_particles").Emitting = true;
 	}
 
@@ -330,28 +343,40 @@ public partial class player : CharacterBody3D
 		player_trail.set_color(input_color);
 		mesh.SetInstanceShaderParameter("input_color", color);
 		rotators.GetNode<GpuParticles3D>("trail_particles").SetInstanceShaderParameter("input_color", color);
-		rotators.GetNode<GpuParticles3D>("trail_particles2").SetInstanceShaderParameter("input_color", color);
+		//rotators.GetNode<GpuParticles3D>("trail_particles2").SetInstanceShaderParameter("input_color", color);
 		rotators.GetNode<GpuParticles3D>("trail_particles3").SetInstanceShaderParameter("input_color", color);
 		GetNode<GpuParticles3D>("death_particles").SetInstanceShaderParameter("input_color", color);
 	}
 
-	public void _on_skate_check_body_entered(Node3D body){
+	//Skating signals
+	public void _on_skate_check_body_entered_left(Node3D body){ skate_on(body, 1); }
+	public void _on_skate_check_body_entered_right(Node3D body){ skate_on(body, -1); }
+	public void _on_skate_check_body_exited_left(Node3D body){ skate_off(body); }
+	public void _on_skate_check_body_exited_right(Node3D body){ skate_off(body); }
+
+	public void skate_on(Node3D body, int dir){
 		if(body.HasMethod("reset_trail") && skating_trail == null){
 			skating_trail = (trail)body;
+			rotators.GetNode<GpuParticles3D>("sparks").Rotation = Vector3.Zero; 
+			rotators.GetNode<GpuParticles3D>("sparks").Rotate(Vector3.Forward, Mathf.Pi/4.0f * dir);
+			rotators.GetNode<GpuParticles3D>("sparks").Emitting = true;
 		}
 	}
 
-	public void _on_skate_check_body_exited(Node3D body){
+	public void skate_off(Node3D body){
 		if(body.HasMethod("reset_trail") && (trail)body == skating_trail){
 			skating_trail = null;
+			rotators.GetNode<GpuParticles3D>("sparks").Emitting = false;
 		}
 	}
 
 	public float get_current_zoom(float min_zoom, float max_zoom){
+		float zoom_val = max_zoom - ((current_speed - SPEED) / (BOOST_ADDITIONAL_SPEED + SKATE_ADDITIONAL_SPEED)) * (max_zoom - min_zoom);
 		if(teching > 0){
-			return max_zoom - ((current_speed - SPEED) / (BOOST_ADDITIONAL_SPEED + SKATE_ADDITIONAL_SPEED + TECH_ADDITIONAL_SPEED)) * (max_zoom - min_zoom);
+			zoom_val = max_zoom - ((current_speed - SPEED) / (BOOST_ADDITIONAL_SPEED + SKATE_ADDITIONAL_SPEED + TECH_ADDITIONAL_SPEED)) * (max_zoom - min_zoom);
 		}
-		return max_zoom - ((current_speed - SPEED) / (BOOST_ADDITIONAL_SPEED + SKATE_ADDITIONAL_SPEED)) * (max_zoom - min_zoom);
+		zoom_val = Mathf.Clamp(zoom_val, min_zoom, max_zoom);
+		return zoom_val;
 	}
 
 	public void prepare_destruction(){

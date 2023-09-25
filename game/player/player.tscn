@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://by2lxt6065kk5"]
+[gd_scene load_steps=26 format=3 uid="uid://by2lxt6065kk5"]
 
 [ext_resource type="Script" path="res://game/player/player.cs" id="1_oxyv2"]
 [ext_resource type="Shader" path="res://assets/shaders/trail_emitting.gdshader" id="2_apdol"]
@@ -9,6 +9,30 @@
 [ext_resource type="Shader" path="res://assets/shaders/outline.gdshader" id="4_ywq8c"]
 [ext_resource type="Shader" path="res://assets/shaders/bike_glow.gdshader" id="5_3vy0v"]
 [ext_resource type="PackedScene" uid="uid://b2k6olndq6bwm" path="res://game/world/trail.tscn" id="5_wt6sh"]
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_iq1g2"]
+emission_shape = 3
+emission_box_extents = Vector3(0.125, 0.25, 0.5)
+direction = Vector3(0, 0.5, -0.5)
+spread = 32.7
+flatness = 0.4
+initial_velocity_min = 15.0
+initial_velocity_max = 25.0
+angular_velocity_max = 107.33
+linear_accel_min = -80.0
+linear_accel_max = -50.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_emhmg"]
+albedo_color = Color(1, 1, 0.0666667, 1)
+emission_enabled = true
+emission = Color(0.87451, 0.858824, 0, 1)
+emission_energy_multiplier = 2.83
+use_particle_trails = true
+
+[sub_resource type="TubeTrailMesh" id="TubeTrailMesh_7tf15"]
+material = SubResource("StandardMaterial3D_emhmg")
+radius = 0.03
+radial_steps = 3
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_o7cyf"]
 lifetime_randomness = 1.0
@@ -39,7 +63,7 @@ shader = ExtResource("5_3vy0v")
 shader_parameter/time_cycle = 5.0
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_18vjj"]
-size = Vector3(5, 1, 2)
+size = Vector3(2.5, 1, 2)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_gdf23"]
 size = Vector3(0.9, 1.4, 3)
@@ -58,7 +82,7 @@ shader_parameter/smoothing_max = 0.1
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_bybvh"]
 emission_shape = 3
 emission_box_extents = Vector3(1, 1, 1)
-direction = Vector3(1, 0.5, 0)
+direction = Vector3(0, 0, -1)
 spread = 25.0
 initial_velocity_min = 15.0
 initial_velocity_max = 35.0
@@ -112,6 +136,9 @@ properties/4/spawn = true
 properties/4/sync = true
 properties/4/watch = false
 
+[sub_resource type="BoxMesh" id="BoxMesh_htchg"]
+size = Vector3(0.5, 0.5, 0.5)
+
 [node name="player" type="CharacterBody3D"]
 collision_layer = 4
 collision_mask = 7
@@ -119,18 +146,23 @@ script = ExtResource("1_oxyv2")
 
 [node name="rotators" type="Node3D" parent="."]
 
+[node name="sparks" type="GPUParticles3D" parent="rotators"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3.02079)
+emitting = false
+amount = 200
+lifetime = 0.5
+fixed_fps = 60
+visibility_aabb = AABB(-4, -4, -4.56389, 8, 8, 9.12779)
+trail_enabled = true
+trail_lifetime = 0.1
+process_material = SubResource("ParticleProcessMaterial_iq1g2")
+draw_pass_1 = SubResource("TubeTrailMesh_7tf15")
+
 [node name="trail_particles" type="GPUParticles3D" parent="rotators"]
 transform = Transform3D(0.999999, 0, 0, 0, 0.999999, 0, 0, 0, 0.999999, 0, 0.0975776, -1.98936)
 amount = 150
 lifetime = 0.3
-collision_base_size = 0.0
-process_material = SubResource("ParticleProcessMaterial_o7cyf")
-draw_pass_1 = SubResource("BoxMesh_grqwo")
-
-[node name="trail_particles2" type="GPUParticles3D" parent="rotators"]
-transform = Transform3D(0.999999, 0, 0, 0, 0.999999, 0, 0, 0, 0.999999, 0, 0.0975776, -1.98936)
-amount = 50
-lifetime = 0.15
+fixed_fps = 60
 collision_base_size = 0.0
 process_material = SubResource("ParticleProcessMaterial_o7cyf")
 draw_pass_1 = SubResource("BoxMesh_grqwo")
@@ -139,6 +171,7 @@ draw_pass_1 = SubResource("BoxMesh_grqwo")
 transform = Transform3D(0.999999, 0, 0, 0, 0.999999, 0, 0, 0, 0.999999, 0, 0.0975776, -1.98936)
 amount = 30
 lifetime = 0.1
+fixed_fps = 60
 collision_base_size = 0.0
 process_material = SubResource("ParticleProcessMaterial_o7cyf")
 draw_pass_1 = SubResource("BoxMesh_grqwo")
@@ -165,10 +198,17 @@ transform = Transform3D(0.7, 0, 0, 0, 0.7, 0, 0, 0, 0.7, 0, 0, 0)
 mesh = ExtResource("4_eqt36")
 surface_material_override/0 = SubResource("ShaderMaterial_w4jxi")
 
-[node name="skate_check" type="Area3D" parent="rotators"]
-transform = Transform3D(0.999026, 0, 0, 0, 0.999026, 0, 0, 0, 0.999026, 0, 0, 0)
+[node name="skate_check_left" type="Area3D" parent="rotators"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.25, 0, 0)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="rotators/skate_check"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="rotators/skate_check_left"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.832467)
+shape = SubResource("BoxShape3D_18vjj")
+
+[node name="skate_check_right" type="Area3D" parent="rotators"]
+transform = Transform3D(0.999026, 0, 0, 0, 0.999026, 0, 0, 0, 0.999026, -1.25, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="rotators/skate_check_right"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.832467)
 shape = SubResource("BoxShape3D_18vjj")
 
@@ -214,7 +254,6 @@ mesh = SubResource("QuadMesh_mw4k7")
 surface_material_override/0 = SubResource("ShaderMaterial_n831k")
 
 [node name="death_particles" type="GPUParticles3D" parent="."]
-transform = Transform3D(-4.36688e-08, 0, -0.999026, 0, 0.999026, 0, 0.999026, 0, -4.36688e-08, 0, 0, 0)
 emitting = false
 amount = 200
 lifetime = 5.0
@@ -240,5 +279,10 @@ top_level = true
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_t5hu2")
 
-[connection signal="body_entered" from="rotators/skate_check" to="." method="_on_skate_check_body_entered"]
-[connection signal="body_exited" from="rotators/skate_check" to="." method="_on_skate_check_body_exited"]
+[node name="last_velocity" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_htchg")
+
+[connection signal="body_entered" from="rotators/skate_check_left" to="." method="_on_skate_check_body_entered_left"]
+[connection signal="body_exited" from="rotators/skate_check_left" to="." method="_on_skate_check_body_exited_left"]
+[connection signal="body_entered" from="rotators/skate_check_right" to="." method="_on_skate_check_body_entered_right"]
+[connection signal="body_exited" from="rotators/skate_check_right" to="." method="_on_skate_check_body_exited_right"]
