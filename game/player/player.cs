@@ -43,6 +43,8 @@ public partial class player : CharacterBody3D
 	private Node3D rotators;
 	private player_camera camera;
 	private Node3D slope_check;
+	private Node3D skate_check;
+	private Node3D sparks;
 	private trail skating_trail;
 	private Vector3 move_direction = new Vector3(0.0f, 0.0f, 1.0f);
 	private float wheel_position = 0.0f;
@@ -83,6 +85,8 @@ public partial class player : CharacterBody3D
 		bottomfront = GetNode<Marker3D>("rotators/bike_frame/bottomfront");
 		camera = GetNode<player_camera>("PlayerCamera");
 		slope_check = hurtbox.GetNode<Node3D>("slope_check");
+		skate_check = hurtbox.GetNode<Node3D>("skate_check");
+		sparks = rotators.GetNode<Node3D>("sparks");
 		player_trail = GetNode<trail>("trail");
 		world_node = GetParent().GetParent<world>();
 
@@ -255,6 +259,24 @@ public partial class player : CharacterBody3D
 		}
 		camera.goal_rotation = new Vector3(rotators.Rotation.X, rotators.Rotation.Y - Mathf.Pi, rotators.Rotation.Z);
 		last_velocity = Velocity;
+
+		//skate check - in main function now as raycast doesn't use signals
+		//need normal for movement correction
+		skating_trail = null;
+		//sparks.Emitting = false;
+		foreach(GpuParticles3D spark in sparks.GetChildren()){
+			spark.Emitting = false;
+		}
+
+		RayCast3D left_skate_ray = skate_check.GetNode<RayCast3D>("skate_check_left");
+		if(left_skate_ray.IsColliding()){
+			skate_on(left_skate_ray);
+		}
+		RayCast3D right_skate_ray = skate_check.GetNode<RayCast3D>("skate_check_right");
+		if(right_skate_ray.IsColliding()){
+			skate_on(right_skate_ray);
+		}
+
 	}
 
 	public override void _Input(InputEvent inputEvent){
@@ -348,25 +370,30 @@ public partial class player : CharacterBody3D
 		GetNode<GpuParticles3D>("death_particles").SetInstanceShaderParameter("input_color", color);
 	}
 
-	//Skating signals
-	public void _on_skate_check_body_entered_left(Node3D body){ skate_on(body, 1); }
-	public void _on_skate_check_body_entered_right(Node3D body){ skate_on(body, -1); }
-	public void _on_skate_check_body_exited_left(Node3D body){ skate_off(body); }
-	public void _on_skate_check_body_exited_right(Node3D body){ skate_off(body); }
+	public void skate_on(RayCast3D ray){
+		Node3D body = (Node3D) ray.GetCollider();
+		if(body.HasMethod("reset_trail")){
+			
+			skating_trail = (trail) body;
+			sparks.Rotation = Vector3.Zero; 
+			sparks.Rotate(Vector3.Forward, Mathf.Pi/4.0f * (ray.Name == "skate_check_left" ? 1 : -1) );
+			//sparks.Emitting = true;
+			
 
-	public void skate_on(Node3D body, int dir){
-		if(body.HasMethod("reset_trail") && skating_trail == null){
-			skating_trail = (trail)body;
-			rotators.GetNode<GpuParticles3D>("sparks").Rotation = Vector3.Zero; 
-			rotators.GetNode<GpuParticles3D>("sparks").Rotate(Vector3.Forward, Mathf.Pi/4.0f * dir);
-			rotators.GetNode<GpuParticles3D>("sparks").Emitting = true;
-		}
-	}
+			Vector3 c_normal = ray.GetCollisionNormal();
+			Vector3 c_point = ray.GetCollisionPoint();
+			float distance = (ray.GlobalPosition - c_point).Length();
+			for(int i = 0; i < 3 - distance / MathF.Abs(ray.Scale.X); i++){
+				sparks.GetChild<GpuParticles3D>(i).Emitting = true;
+			}
 
-	public void skate_off(Node3D body){
-		if(body.HasMethod("reset_trail") && (trail)body == skating_trail){
-			skating_trail = null;
-			rotators.GetNode<GpuParticles3D>("sparks").Emitting = false;
+			/*Vector3 perp = normal.Cross(current_normal).Normalized() * dir;
+
+			float goal_angle = current_normal.SignedAngleTo(move_direction, perp);
+			float rotate_amount = Mathf.Min(goal_angle, Mathf.Sign(goal_angle) * rotation_speed * deltaf * distance); 
+
+			move_direction = move_direction.Rotated(current_normal, rotate_amount).Normalized();
+*/
 		}
 	}
 
