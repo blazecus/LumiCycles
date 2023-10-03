@@ -1,0 +1,7 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://dj5gimlfwyro"]
+
+[resource]
+albedo_color = Color(0.898039, 0.964706, 0, 1)
+emission_enabled = true
+emission = Color(0.905882, 0.921569, 0, 1)
+use_particle_trails = true

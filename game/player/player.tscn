@@ -1,10 +1,13 @@
-[gd_scene load_steps=25 format=3 uid="uid://by2lxt6065kk5"]
+[gd_scene load_steps=29 format=3 uid="uid://by2lxt6065kk5"]
 
 [ext_resource type="Script" path="res://game/player/player.cs" id="1_oxyv2"]
+[ext_resource type="Material" uid="uid://bbek8giiny5w6" path="res://assets/materials/spark_material3.tres" id="2_3t0cx"]
 [ext_resource type="Shader" path="res://assets/shaders/trail_emitting.gdshader" id="2_apdol"]
 [ext_resource type="Script" path="res://game/player/player_camera.cs" id="2_mnuh0"]
+[ext_resource type="Material" uid="uid://dj5gimlfwyro" path="res://assets/materials/spark_material1.tres" id="2_ojg0k"]
 [ext_resource type="Material" uid="uid://c3txy5w43kvy7" path="res://assets/materials/bike_material.tres" id="2_pxky8"]
 [ext_resource type="ArrayMesh" uid="uid://bxm3nhe5b07h3" path="res://assets/meshes/bike_frame.obj" id="3_aavr1"]
+[ext_resource type="Material" uid="uid://duog2mxf34qj6" path="res://assets/materials/spark_material2.tres" id="3_kmvba"]
 [ext_resource type="ArrayMesh" uid="uid://hfobick66h5f" path="res://assets/meshes/bike_glow.obj" id="4_eqt36"]
 [ext_resource type="Shader" path="res://assets/shaders/outline.gdshader" id="4_ywq8c"]
 [ext_resource type="Shader" path="res://assets/shaders/bike_glow.gdshader" id="5_3vy0v"]
@@ -22,15 +25,18 @@ angular_velocity_max = 107.33
 linear_accel_min = -80.0
 linear_accel_max = -50.0
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sqhhg"]
-albedo_color = Color(1, 1, 0.0666667, 1)
-emission_enabled = true
-emission = Color(0.941176, 0.231373, 0, 1)
-emission_energy_multiplier = 2.83
-use_particle_trails = true
+[sub_resource type="TubeTrailMesh" id="TubeTrailMesh_ys6wn"]
+material = ExtResource("2_ojg0k")
+radius = 0.03
+radial_steps = 3
 
-[sub_resource type="TubeTrailMesh" id="TubeTrailMesh_7tf15"]
-material = SubResource("StandardMaterial3D_sqhhg")
+[sub_resource type="TubeTrailMesh" id="TubeTrailMesh_qs3po"]
+material = ExtResource("3_kmvba")
+radius = 0.03
+radial_steps = 3
+
+[sub_resource type="TubeTrailMesh" id="TubeTrailMesh_up3no"]
+material = ExtResource("2_3t0cx")
 radius = 0.03
 radial_steps = 3
 
@@ -148,38 +154,38 @@ script = ExtResource("1_oxyv2")
 [node name="spark1" type="GPUParticles3D" parent="rotators/sparks"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3.02079)
 emitting = false
-amount = 50
+amount = 25
 lifetime = 0.5
 fixed_fps = 60
 visibility_aabb = AABB(-4, -4, -4.56389, 8, 8, 9.12779)
 trail_enabled = true
 trail_lifetime = 0.1
 process_material = SubResource("ParticleProcessMaterial_iq1g2")
-draw_pass_1 = SubResource("TubeTrailMesh_7tf15")
+draw_pass_1 = SubResource("TubeTrailMesh_ys6wn")
 
 [node name="spark2" type="GPUParticles3D" parent="rotators/sparks"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3.02079)
 emitting = false
-amount = 50
+amount = 100
 lifetime = 0.5
 fixed_fps = 60
 visibility_aabb = AABB(-4, -4, -4.56389, 8, 8, 9.12779)
 trail_enabled = true
 trail_lifetime = 0.1
 process_material = SubResource("ParticleProcessMaterial_iq1g2")
-draw_pass_1 = SubResource("TubeTrailMesh_7tf15")
+draw_pass_1 = SubResource("TubeTrailMesh_qs3po")
 
 [node name="spark3" type="GPUParticles3D" parent="rotators/sparks"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3.02079)
 emitting = false
-amount = 50
+amount = 200
 lifetime = 0.5
 fixed_fps = 60
 visibility_aabb = AABB(-4, -4, -4.56389, 8, 8, 9.12779)
 trail_enabled = true
 trail_lifetime = 0.1
 process_material = SubResource("ParticleProcessMaterial_iq1g2")
-draw_pass_1 = SubResource("TubeTrailMesh_7tf15")
+draw_pass_1 = SubResource("TubeTrailMesh_up3no")
 
 [node name="trail_particles" type="GPUParticles3D" parent="rotators"]
 transform = Transform3D(0.999999, 0, 0, 0, 0.999999, 0, 0, 0, 0.999999, 0, 0.0975776, -1.98936)
@@ -226,13 +232,14 @@ transform = Transform3D(0.999026, 0, 0, 0, 0.999026, 0, 0, 0, 0.999026, 0, 0, 0)
 shape = SubResource("BoxShape3D_gdf23")
 
 [node name="skate_check" type="Node3D" parent="hurtbox"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.21614)
 
 [node name="skate_check_left" type="RayCast3D" parent="hurtbox/skate_check"]
-transform = Transform3D(2.5, 0, 0, 0, 2.5, 0, 0, 0, 2.5, 0, 0, 1.70063)
+transform = Transform3D(5, 0, 0, 0, 5, 0, 0, 0, 5, 0, 0, 1.70063)
 target_position = Vector3(1, 0, 0)
 
 [node name="skate_check_right" type="RayCast3D" parent="hurtbox/skate_check"]
-transform = Transform3D(-2.5, 0, 0, 0, -2.5, 0, 0, 0, -2.5, 0, 0, 1.70063)
+transform = Transform3D(-5, 0, 0, 0, -5, 0, 0, 0, -5, 0, 0, 1.70063)
 target_position = Vector3(1, 0, 0)
 
 [node name="slope_check" type="Node3D" parent="hurtbox"]
