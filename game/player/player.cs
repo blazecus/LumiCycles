@@ -65,6 +65,9 @@ public partial class player : CharacterBody3D
 	private float current_speed = SPEED;
 	private float tech_counter = 0.0f;
 	private float teching = 0.0f;
+	private float lean_rotation_speed = 6.0f;
+	private float current_lean = 0.0f;
+	private float goal_lean = 0.0f;
 	public Color color = new Color(0.0f, 0.0f, 0.0f, 1.0f);
 
 	[Export]
@@ -215,9 +218,13 @@ public partial class player : CharacterBody3D
 
 		current_speed = Mathf.Lerp(current_speed, goal_speed, current_acceleration * deltaf);
 
+		goal_lean = 0.0f;
+
 		//movement!
 		if(IsOnFloor() && jump_timer > JUMP_BUFFER){
-			rotators.Rotate(move_direction, -rotation_amount * 8.0f);
+			//rotators.Rotate(move_direction, -rotation_amount * 8.0f);
+			goal_lean = -rotation_amount * 12.0f;
+			//updated after skate calculation
 			velocity = move_direction * current_speed;
 		}
 
@@ -276,6 +283,9 @@ public partial class player : CharacterBody3D
 		if(right_skate_ray.IsColliding()){
 			skate_on(right_skate_ray, deltaf);
 		}
+		float angle_change = Mathf.LerpAngle(current_lean, goal_lean, deltaf * lean_rotation_speed);
+		rotators.Rotate(move_direction, angle_change);
+		current_lean = angle_change;
 
 	}
 
@@ -400,7 +410,8 @@ public partial class player : CharacterBody3D
 
 			GetNode<MeshInstance3D>("last_velocity").Position = perp * 3;
 			move_direction = move_direction.Rotated(current_normal, rotate_amount).Normalized();
-			rotators.Rotate(move_direction, -Mathf.Sign(ray.Scale.X) * dist_factor * 0.5f);
+			//rotators.Rotate(move_direction, -Mathf.Sign(rotate_amount) * dist_factor * 0.5f);
+			goal_lean += -Mathf.Sign(rotate_amount) * dist_factor * 0.5f;
 		}
 	}
 
