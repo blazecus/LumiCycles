@@ -154,7 +154,7 @@ script = ExtResource("1_oxyv2")
 [node name="spark1" type="GPUParticles3D" parent="rotators/sparks"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3.02079)
 emitting = false
-amount = 25
+amount = 50
 lifetime = 0.5
 fixed_fps = 60
 visibility_aabb = AABB(-4, -4, -4.56389, 8, 8, 9.12779)

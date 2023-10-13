@@ -384,19 +384,11 @@ public partial class player : CharacterBody3D
 		Node3D body = (Node3D) ray.GetCollider();
 		if(body.HasMethod("reset_trail")){
 			
-			skating_trail = (trail) body;
-			sparks.Rotation = Vector3.Zero; 
-			sparks.Rotate(Vector3.Forward, Mathf.Pi/4.0f * (ray.Name == "skate_check_left" ? 1 : -1) );
-
 			Vector3 c_normal = ray.GetCollisionNormal();
 			Vector3 c_point = ray.GetCollisionPoint();
 			
 			float distance = Mathf.Clamp((ray.GlobalPosition - c_point).Length(), 1.0f, 5.0f);
 			float dist_factor = 1.0f - (distance - 1.0f) / 4.0f;
-
-			for(int i = 0; i < 3 && i < 4.0f * dist_factor; i++){
-				sparks.GetChild<GpuParticles3D>(i).Emitting = true;
-			}
 			
 			//select shortest angle to be perpendicular to trail
 			Vector3 perp = c_normal.Cross(current_normal).Normalized();
@@ -405,8 +397,21 @@ public partial class player : CharacterBody3D
 			if(Mathf.Abs(goal_angle_negative) < Mathf.Abs(goal_angle)){
 				goal_angle = goal_angle_negative;
 			}
-			
-			float rotate_amount = Mathf.Sign(goal_angle) * Mathf.Min(Mathf.Abs(goal_angle), Mathf.Abs(goal_angle * SKATE_CORRECTION_FACTOR * deltaf * dist_factor)); 
+
+			if(Mathf.Abs(goal_angle) > Mathf.Pi/6.0f){
+				return; //effect is only applied when already mostly aligned to the direction of the trail
+			}
+
+			skating_trail = (trail) body;
+			sparks.Rotation = Vector3.Zero; 
+			sparks.Rotate(Vector3.Forward, Mathf.Pi/4.0f * (ray.Name == "skate_check_left" ? 1 : -1) );
+
+			for(int i = 0; i < 3 && i < 4.0f * dist_factor; i++){
+				sparks.GetChild<GpuParticles3D>(i).Emitting = true;
+			}
+
+			float skate_influence = Mathf.Clamp(dist_factor * dist_factor, 0.2f, 0.7f);
+			float rotate_amount = Mathf.Sign(goal_angle) * Mathf.Min(Mathf.Abs(goal_angle), Mathf.Abs(goal_angle * SKATE_CORRECTION_FACTOR * deltaf * skate_influence)); 
 
 			GetNode<MeshInstance3D>("last_velocity").Position = perp * 3;
 			move_direction = move_direction.Rotated(current_normal, rotate_amount).Normalized();

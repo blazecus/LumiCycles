@@ -2,8 +2,8 @@ using Godot;
 using System;
 public partial class player_camera : Node3D
 {
-	private const float MIN_ZOOM = 3.0f;
-	private const float MAX_ZOOM = 12.0f;
+	private const float MIN_ZOOM = 6.0f;
+	private const float MAX_ZOOM = 15.0f;
 	private const float CONTROLLER_SENSITIVITY = 3000.0f;
 	private const float CAMERA_CORRECTION_SPEED = 1.5f;
 	private const float DEFAULT_CAMERA_X_ROTATION = -Mathf.Pi/6.0f;
