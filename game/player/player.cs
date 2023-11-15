@@ -1,6 +1,7 @@
 using System.Security.Principal;
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public partial class player : CharacterBody3D
 {
@@ -53,8 +54,6 @@ public partial class player : CharacterBody3D
 	// Get the gravity from the project settings to be synced with RigidBody nodes.
 	public float gravity = ProjectSettings.GetSetting("physics/3d/default_gravity").AsSingle();
 
-	private float controller_left_x = 0.0f;
-	private float controller_left_y = 0.0f;
 	public Vector3 last_pos = Vector3.Zero;
 	private Vector3 current_normal = new Vector3(0.0f, 1.0f, 0.0f);
 	private Vector3 last_velocity = Vector3.Zero;
@@ -68,18 +67,71 @@ public partial class player : CharacterBody3D
 	private float lean_rotation_speed = 6.0f;
 	private float current_lean = 0.0f;
 	private float goal_lean = 0.0f;
+	private float ping_counter = 0.0f;
+	private float last_ping = 0.0f;	
 	public Color color = new Color(0.0f, 0.0f, 0.0f, 1.0f);
+	
+	//synced variables
 
+	[Export]
+	private Vector3 velocity = Vector3.Zero;
+	[Export]
+	private Godot.Collections.Dictionary<string, bool> input_pressed = new  Godot.Collections.Dictionary<string, bool>();
+	[Export]
+	private Godot.Collections.Dictionary<string, bool> input_just_pressed = new Godot.Collections.Dictionary<string, bool>();
+	[Export]
+	private float controller_left_x = 0.0f;
+	[Export]
+	private float controller_left_y = 0.0f;
 	[Export]
 	public bool active = false;
 	[Export]
 	public bool alive = true;
 
+	public void get_input(){
+		//inputs are only retrieved if authority - otherwise they are just synchronized
+		if(!IsMultiplayerAuthority()){
+			return;
+		}
+		//inputs are stored in dictionary to easily synchronize
+		foreach(string action in input_pressed.Keys){
+			input_pressed[action] = Input.IsActionPressed(action);
+			input_just_pressed[action] = Input.IsActionJustPressed(action);
+		}
+	}
+	public void _on_multiplayer_synchronizer_synchronized(){
+		if(IsMultiplayerAuthority()){
+			//check should be unnecessary
+			return;
+		}
+		last_ping = ping_counter;
+		ping_counter = 0.0f;
+
+		//position, velocity, and inputs have been synced - now need to predict future position and velocity
+		client_side_prediction();
+
+	}
+
+	public void client_side_prediction(){
+		//simplest form of client side prediction - just move forward by last velocity and estimated velocity
+		Position += move_direction * velocity * last_ping;
+	}
+
 	public override void _EnterTree(){
+		//needs to be done before any syncs
+		for(int i = InputMap.GetActions().Count - 1; i >= 0; i--){
+			string action = InputMap.GetActions()[i];
+			if( action.Substr(0,2) != "ui" ) {
+				input_pressed.Add(action, false);
+				input_just_pressed.Add(action, false);
+			}
+		}
+
 		SetMultiplayerAuthority(Int32.Parse(Name));
 	}
 
 	public override void _Ready(){
+
 		rotators = GetNode<Node3D>("rotators");
 		mesh = GetNode<MeshInstance3D>("rotators/bike_frame");
 		hurtbox = GetNode<CollisionShape3D>("hurtbox");
@@ -98,20 +150,15 @@ public partial class player : CharacterBody3D
 	}
 	public override void _PhysicsProcess(double delta)
 	{
-		//only run process if authority
-		if(!IsMultiplayerAuthority()){
-			return;
-		}
+		float deltaf = (float) delta;
 
 		if(!active || !alive){
 			return;
 		}
 
-		//GetNode<MeshInstance3D>("last_velocity").Position = last_velocity.Normalized() * 3;
+		get_input();
 
 		world_node.authority_player_position = Position;
-
-		float deltaf = (float) delta;
 
 		jump_timer += deltaf;
 
@@ -150,7 +197,7 @@ public partial class player : CharacterBody3D
 		float md_angle = current_normal.SignedAngleTo(move_direction, md_axis);
 		move_direction = move_direction.Rotated(md_axis, Mathf.Pi/2.0f - md_angle).Normalized();
 		
-		Vector3 velocity = Velocity;
+		velocity = Velocity;
 
 		// rotate forwards while falling, but only to a certain point
 		if (!IsOnFloor() && air_timer > AIR_ROTATE_BUFFER){
@@ -185,10 +232,10 @@ public partial class player : CharacterBody3D
 			rotation_amount = wheel_position * deltaf * MOVE_DIRECTION_ROTATION_SPEED * 0.5f;
 		}
 		if(!settings.Instance.controller_toggle){
-			if(Input.IsActionPressed("left")){
+			if(input_pressed["left"]){
 				rotation_amount = -deltaf * MOVE_DIRECTION_ROTATION_SPEED * 0.5f;
 			}
-			else if(Input.IsActionPressed("right")){
+			else if(input_pressed["right"]){
 				rotation_amount = deltaf * MOVE_DIRECTION_ROTATION_SPEED * 0.5f;
 			}
 		}
@@ -202,15 +249,15 @@ public partial class player : CharacterBody3D
 		
 		//determine speed
 		float goal_speed = SPEED + 
-			(Input.IsActionPressed("boost") ? 1 : 0) * BOOST_ADDITIONAL_SPEED + 
+			(input_pressed["boost"] ? 1 : 0) * BOOST_ADDITIONAL_SPEED + 
 			(skating_trail != null ? 1 : 0) * SKATE_ADDITIONAL_SPEED + 
 			(teching > 0 ? 1 : 0) * TECH_ADDITIONAL_SPEED;
 		float current_acceleration = ACCELERATION + 
-			(Input.IsActionPressed("boost") ? 1 : 0) * BOOST_ADDITIONAL_ACCELERATION + 
+			(input_pressed["boost"] ? 1 : 0) * BOOST_ADDITIONAL_ACCELERATION + 
 			(skating_trail != null ? 1 : 0) * SKATE_ADDITIONAL_ACCELERATION + 
 			(teching > 0 ? 1 : 0) * TECH_ADDITIONAL_ACCELERATION;
 		float negative_acceleration = NEGATIVE_ACCELERATION + 
-			(Input.IsActionPressed("boost") ? 1 : 0) * BOOST_NEGATIVE_ACCELERATION + 
+			(input_pressed["boost"] ? 1 : 0) * BOOST_NEGATIVE_ACCELERATION + 
 			(skating_trail != null ? 1 : 0) * SKATE_NEGATIVE_ACCELERATION + 
 			(teching > 0 ? 1 : 0) * TECH_NEGATIVE_ACCELERATION;
 		
@@ -229,7 +276,7 @@ public partial class player : CharacterBody3D
 		}
 
 		// Handle Jump.
-		if (Input.IsActionJustPressed("jump") && IsOnFloor()){
+		if (input_just_pressed["jump"] && IsOnFloor()){
 			velocity += current_normal * JUMP_VELOCITY;
 			Vector3 axis = -move_direction.Cross(current_normal).Normalized();
 			current_normal = current_normal.Rotated(axis, -Mathf.Pi/4.0f).Normalized();
@@ -247,7 +294,7 @@ public partial class player : CharacterBody3D
 		//check for tech
 		tech_counter -= deltaf;
 		teching -= deltaf;
-		if(Input.IsActionJustPressed("tech") && tech_counter <= TECH_COOLDOWN){
+		if(input_just_pressed["tech"] && tech_counter <= TECH_COOLDOWN){
 			tech_counter = TECH_WINDOW;			
 		}
 

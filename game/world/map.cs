@@ -15,10 +15,10 @@ public partial class map : Node3D
 	const int BLOCK_Z_MAX = 200;
 	public int network_authority_id = 0;
 	private RandomNumberGenerator rng;
-	public Godot.Collections.Array<Vector3> block_position_array;
-	public Godot.Collections.Array<Vector3> block_scale_array;
-	public Godot.Collections.Array<Vector3> block_dir_array;
-	public Godot.Collections.Array<float> block_speed_array;
+	public Godot.Collections.Array<Vector3> block_position_array = new Godot.Collections.Array<Vector3>() ;
+	public Godot.Collections.Array<Vector3> block_scale_array = new Godot.Collections.Array<Vector3>();
+	public Godot.Collections.Array<Vector3> block_dir_array = new Godot.Collections.Array<Vector3>();
+	public Godot.Collections.Array<float> block_speed_array = new Godot.Collections.Array<float>();
 	private Material grid_material = GD.Load<Material>("res://assets/materials/grid_material.tres");
 	private Node3D grid_meshes;
 	private MeshInstance3D mesh;

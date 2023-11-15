@@ -97,5 +97,3 @@ draw_pass_1 = SubResource("ArrayMesh_ebqtl")
 [node name="skybox" parent="." instance=ExtResource("5_ylfm3")]
 
 [node name="Platforms" type="Node" parent="."]
-
-[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]

@@ -11,5 +11,5 @@ shader_parameter/xwidth = 1.0
 shader_parameter/sl = 8.0
 shader_parameter/sl_portion = 1.0
 shader_parameter/columns = 4.0
-shader_parameter/input_color = Quaternion(0.7, 0.7, 1, 1)
+shader_parameter/input_color = Vector4(0.7, 0.7, 1, 1)
 shader_parameter/letters = ExtResource("2_8qiaa")

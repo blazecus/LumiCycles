@@ -138,6 +138,26 @@ properties/4/path = NodePath(".:alive")
 properties/4/spawn = true
 properties/4/sync = true
 properties/4/watch = false
+properties/5/path = NodePath(".:input_pressed")
+properties/5/spawn = true
+properties/5/sync = true
+properties/5/watch = false
+properties/6/path = NodePath(".:input_just_pressed")
+properties/6/spawn = true
+properties/6/sync = true
+properties/6/watch = false
+properties/7/path = NodePath(".:controller_left_x")
+properties/7/spawn = true
+properties/7/sync = true
+properties/7/watch = false
+properties/8/path = NodePath(".:controller_left_y")
+properties/8/spawn = true
+properties/8/sync = true
+properties/8/watch = false
+properties/9/path = NodePath(".:velocity")
+properties/9/spawn = true
+properties/9/sync = true
+properties/9/watch = false
 
 [sub_resource type="BoxMesh" id="BoxMesh_htchg"]
 size = Vector3(0.5, 0.5, 0.5)
@@ -307,3 +327,5 @@ replication_config = SubResource("SceneReplicationConfig_t5hu2")
 
 [node name="last_velocity" type="MeshInstance3D" parent="."]
 mesh = SubResource("BoxMesh_htchg")
+
+[connection signal="synchronized" from="MultiplayerSynchronizer" to="." method="_on_multiplayer_synchronizer_synchronized"]
