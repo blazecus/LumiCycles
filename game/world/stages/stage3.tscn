@@ -13,16 +13,16 @@ script = ExtResource("1_614si")
 [node name="spawns" type="Node3D" parent="."]
 
 [node name="spawn1" type="Marker3D" parent="spawns"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 90, 10, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 10, 0)
 
 [node name="spawn2" type="Marker3D" parent="spawns"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -90, 10, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 10, 0)
 
 [node name="spawn3" type="Marker3D" parent="spawns"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, 90)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 10, 90)
 
 [node name="spawn4" type="Marker3D" parent="spawns"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, -90)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 10, -90)
 
 [node name="lights" type="Node3D" parent="."]
 visible = false

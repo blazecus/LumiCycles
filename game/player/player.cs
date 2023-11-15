@@ -69,6 +69,8 @@ public partial class player : CharacterBody3D
 	private float goal_lean = 0.0f;
 	private float ping_counter = 0.0f;
 	private float last_ping = 0.0f;	
+	private float check_ping_counter = 0.0f;
+
 	public Color color = new Color(0.0f, 0.0f, 0.0f, 1.0f);
 	
 	//synced variables
@@ -104,17 +106,37 @@ public partial class player : CharacterBody3D
 			//check should be unnecessary
 			return;
 		}
-		last_ping = ping_counter;
-		ping_counter = 0.0f;
 
 		//position, velocity, and inputs have been synced - now need to predict future position and velocity
 		client_side_prediction();
-
 	}
 
 	public void client_side_prediction(){
 		//simplest form of client side prediction - just move forward by last velocity and estimated velocity
 		Position += move_direction * velocity * last_ping;
+	}
+	
+
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer)]	
+	public void check_ping(bool send, string id){
+		if(!IsMultiplayerAuthority()){
+			if(Name != id){
+				return;
+			}
+
+			if(send){
+				ping_counter = 0.0f;
+				Rpc("check_ping", false, id);
+			}
+			else{
+				//divide by half since it starts from when it is sent
+				last_ping = ping_counter/2.0f;
+				GD.Print("ping: " + last_ping + " ms");
+			}
+		}
+		else{
+			Rpc("check_ping", false, id);	
+		}	
 	}
 
 	public override void _EnterTree(){
@@ -155,6 +177,16 @@ public partial class player : CharacterBody3D
 		if(!active || !alive){
 			return;
 		}
+
+		if(!IsMultiplayerAuthority()){
+			ping_counter += deltaf;
+			check_ping_counter += deltaf;
+			if(check_ping_counter > 1.0f){
+				check_ping_counter = 0.0f;
+				check_ping(true, Name);
+			}
+		}
+
 
 		get_input();
 
