@@ -12,7 +12,7 @@ config_version=5
 
 config/name="Light Bike"
 run/main_scene="res://game/UI/start_screen.tscn"
-config/features=PackedStringArray("4.1", "C#", "Forward Plus")
+config/features=PackedStringArray("4.2", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
@@ -66,3 +66,7 @@ tech={
 "events": [Object(InputEventJoypadButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"button_index":2,"pressure":0.0,"pressed":true,"script":null)
 ]
 }
+
+[physics]
+
+3d/physics_engine="JoltPhysics3D"

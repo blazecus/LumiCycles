@@ -5,4 +5,5 @@
 [resource]
 render_priority = 0
 shader = ExtResource("1_we8fi")
-shader_parameter/input_color = Quaternion(0, 0, 0, 0)
+shader_parameter/edge_thickness_base = 0.25
+shader_parameter/edge_thickness_minimum = 0.15

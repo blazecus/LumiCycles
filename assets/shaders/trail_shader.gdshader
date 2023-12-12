@@ -48,7 +48,7 @@ void fragment() {
 	edge_thickness += random2(vec2((UV.x + 1500.0f) / 86435600.0f, ya/3.0f * (TIME + 1500.0f) / 60000000.0f));
 	edge_thickness *= edge_thickness_base / 3.0f + edge_thickness_minimum;
 	*/
-	float edge_thickness = 0.3f;
+	float edge_thickness = 0.2f;
 	
 	if(UV.x < edge_thickness || UV.y < edge_thickness)
 	{
@@ -90,5 +90,6 @@ void fragment() {
 
 	}
 	
+	EMISSION = EMISSION * 0.8f;
 	RADIANCE = vec4(ALBEDO, 1.0f);
 }
