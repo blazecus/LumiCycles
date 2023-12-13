@@ -45,6 +45,7 @@ public partial class player : CharacterBody3D
 	private Node3D rotators;
 	private player_camera camera;
 	private Node3D slope_check;
+	private Node3D tech_check;
 	private Node3D skate_check;
 	private Node3D sparks;
 	private trail skating_trail;
@@ -163,6 +164,7 @@ public partial class player : CharacterBody3D
 		bottomfront = GetNode<Marker3D>("rotators/bike_frame/bottomfront");
 		camera = GetNode<player_camera>("PlayerCamera");
 		slope_check = hurtbox.GetNode<Node3D>("slope_check");
+		tech_check = hurtbox.GetNode<Node3D>("tech_check");
 		skate_check = hurtbox.GetNode<Node3D>("skate_check");
 		sparks = rotators.GetNode<Node3D>("sparks");
 		player_trail = GetNode<trail>("trail");
@@ -219,9 +221,6 @@ public partial class player : CharacterBody3D
 			float rotate_angle = current_normal.SignedAngleTo(next_normal, rotate_axis);
 			float fixed_speed = deltaf * Mathf.Sign(rotate_angle) * NORMAL_ROTATION_SPEED;
 			float final_speed = Mathf.Sign(rotate_angle) * Mathf.Min(Mathf.Abs(fixed_speed), Mathf.Abs(rotate_angle));
-			//if(IsOnFloor() || air_timer > JUMP_BUFFER){
-			//move_direction = move_direction.Rotated(rotate_axis, final_speed).Normalized();
-			//current_normal = next_normal;
 			current_normal = current_normal.Rotated(rotate_axis, final_speed).Normalized();
 		}
 
@@ -294,9 +293,7 @@ public partial class player : CharacterBody3D
 			(teching > 0 ? 1 : 0) * TECH_NEGATIVE_ACCELERATION;
 		
 		current_acceleration = current_speed < goal_speed ? current_acceleration : negative_acceleration;
-
 		current_speed = Mathf.Lerp(current_speed, goal_speed, current_acceleration * deltaf);
-
 		goal_lean = 0.0f;
 
 		//movement!
@@ -336,12 +333,13 @@ public partial class player : CharacterBody3D
 			 						  || (((Node3D)collision.GetCollider()).GetChildCount() == 1);
 			if(collision.GetCollider().HasMethod("can_kill") && check_trail_collision){
 				//dead?
-				if(tech_counter > 0 && collision.GetCollider().HasMethod("reset_trail")){
-					reflect(collision.GetNormal());
-				}
-				else if(teching <= 0){
-					die();
-				}
+				//if(tech_counter > 0 && collision.GetCollider().HasMethod("reset_trail")){
+				//	reflect(collision.GetNormal());
+				//}
+				//else if(teching <= 0){
+				//	die();
+				//}
+				die();
 			}
 		}
 		camera.goal_rotation = new Vector3(rotators.Rotation.X, rotators.Rotation.Y - Mathf.Pi, rotators.Rotation.Z);
@@ -413,6 +411,7 @@ public partial class player : CharacterBody3D
 		//Vector3 mdt = (new Vector3(move_direction.X, 0, move_direction.Z)).Normalized();
 		move_direction = move_direction.Bounce(normal).Normalized();
 		Velocity = move_direction * current_speed;
+		GD.Print("adfas");
 	}
 
 	public void spawn_player(Vector3 position){
@@ -461,7 +460,7 @@ public partial class player : CharacterBody3D
 
 	public void skate_on(RayCast3D ray, float deltaf){
 		Node3D body = (Node3D) ray.GetCollider();
-		if(body.HasMethod("reset_trail")){
+		if(body.GetParent().HasMethod("reset_trail")){
 			
 			Vector3 c_normal = ray.GetCollisionNormal();
 			Vector3 c_point = ray.GetCollisionPoint();
@@ -481,7 +480,7 @@ public partial class player : CharacterBody3D
 				return; //effect is only applied when already mostly aligned to the direction of the trail
 			}
 
-			skating_trail = (trail) body;
+			skating_trail = (trail) body.GetParent();
 			sparks.Rotation = Vector3.Zero; 
 			sparks.Rotate(Vector3.Forward, Mathf.Pi/4.0f * (ray.Name == "skate_check_left" ? 1 : -1) );
 
@@ -519,5 +518,21 @@ public partial class player : CharacterBody3D
 	public bool speed_up(){
 		boosting = 1;
 		return true;
+		}
+
+	public void trail_collision(){
+		if(!IsMultiplayerAuthority()){
+			return;
+		}
+		foreach(RayCast3D ray in tech_check.GetChildren()){
+			if(ray.IsColliding()){
+				if(tech_counter > 0 && ((Node3D)ray.GetCollider()).GetParent().HasMethod("reset_trail")){
+					reflect(ray.GetCollisionNormal());
+					return;
+				}
+			}
+
+		}
+		die();
 	}
 }

@@ -9,7 +9,7 @@ chunks should be done fairly often, which means the mesh might have to be copied
 -------------------------------------------*/
 
 
-public partial class trail : StaticBody3D
+public partial class trail : Node3D 
 {
 	private const int CHUNK_SIZE = 10;
 	public const float TRAIL_CHECK_INTERVAL = 0.1f;
@@ -21,7 +21,11 @@ public partial class trail : StaticBody3D
 	public Material trail_material = GD.Load<Material>("res://assets/materials/trail_material.tres");
 
 	private MeshInstance3D mesh;
+	private MeshInstance3D frontmesh;
 	private ImmediateMesh imesh;
+	private ImmediateMesh frontimesh;
+	private Area3D trail_area;
+	private Area3D close_trail_area;
 	public Godot.Collections.Array<Vector3> points;
 	public Godot.Collections.Array<Vector3> added_points;
 	public int added_count = 0;
@@ -40,7 +44,11 @@ public partial class trail : StaticBody3D
 	public override void _Ready()
 	{
 		mesh = GetNode<MeshInstance3D>("mesh");
-		//imesh = (ImmediateMesh) mesh.Mesh;
+		frontmesh = GetNode<MeshInstance3D>("frontmesh");
+		trail_area = GetNode<Area3D>("trail_area");
+		close_trail_area = GetNode<Area3D>("close_trail_area");
+		frontimesh = new ImmediateMesh();
+		frontmesh.Mesh = frontimesh;
 		imesh = new ImmediateMesh();
 		mesh.Mesh = imesh;
 		points = new Godot.Collections.Array<Vector3>();
@@ -56,6 +64,7 @@ public partial class trail : StaticBody3D
 		if(!parent_player.active || !parent_player.alive){
 			return;
 		}
+		frontmesh.SetInstanceShaderParameter("input_color", color);
 		mesh.SetInstanceShaderParameter("input_color", color);
 		float deltaf = (float) delta;
 		trail_timer += deltaf;
@@ -66,52 +75,104 @@ public partial class trail : StaticBody3D
 			}
 			trail_timer = 0.0f;
 		}
+		configure_front_quad();
 	}
 
+	public void configure_front_quad(){
+
+		Vector3 last_point_bot;
+		Vector3 last_point_top;
+		if(added_points.Count >= 2){
+			last_point_bot = added_points[added_points.Count-2];
+			last_point_top = added_points[added_points.Count-1];
+		}
+		else{
+			if(points.Count < 2){
+				return;
+			}
+			last_point_bot = points[points.Count-2];
+			last_point_top = points[points.Count-1];
+		}
+
+		Godot.Collections.Array<Vector3> in_points = new Godot.Collections.Array<Vector3>
+        {
+			last_point_bot,
+			last_point_top,
+			parent_player.trailbottom.GlobalPosition,
+			parent_player.trailtop.GlobalPosition
+        };
+
+		frontimesh.ClearSurfaces();
+		frontimesh.SurfaceBegin(Mesh.PrimitiveType.Triangles, trail_material);
+		int uv_i = points.Count + added_points.Count;
+		float end = (uv_i / 2.0f)/UV_SCALING_FACTOR;
+		frontmesh.SetInstanceShaderParameter("uv_end", end);
+		mesh.SetInstanceShaderParameter("uv_end", end);
+		draw_rect(ref frontimesh, ref in_points, uv_i);
+		frontimesh.SurfaceEnd();
+
+		if(close_trail_area.HasNode("last")){
+			CollisionShape3D tlast = close_trail_area.GetNode<CollisionShape3D>("last");
+			close_trail_area.RemoveChild(tlast);
+			tlast.QueueFree();
+		}
+
+		last_hitbox();
+	}
+
+	public void draw_rect(ref ImmediateMesh mesh, ref Godot.Collections.Array<Vector3> in_points, int i){
+		//triangle 1 front
+		mesh.SurfaceSetUV(new Vector2((i/2) / UV_SCALING_FACTOR, 0));
+		mesh.SurfaceAddVertex(in_points[0]);
+
+		mesh.SurfaceSetUV(new Vector2((i/2) / UV_SCALING_FACTOR, 1));
+		mesh.SurfaceAddVertex(in_points[1]);
+
+		mesh.SurfaceSetUV(new Vector2((i/2 + 1) / UV_SCALING_FACTOR,0));
+		mesh.SurfaceAddVertex(in_points[2]);
+
+		//triangle 1 back
+		mesh.SurfaceSetUV(new Vector2((i/2 + 1) / UV_SCALING_FACTOR, 0));
+		mesh.SurfaceAddVertex(in_points[2]);
+		
+		mesh.SurfaceSetUV(new Vector2((i/2) / UV_SCALING_FACTOR, 1));
+		mesh.SurfaceAddVertex(in_points[1]);
+
+		mesh.SurfaceSetUV(new Vector2((i/2) / UV_SCALING_FACTOR, 0));
+		mesh.SurfaceAddVertex(in_points[0]);
+
+		//triangle 2 front
+		mesh.SurfaceSetUV(new Vector2((i/2) / UV_SCALING_FACTOR, 1));
+		mesh.SurfaceAddVertex(in_points[1]);
+
+		mesh.SurfaceSetUV(new Vector2((i/2 + 1) / UV_SCALING_FACTOR, 1));
+		mesh.SurfaceAddVertex(in_points[3]);
+
+		mesh.SurfaceSetUV(new Vector2((i/2 + 1) / UV_SCALING_FACTOR, 0));
+		mesh.SurfaceAddVertex(in_points[2]);
+
+		//triangle 2 back
+		mesh.SurfaceSetUV(new Vector2((i/2 + 1) / UV_SCALING_FACTOR, 0));
+		mesh.SurfaceAddVertex(in_points[2]);
+
+		mesh.SurfaceSetUV(new Vector2((i/2 + 1) / UV_SCALING_FACTOR, 1));
+		mesh.SurfaceAddVertex(in_points[3]);
+
+		mesh.SurfaceSetUV(new Vector2((i/2) / UV_SCALING_FACTOR, 1));
+		mesh.SurfaceAddVertex(in_points[1]);
+	}
 	public void draw_mesh(int start_index){
 		if(points.Count > 4){
 			imesh.SurfaceBegin(Mesh.PrimitiveType.Triangles, trail_material);
 			for(int i = start_index; i < points.Count - 3; i += 2){
-				
-				//triangle 1 front
-				imesh.SurfaceSetUV(new Vector2((i/2) / UV_SCALING_FACTOR, 0));
-				imesh.SurfaceAddVertex(points[i]);
-
-				imesh.SurfaceSetUV(new Vector2((i/2) / UV_SCALING_FACTOR, 1));
-				imesh.SurfaceAddVertex(points[i+1]);
-
-				imesh.SurfaceSetUV(new Vector2((i/2 + 1) / UV_SCALING_FACTOR,0));
-				imesh.SurfaceAddVertex(points[i+2]);
-
-				//triangle 1 back
-				imesh.SurfaceSetUV(new Vector2((i/2 + 1) / UV_SCALING_FACTOR, 0));
-				imesh.SurfaceAddVertex(points[i+2]);
-				
-				imesh.SurfaceSetUV(new Vector2((i/2) / UV_SCALING_FACTOR, 1));
-				imesh.SurfaceAddVertex(points[i+1]);
-
-				imesh.SurfaceSetUV(new Vector2((i/2) / UV_SCALING_FACTOR, 0));
-				imesh.SurfaceAddVertex(points[i]);
-
-				//triangle 2 front
-				imesh.SurfaceSetUV(new Vector2((i/2) / UV_SCALING_FACTOR, 1));
-				imesh.SurfaceAddVertex(points[i+1]);
-
-				imesh.SurfaceSetUV(new Vector2((i/2 + 1) / UV_SCALING_FACTOR, 1));
-				imesh.SurfaceAddVertex(points[i+3]);
-
-				imesh.SurfaceSetUV(new Vector2((i/2 + 1) / UV_SCALING_FACTOR, 0));
-				imesh.SurfaceAddVertex(points[i+2]);
-
-				//triangle 2 back
-				imesh.SurfaceSetUV(new Vector2((i/2 + 1) / UV_SCALING_FACTOR, 0));
-				imesh.SurfaceAddVertex(points[i+2]);
-
-				imesh.SurfaceSetUV(new Vector2((i/2 + 1) / UV_SCALING_FACTOR, 1));
-				imesh.SurfaceAddVertex(points[i+3]);
-
-				imesh.SurfaceSetUV(new Vector2((i/2) / UV_SCALING_FACTOR, 1));
-				imesh.SurfaceAddVertex(points[i+1]);
+				Godot.Collections.Array<Vector3> in_points = new Godot.Collections.Array<Vector3>
+                {
+                    points[i],
+                    points[i + 1],
+                    points[i + 2],
+                    points[i + 3]
+                };
+				draw_rect(ref imesh, ref in_points, i);
 			}
 			imesh.SurfaceEnd();
 		}
@@ -123,37 +184,14 @@ public partial class trail : StaticBody3D
 			int i = added_points.Count - 4;
 			int uv_i = points.Count + added_points.Count - 4;
 
-				//triangle 1 front
-				imesh.SurfaceSetUV(new Vector2((uv_i/2) / UV_SCALING_FACTOR, 0));
-				imesh.SurfaceAddVertex(added_points[i]);
-				imesh.SurfaceSetUV(new Vector2((uv_i/2) / UV_SCALING_FACTOR, 1));
-				imesh.SurfaceAddVertex(added_points[i+1]);
-				imesh.SurfaceSetUV(new Vector2((uv_i/2 + 1) / UV_SCALING_FACTOR,0));
-				imesh.SurfaceAddVertex(added_points[i+2]);
-
-				//triangle 1 back
-				imesh.SurfaceSetUV(new Vector2((uv_i/2 + 1) / UV_SCALING_FACTOR, 0));
-				imesh.SurfaceAddVertex(added_points[i+2]);
-				imesh.SurfaceSetUV(new Vector2((uv_i/2) / UV_SCALING_FACTOR, 1));
-				imesh.SurfaceAddVertex(added_points[i+1]);
-				imesh.SurfaceSetUV(new Vector2((uv_i/2) / UV_SCALING_FACTOR, 0));
-				imesh.SurfaceAddVertex(added_points[i]);
-
-				//triangle 2 front
-				imesh.SurfaceSetUV(new Vector2((uv_i/2) / UV_SCALING_FACTOR, 1));
-				imesh.SurfaceAddVertex(added_points[i+1]);
-				imesh.SurfaceSetUV(new Vector2((uv_i/2 + 1) / UV_SCALING_FACTOR, 1));
-				imesh.SurfaceAddVertex(added_points[i+3]);
-				imesh.SurfaceSetUV(new Vector2((uv_i/2 + 1) / UV_SCALING_FACTOR, 0));
-				imesh.SurfaceAddVertex(added_points[i+2]);
-
-				//triangle 2 back
-				imesh.SurfaceSetUV(new Vector2((uv_i/2 + 1) / UV_SCALING_FACTOR, 0));
-				imesh.SurfaceAddVertex(added_points[i+2]);
-				imesh.SurfaceSetUV(new Vector2((uv_i/2 + 1) / UV_SCALING_FACTOR, 1));
-				imesh.SurfaceAddVertex(added_points[i+3]);
-				imesh.SurfaceSetUV(new Vector2((uv_i/2) / UV_SCALING_FACTOR, 1));
-				imesh.SurfaceAddVertex(added_points[i+1]);
+			Godot.Collections.Array<Vector3> in_points = new Godot.Collections.Array<Vector3>
+            {
+                added_points[i],
+                added_points[i + 1],
+                added_points[i + 2],
+                added_points[i + 3]
+            };
+			draw_rect(ref imesh, ref in_points, uv_i);
 
 			imesh.SurfaceEnd();
 		}
@@ -162,49 +200,33 @@ public partial class trail : StaticBody3D
 				return;
 			}
 			imesh.SurfaceBegin(Mesh.PrimitiveType.Triangles, trail_material);
-				int i = points.Count - 2;
-
-				//triangle 1 front
-				imesh.SurfaceSetUV(new Vector2((i/2) / UV_SCALING_FACTOR, 0));
-				imesh.SurfaceAddVertex(points[points.Count-2]);
-				imesh.SurfaceSetUV(new Vector2((i/2) / UV_SCALING_FACTOR, 1));
-				imesh.SurfaceAddVertex(points[points.Count-1]);
-				imesh.SurfaceSetUV(new Vector2((i/2 + 1) / UV_SCALING_FACTOR,0));
-				imesh.SurfaceAddVertex(added_points[0]);
-
-				//triangle 1 back
-				imesh.SurfaceSetUV(new Vector2((i/2 + 1) / UV_SCALING_FACTOR, 0));
-				imesh.SurfaceAddVertex(added_points[0]);
-				imesh.SurfaceSetUV(new Vector2((i/2) / UV_SCALING_FACTOR, 1));
-				imesh.SurfaceAddVertex(points[points.Count-1]);
-				imesh.SurfaceSetUV(new Vector2((i/2) / UV_SCALING_FACTOR, 0));
-				imesh.SurfaceAddVertex(points[points.Count-2]);
-
-				//triangle 2 front
-				imesh.SurfaceSetUV(new Vector2((i/2) / UV_SCALING_FACTOR, 1));
-				imesh.SurfaceAddVertex(points[points.Count-1]);
-				imesh.SurfaceSetUV(new Vector2((i/2 + 1) / UV_SCALING_FACTOR, 1));
-				imesh.SurfaceAddVertex(added_points[1]);
-				imesh.SurfaceSetUV(new Vector2((i/2 + 1) / UV_SCALING_FACTOR, 0));
-				imesh.SurfaceAddVertex(added_points[0]);
-
-				//triangle 2 back
-				imesh.SurfaceSetUV(new Vector2((i/2 + 1) / UV_SCALING_FACTOR, 0));
-				imesh.SurfaceAddVertex(added_points[0]);
-				imesh.SurfaceSetUV(new Vector2((i/2 + 1) / UV_SCALING_FACTOR, 1));
-				imesh.SurfaceAddVertex(added_points[1]);
-				imesh.SurfaceSetUV(new Vector2((i/2) / UV_SCALING_FACTOR, 1));
-				imesh.SurfaceAddVertex(points[points.Count-1]);
+			int i = points.Count - 2;
+			
+			Godot.Collections.Array<Vector3> in_points = new Godot.Collections.Array<Vector3>
+            {
+                points[points.Count - 2],
+                points[points.Count - 1],
+                added_points[0],
+                added_points[1]
+            };
+			draw_rect(ref imesh, ref in_points, i);
 
 			imesh.SurfaceEnd();
 		}
 	}
 
 	public void update_collision(){
+		foreach(CollisionShape3D cshape in close_trail_area.GetChildren()){
+			if(cshape.Name != "last"){
+				close_trail_area.RemoveChild(cshape);
+				trail_area.AddChild(cshape);
+			}
+		}
 		CollisionShape3D p = new CollisionShape3D();
 		ConvexPolygonShape3D shape = new ConvexPolygonShape3D();
 		Vector3[] pc = new Vector3[6];
-		int i = added_points.Count - TRAIL_HITBOX_LAG * 2;
+
+		int i = added_points.Count - 4;
 		//hard coding edge cases - definitely a better solution but not important
 		if(i == -2){
 			if(points.Count < 2){
@@ -243,9 +265,45 @@ public partial class trail : StaticBody3D
 			pc[4] = added_points[i+3];
 			pc[5] = added_points[i+2];
 		}
+
 		shape.Points = pc;
 		p.Shape = shape;
-		AddChild(p);
+		close_trail_area.AddChild(p);
+	}
+
+	public void last_hitbox(){
+		CollisionShape3D p = new CollisionShape3D();
+		ConvexPolygonShape3D shape = new ConvexPolygonShape3D();
+		Vector3 top;
+		Vector3 bot;
+		if(added_points.Count < 2){
+			if(points.Count < 2){
+				return;
+			}
+
+			top = points[points.Count - 1];
+			bot = points[points.Count - 2];
+		}
+		else{
+			top = added_points[added_points.Count - 1];
+			bot = added_points[added_points.Count - 2];
+		}
+		if((top - parent_player.trailtop.GlobalPosition).Length() < 0.2f || (bot - parent_player.trailbottom.GlobalPosition).Length() < 0.2f){
+			return;
+		}
+		Vector3[] pc = new Vector3[6];
+		pc[0] = bot;
+		pc[1] = top;
+		pc[2] = parent_player.trailbottom.GlobalPosition;
+
+		pc[3] = top;
+		pc[4] = parent_player.trailtop.GlobalPosition;
+		pc[5] = parent_player.trailbottom.GlobalPosition;
+
+		shape.Points = pc;
+		p.Shape = shape;
+		p.Name = "last";
+		close_trail_area.AddChild(p);
 	}
 
 	public void add_section(Vector3 p1, Vector3 p2){
@@ -284,11 +342,13 @@ public partial class trail : StaticBody3D
 	public void sync_trail(Godot.Collections.Array<Vector3> sync_points){
 		//remove bad client side collision shapes
 		for(int i = 0; i < added_points.Count / 2; i++){
-			GetChild<CollisionShape3D>(GetChildCount() - 1).QueueFree();
+			trail_area.GetChild<CollisionShape3D>(trail_area.GetChildCount() - 1).QueueFree();
+		}
+		for(int i = 0; i < close_trail_area.GetChildCount(); i++){
+			close_trail_area.GetChild<CollisionShape3D>(trail_area.GetChildCount() - 1).QueueFree();
 		}
 		added_points.Clear();
-
-		//use update_collision to them back
+			//use update_collision to them back
 		for(int i = 0; i < sync_points.Count; i += 2){
 			added_points.Add(sync_points[i]);
 			added_points.Add(sync_points[i+1]);
@@ -307,7 +367,6 @@ public partial class trail : StaticBody3D
 
 	public void set_color(Color input_color){
 		color = input_color;
-		//imesh.SurfaceSetColor(color);
 		mesh.SetInstanceShaderParameter("input_color", color);
 	}
 
@@ -317,7 +376,13 @@ public partial class trail : StaticBody3D
 		points.Clear();
 		added_points.Clear();
 		imesh.ClearSurfaces();
-		foreach(var child in GetChildren()){
+		frontimesh.ClearSurfaces();
+		foreach(var child in trail_area.GetChildren()){
+			if(child is CollisionShape3D){
+				child.QueueFree();
+			}
+		}
+		foreach(var child in close_trail_area.GetChildren()){
 			if(child is CollisionShape3D){
 				child.QueueFree();
 			}
@@ -325,7 +390,16 @@ public partial class trail : StaticBody3D
 		polygon_counter = 0;
 	}
 
-	public bool can_kill(){
-		return true;
+	public void _on_trail_area_body_entered_all(Node3D body){
+		if(body.HasMethod("trail_collision")){
+			((player)body).trail_collision();
+		}
+	}
+	public void _on_trail_area_body_entered_close(Node3D body){
+		if(body != parent_player){
+			if(body.HasMethod("trail_collision")){
+				((player)body).trail_collision();
+			}
+		}
 	}
 }

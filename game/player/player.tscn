@@ -165,7 +165,7 @@ script = ExtResource("1_oxyv2")
 [node name="spark1" type="GPUParticles3D" parent="rotators/sparks"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3.02079)
 emitting = false
-amount = 50
+amount = 100
 lifetime = 0.5
 fixed_fps = 60
 visibility_aabb = AABB(-4, -4, -4.56389, 8, 8, 9.12779)
@@ -177,7 +177,7 @@ draw_pass_1 = SubResource("TubeTrailMesh_ys6wn")
 [node name="spark2" type="GPUParticles3D" parent="rotators/sparks"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3.02079)
 emitting = false
-amount = 100
+amount = 200
 lifetime = 0.5
 fixed_fps = 60
 visibility_aabb = AABB(-4, -4, -4.56389, 8, 8, 9.12779)
@@ -189,7 +189,7 @@ draw_pass_1 = SubResource("TubeTrailMesh_qs3po")
 [node name="spark3" type="GPUParticles3D" parent="rotators/sparks"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3.02079)
 emitting = false
-amount = 200
+amount = 400
 lifetime = 0.5
 fixed_fps = 60
 visibility_aabb = AABB(-4, -4, -4.56389, 8, 8, 9.12779)
@@ -200,6 +200,7 @@ draw_pass_1 = SubResource("TubeTrailMesh_up3no")
 
 [node name="trail_particles" type="GPUParticles3D" parent="rotators"]
 transform = Transform3D(0.999999, 0, 0, 0, 0.999999, 0, 0, 0, 0.999999, 0, 0.0975776, -1.98936)
+visible = false
 amount = 150
 lifetime = 0.3
 fixed_fps = 60
@@ -209,6 +210,7 @@ draw_pass_1 = SubResource("BoxMesh_grqwo")
 
 [node name="trail_particles3" type="GPUParticles3D" parent="rotators"]
 transform = Transform3D(0.999999, 0, 0, 0, 0.999999, 0, 0, 0, 0.999999, 0, 0.0975776, -1.98936)
+visible = false
 amount = 30
 lifetime = 0.1
 fixed_fps = 60
@@ -225,7 +227,7 @@ surface_material_override/0 = ExtResource("2_pxky8")
 transform = Transform3D(1.42857, 0, 0, 0, 1.42857, 0, 0, 0, 1.42857, 0, 0.714, -2.34139)
 
 [node name="trailbottom" type="Marker3D" parent="rotators/bike_frame"]
-transform = Transform3D(1.42857, 0, 0, 0, 1.42857, 0, 0, 0, 1.42857, 0, -0.714, -2.34139)
+transform = Transform3D(1.42857, 0, 0, 0, 1.42857, 0, 0, 0, 1.42857, 0, -0.527549, -2.34139)
 
 [node name="topfront" type="Marker3D" parent="rotators/bike_frame"]
 transform = Transform3D(1.42857, 0, 0, 0, 1.42857, 0, 0, 0, 1.42857, 0, 0.714, 4.40728)
@@ -248,10 +250,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.21614)
 [node name="skate_check_left" type="RayCast3D" parent="hurtbox/skate_check"]
 transform = Transform3D(5, 0, 0, 0, 5, 0, 0, 0, 5, 0, 0, 1.70063)
 target_position = Vector3(1, 0, 0)
+collide_with_areas = true
 
 [node name="skate_check_right" type="RayCast3D" parent="hurtbox/skate_check"]
 transform = Transform3D(-5, 0, 0, 0, -5, 0, 0, 0, -5, 0, 0, 1.70063)
 target_position = Vector3(1, 0, 0)
+collide_with_areas = true
 
 [node name="slope_check" type="Node3D" parent="hurtbox"]
 transform = Transform3D(1.00097, 0, 0, 0, 1.00097, 0, 0, 0, 1.00097, 0, 0, 0.423415)
@@ -270,6 +274,24 @@ target_position = Vector3(1, 0, 0)
 [node name="right" type="RayCast3D" parent="hurtbox/slope_check"]
 transform = Transform3D(2, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.617619)
 target_position = Vector3(-1, 0, 0)
+
+[node name="tech_check" type="Node3D" parent="hurtbox"]
+transform = Transform3D(1.00097, 0, 0, 0, 1.00097, 0, 0, 0, 1.00097, 0, 0, 0.423415)
+
+[node name="forward" type="RayCast3D" parent="hurtbox/tech_check"]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 3, 0, 0, 0.617619)
+target_position = Vector3(0, 0, 1)
+collide_with_areas = true
+
+[node name="left" type="RayCast3D" parent="hurtbox/tech_check"]
+transform = Transform3D(3, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0.617619)
+target_position = Vector3(1, 0, 0)
+collide_with_areas = true
+
+[node name="right" type="RayCast3D" parent="hurtbox/tech_check"]
+transform = Transform3D(3, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0.617619)
+target_position = Vector3(-1, 0, 0)
+collide_with_areas = true
 
 [node name="PlayerCamera" type="Node3D" parent="."]
 script = ExtResource("2_mnuh0")
