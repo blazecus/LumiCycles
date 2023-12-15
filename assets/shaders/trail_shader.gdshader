@@ -1,7 +1,8 @@
 shader_type spatial;
+render_mode world_vertex_coords;
 
 instance uniform vec4 input_color = vec4(0.0f);
-instance uniform float uv_end = 0.0f;
+instance uniform vec3 player_position = vec3(0.0f);
 
 uniform float edge_thickness_base = 0.25f;
 uniform float edge_thickness_minimum = 0.15f;
@@ -50,7 +51,7 @@ void fragment() {
 	edge_thickness *= edge_thickness_base / 3.0f + edge_thickness_minimum;
 	*/
 	float edge_thickness = 0.2f;
-	float bike_edge_thickness = 8.0f;
+
 	if(UV.x < edge_thickness || UV.y < edge_thickness)
 	{
 		vec2 uvb = ((edge_thickness - UV) / edge_thickness) * 2.0f;
@@ -71,22 +72,25 @@ void fragment() {
 		//}
 		EMISSION += check_emission;
 	}
-	if(uv_end - UV.x < bike_edge_thickness)
+	
+	float bike_edge_thickness = 12.0f;
+	vec3 world_vertex = (INV_VIEW_MATRIX * vec4(VERTEX, 1.0)).xyz;
+	float dist = length(player_position - world_vertex);
+	if(dist < bike_edge_thickness)
 	{
-		float uvb = ((bike_edge_thickness - (uv_end - UV.x)) / bike_edge_thickness) * 2.0f;
+		float uvb = ((bike_edge_thickness - dist) / bike_edge_thickness) * 2.0f;
 		uvb = uvb * uvb * 2.0f;
 		float lx_factor = 0.0f;
 		float ly_factor = 0.0f;
-		if(UV.x < bike_edge_thickness){
-			lx_factor = uvb;
-		}
+		lx_factor = uvb;
 		float line_factor = max(lx_factor,ly_factor) * 1.8f;
 		line_factor -= mod(line_factor, 2.0f);
 		vec3 check_emission = vec3(0.1f,0.1f,1.5f) * line_factor;
 		//if(check_emission.x > 0.075f){
 		//	EMISSION = check_emission;			
 		//}
-		EMISSION += check_emission;
+		float uvt = ((bike_edge_thickness - dist) / bike_edge_thickness);
+		EMISSION += check_emission * 0.2f * uvt * uvt * uvt * vel;
 	}
 	
 	if(UV.y > 1.0f - edge_thickness){

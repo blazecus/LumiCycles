@@ -36,6 +36,7 @@ public partial class trail : Node3D
 	private float trail_timer = 0.0f;
 	private Vector3 last_player_pos = Vector3.Zero;
 	public Color color = new Color(0.0f, 0.0f, 0.0f, 1.0f);
+	private int current_uv = 0;
 
 	public void setup(){
 
@@ -104,11 +105,10 @@ public partial class trail : Node3D
 
 		frontimesh.ClearSurfaces();
 		frontimesh.SurfaceBegin(Mesh.PrimitiveType.Triangles, trail_material);
-		int uv_i = points.Count + added_points.Count;
-		float end = (uv_i / 2.0f)/UV_SCALING_FACTOR;
-		frontmesh.SetInstanceShaderParameter("uv_end", end);
-		mesh.SetInstanceShaderParameter("uv_end", end);
-		draw_rect(ref frontimesh, ref in_points, uv_i);
+		float end = (current_uv / 2.0f)/UV_SCALING_FACTOR;
+		frontmesh.SetInstanceShaderParameter("player_position", parent_player.GlobalPosition);
+		mesh.SetInstanceShaderParameter("player_position", parent_player.GlobalPosition);
+		draw_rect(ref frontimesh, ref in_points, current_uv);
 		frontimesh.SurfaceEnd();
 
 		if(close_trail_area.HasNode("last")){
@@ -192,7 +192,7 @@ public partial class trail : Node3D
                 added_points[i + 3]
             };
 			draw_rect(ref imesh, ref in_points, uv_i);
-
+			current_uv = uv_i + 2;
 			imesh.SurfaceEnd();
 		}
 		else{
@@ -210,8 +210,8 @@ public partial class trail : Node3D
                 added_points[1]
             };
 			draw_rect(ref imesh, ref in_points, i);
-
 			imesh.SurfaceEnd();
+			current_uv = i + 2;
 		}
 	}
 

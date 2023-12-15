@@ -66,7 +66,3 @@ tech={
 "events": [Object(InputEventJoypadButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"button_index":2,"pressure":0.0,"pressed":true,"script":null)
 ]
 }
-
-[physics]
-
-3d/physics_engine="JoltPhysics3D"

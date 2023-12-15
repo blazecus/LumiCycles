@@ -329,16 +329,7 @@ public partial class player : CharacterBody3D
 
 		for(int i = 0; i < GetSlideCollisionCount(); i++){
 			KinematicCollision3D collision = GetSlideCollision(i);
-			bool check_trail_collision = (collision.GetColliderShapeIndex() < ((Node3D)collision.GetCollider()).GetChildCount() - 5)
-			 						  || (((Node3D)collision.GetCollider()).GetChildCount() == 1);
-			if(collision.GetCollider().HasMethod("can_kill") && check_trail_collision){
-				//dead?
-				//if(tech_counter > 0 && collision.GetCollider().HasMethod("reset_trail")){
-				//	reflect(collision.GetNormal());
-				//}
-				//else if(teching <= 0){
-				//	die();
-				//}
+			if(collision.GetCollider().HasMethod("can_kill")){
 				die();
 			}
 		}
@@ -397,7 +388,7 @@ public partial class player : CharacterBody3D
 		alive = false;
 		active = false;
 		rotators.Visible = false;
-		hurtbox.Disabled = true;
+		//hurtbox.Disabled = true;
 		world_node.player_died();
 		GetNode<GpuParticles3D>("death_particles").LookAt(GlobalPosition + last_velocity.Normalized());
 		GetNode<GpuParticles3D>("death_particles").Emitting = true;
@@ -408,7 +399,6 @@ public partial class player : CharacterBody3D
 		tech_counter = 0.0f;
 		normal.Y = 0;
 		normal = normal.Normalized();
-		//Vector3 mdt = (new Vector3(move_direction.X, 0, move_direction.Z)).Normalized();
 		move_direction = move_direction.Bounce(normal).Normalized();
 		Velocity = move_direction * current_speed;
 		GD.Print("adfas");
@@ -531,7 +521,6 @@ public partial class player : CharacterBody3D
 					return;
 				}
 			}
-
 		}
 		die();
 	}
