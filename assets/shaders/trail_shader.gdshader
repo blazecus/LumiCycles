@@ -73,7 +73,7 @@ void fragment() {
 		EMISSION += check_emission;
 	}
 	
-	float bike_edge_thickness = 12.0f;
+	float bike_edge_thickness = 10.0f + 6.0f * abs(random(vel + (TIME-mod(TIME, 0.01f * vel))));
 	vec3 world_vertex = (INV_VIEW_MATRIX * vec4(VERTEX, 1.0)).xyz;
 	float dist = length(player_position - world_vertex);
 	if(dist < bike_edge_thickness)

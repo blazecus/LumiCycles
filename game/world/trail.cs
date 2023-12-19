@@ -11,9 +11,9 @@ chunks should be done fairly often, which means the mesh might have to be copied
 
 public partial class trail : Node3D 
 {
-	private const int CHUNK_SIZE = 10;
-	public const float TRAIL_CHECK_INTERVAL = 0.1f;
-	public const float TRAIL_LENGTH_INTERVAL = 0.5f;
+	private const int CHUNK_SIZE = 200;
+	public const float TRAIL_CHECK_INTERVAL = 0.05f;
+	public const float TRAIL_LENGTH_INTERVAL = 0.25f;
 	public const int TRAIL_HITBOX_LAG = 3;
 	public const float TRAIL_STARTUP = 1.5f;
 	public const float UV_SCALING_FACTOR = 1.0f;

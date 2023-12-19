@@ -401,7 +401,6 @@ public partial class player : CharacterBody3D
 		normal = normal.Normalized();
 		move_direction = move_direction.Bounce(normal).Normalized();
 		Velocity = move_direction * current_speed;
-		GD.Print("adfas");
 	}
 
 	public void spawn_player(Vector3 position){
@@ -484,7 +483,7 @@ public partial class player : CharacterBody3D
 			GetNode<MeshInstance3D>("last_velocity").Position = perp * 3;
 			move_direction = move_direction.Rotated(current_normal, rotate_amount).Normalized();
 			//rotators.Rotate(move_direction, -Mathf.Sign(rotate_amount) * dist_factor * 0.5f);
-			goal_lean += -Mathf.Sign(rotate_amount) * dist_factor * 0.5f;
+			goal_lean += ((ray.Name == "skate_check_left") ? -1 : 1) * dist_factor * 0.5f;
 		}
 	}
 
