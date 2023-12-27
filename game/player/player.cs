@@ -33,6 +33,7 @@ public partial class player : CharacterBody3D
 	public const float TECH_COOLDOWN = 0.04f;
 	public const float TECH_DURATION = 0.1f;
 	public const float SKATE_CORRECTION_FACTOR = 15.0f;
+	public const float PREDICTION_CORRECTION_SPEED = 12.5f;
 	public PackedScene trail_scene = ResourceLoader.Load<PackedScene>("res://game/world/trail.tscn"); 
 	private world world_node;
 	private trail player_trail;
@@ -71,6 +72,7 @@ public partial class player : CharacterBody3D
 	private float ping_counter = 0.0f;
 	private float last_ping = 0.0f;	
 	private float check_ping_counter = 0.0f;
+	private Vector3 prediction_difference = Vector3.Zero;
 
 	public Color color = new Color(0.0f, 0.0f, 0.0f, 1.0f);
 	
@@ -114,7 +116,8 @@ public partial class player : CharacterBody3D
 
 	public void client_side_prediction(){
 		//simplest form of client side prediction - just move forward by last velocity and estimated velocity
-		Position += move_direction * velocity * last_ping;
+		//Position += move_direction * velocity * last_ping;
+		prediction_difference = move_direction * velocity * last_ping;
 	}
 	
 
@@ -188,7 +191,6 @@ public partial class player : CharacterBody3D
 				check_ping(true, Name);
 			}
 		}
-
 
 		get_input();
 
@@ -355,6 +357,17 @@ public partial class player : CharacterBody3D
 		rotators.Rotate(move_direction, angle_change);
 		current_lean = angle_change;
 
+		if(!IsMultiplayerAuthority()){
+			//After normal movement is calculated, continue on client side prediction correction
+			//Interpolating like this makes the process look smooth as opposed to jittering
+			float pd_len = prediction_difference.Length();
+			if(pd_len > 0.01f){
+				float distance = Mathf.Min(pd_len, PREDICTION_CORRECTION_SPEED * deltaf);
+				Vector3 change = prediction_difference.Normalized() * distance; 
+				Position += change;
+				prediction_difference -= change;
+			}
+		}
 	}
 
 	public override void _Input(InputEvent inputEvent){
