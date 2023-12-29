@@ -77,6 +77,9 @@ public partial class trail : Node3D
 			trail_timer = 0.0f;
 		}
 		configure_front_quad();
+		GD.Print(frontimesh.GetSurfaceCount());
+		GD.Print(imesh.GetSurfaceCount());
+		GD.Print("-");
 	}
 
 	public void configure_front_quad(){
