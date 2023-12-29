@@ -11,7 +11,7 @@ chunks should be done fairly often, which means the mesh might have to be copied
 
 public partial class trail : Node3D 
 {
-	private const int CHUNK_SIZE = 200;
+	private const int CHUNK_SIZE = 20;
 	public const float TRAIL_CHECK_INTERVAL = 0.05f;
 	public const float TRAIL_LENGTH_INTERVAL = 0.25f;
 	public const int TRAIL_HITBOX_LAG = 3;
@@ -58,7 +58,6 @@ public partial class trail : Node3D
 		network_authority_id = Int32.Parse(parent_player.Name);
 		SetMultiplayerAuthority(network_authority_id);
 		trail_timer = -TRAIL_STARTUP;
-		GD.Print("trail ready");
 	}
 
 	public override void _Process(double delta)
@@ -346,6 +345,8 @@ public partial class trail : Node3D
 			trail_area.GetChild<CollisionShape3D>(trail_area.GetChildCount() - 1).QueueFree();
 		}
 		for(int i = 0; i < close_trail_area.GetChildCount(); i++){
+			GD.Print(close_trail_area);
+			GD.Print("-");
 			close_trail_area.GetChild<CollisionShape3D>(trail_area.GetChildCount() - 1).QueueFree();
 		}
 		added_points.Clear();
