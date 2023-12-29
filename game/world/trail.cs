@@ -348,9 +348,7 @@ public partial class trail : Node3D
 			trail_area.GetChild<CollisionShape3D>(trail_area.GetChildCount() - 1).QueueFree();
 		}
 		for(int i = 0; i < close_trail_area.GetChildCount(); i++){
-			GD.Print(close_trail_area);
-			GD.Print("-");
-			close_trail_area.GetChild<CollisionShape3D>(trail_area.GetChildCount() - 1).QueueFree();
+			close_trail_area.GetChild<CollisionShape3D>(close_trail_area.GetChildCount() - 1).QueueFree();
 		}
 		added_points.Clear();
 			//use update_collision to them back
