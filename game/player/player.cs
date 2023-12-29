@@ -33,7 +33,7 @@ public partial class player : CharacterBody3D
 	public const float TECH_COOLDOWN = 0.04f;
 	public const float TECH_DURATION = 0.1f;
 	public const float SKATE_CORRECTION_FACTOR = 15.0f;
-	public const float PREDICTION_CORRECTION_SPEED = 12.5f;
+	public const float PREDICTION_CORRECTION_SPEED = 30.0f;
 	public PackedScene trail_scene = ResourceLoader.Load<PackedScene>("res://game/world/trail.tscn"); 
 	private world world_node;
 	private trail player_trail;
@@ -79,6 +79,8 @@ public partial class player : CharacterBody3D
 	//synced variables
 
 	[Export]
+	private Vector3 sync_position = Vector3.Zero;
+	[Export]
 	private Vector3 velocity = Vector3.Zero;
 	[Export]
 	private Godot.Collections.Dictionary<string, bool> input_pressed = new  Godot.Collections.Dictionary<string, bool>();
@@ -117,7 +119,7 @@ public partial class player : CharacterBody3D
 	public void client_side_prediction(){
 		//simplest form of client side prediction - just move forward by last velocity and estimated velocity
 		//Position += move_direction * velocity * last_ping;
-		prediction_difference = move_direction * velocity * last_ping;
+		prediction_difference = sync_position - Position + move_direction * velocity * last_ping;
 	}
 	
 
@@ -368,6 +370,7 @@ public partial class player : CharacterBody3D
 				prediction_difference -= change;
 			}
 		}
+		sync_position = Position;
 	}
 
 	public override void _Input(InputEvent inputEvent){
