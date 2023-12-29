@@ -370,7 +370,9 @@ public partial class player : CharacterBody3D
 				prediction_difference -= change;
 			}
 		}
-		sync_position = Position;
+		else{
+			sync_position = Position;
+		}
 	}
 
 	public override void _Input(InputEvent inputEvent){
