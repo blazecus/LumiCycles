@@ -58,6 +58,7 @@ public partial class trail : Node3D
 		network_authority_id = Int32.Parse(parent_player.Name);
 		SetMultiplayerAuthority(network_authority_id);
 		trail_timer = -TRAIL_STARTUP;
+		GD.Print("trail ready");
 	}
 
 	public override void _Process(double delta)
