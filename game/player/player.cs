@@ -33,7 +33,7 @@ public partial class player : CharacterBody3D
 	public const float TECH_COOLDOWN = 0.04f;
 	public const float TECH_DURATION = 0.1f;
 	public const float SKATE_CORRECTION_FACTOR = 15.0f;
-	public const float PREDICTION_CORRECTION_SPEED = 30.0f;
+	public const float PREDICTION_CORRECTION_SPEED = 3.0f;
 	public PackedScene trail_scene = ResourceLoader.Load<PackedScene>("res://game/world/trail.tscn"); 
 	private world world_node;
 	private trail player_trail;
