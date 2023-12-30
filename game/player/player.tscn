@@ -149,6 +149,9 @@ properties/8/replication_mode = 1
 properties/9/path = NodePath(".:sync_position")
 properties/9/spawn = true
 properties/9/replication_mode = 1
+properties/10/path = NodePath(".:current_speed")
+properties/10/spawn = true
+properties/10/replication_mode = 1
 
 [sub_resource type="BoxMesh" id="BoxMesh_htchg"]
 size = Vector3(0.5, 0.5, 0.5)

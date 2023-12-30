@@ -63,7 +63,6 @@ public partial class player : CharacterBody3D
 	private float jump_timer = 0.0f;
 	private float air_timer = 0.0f;
 	private float boosting = 0.02f;
-	private float current_speed = SPEED;
 	private float tech_counter = 0.0f;
 	private float teching = 0.0f;
 	private float lean_rotation_speed = 6.0f;
@@ -77,7 +76,8 @@ public partial class player : CharacterBody3D
 	public Color color = new Color(0.0f, 0.0f, 0.0f, 1.0f);
 	
 	//synced variables
-
+	[Export]
+	private float current_speed = SPEED;
 	[Export]
 	private Vector3 sync_position = Vector3.Zero;
 	[Export]
@@ -287,9 +287,6 @@ public partial class player : CharacterBody3D
 		rotators.LookAt(lookat_pos, current_normal);
 		hurtbox.LookAt(lookat_pos, current_normal); 
 		
-		if(!IsMultiplayerAuthority()){
-			GD.Print(input_pressed["boost"]);
-		}
 		//determine speed
 		float goal_speed = SPEED + 
 			(input_pressed["boost"] ? 1 : 0) * BOOST_ADDITIONAL_SPEED + 
