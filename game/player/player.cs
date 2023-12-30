@@ -33,7 +33,7 @@ public partial class player : CharacterBody3D
 	public const float TECH_COOLDOWN = 0.04f;
 	public const float TECH_DURATION = 0.1f;
 	public const float SKATE_CORRECTION_FACTOR = 15.0f;
-	public const float PREDICTION_CORRECTION_SPEED = 3.0f;
+	public const float PREDICTION_CORRECTION_SPEED = 0.5f;
 	public PackedScene trail_scene = ResourceLoader.Load<PackedScene>("res://game/world/trail.tscn"); 
 	private world world_node;
 	private trail player_trail;
@@ -120,6 +120,10 @@ public partial class player : CharacterBody3D
 		//simplest form of client side prediction - just move forward by last velocity and estimated velocity
 		//Position += move_direction * velocity * last_ping;
 		prediction_difference = sync_position - Position + move_direction * velocity * last_ping;
+		if(prediction_difference.Length() > 1.0f){
+			Position = Position + prediction_difference;
+			prediction_difference = Vector3.Zero;
+		}
 	}
 	
 
