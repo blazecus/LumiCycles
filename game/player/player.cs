@@ -287,6 +287,9 @@ public partial class player : CharacterBody3D
 		rotators.LookAt(lookat_pos, current_normal);
 		hurtbox.LookAt(lookat_pos, current_normal); 
 		
+		if(!IsMultiplayerAuthority()){
+			GD.Print(input_pressed["boost"]);
+		}
 		//determine speed
 		float goal_speed = SPEED + 
 			(input_pressed["boost"] ? 1 : 0) * BOOST_ADDITIONAL_SPEED + 
