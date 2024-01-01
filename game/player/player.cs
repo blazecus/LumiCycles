@@ -33,7 +33,7 @@ public partial class player : CharacterBody3D
 	public const float TECH_COOLDOWN = 0.04f;
 	public const float TECH_DURATION = 0.1f;
 	public const float SKATE_CORRECTION_FACTOR = 15.0f;
-	public const float PREDICTION_CORRECTION_SPEED = 1.5f;
+	public const float PREDICTION_CORRECTION_SPEED = 1.0f;
 	public PackedScene trail_scene = ResourceLoader.Load<PackedScene>("res://game/world/trail.tscn"); 
 	private world world_node;
 	private trail player_trail;
@@ -124,6 +124,9 @@ public partial class player : CharacterBody3D
 			Position = Position + prediction_difference;
 			prediction_difference = Vector3.Zero;
 			GD.Print("desync, position reset");
+		}
+		else if(prediction_difference.Length() < 0.5f){
+			prediction_difference = Vector3.Zero;
 		}
 	}
 	
@@ -368,7 +371,7 @@ public partial class player : CharacterBody3D
 			//After normal movement is calculated, continue on client side prediction correction
 			//Interpolating like this makes the process look smooth as opposed to jittering
 			float pd_len = prediction_difference.Length();
-			GD.Print(pd_len);
+			//GD.Print(pd_len);
 			if(pd_len > 0.01f){
 				float distance = Mathf.Min(pd_len, PREDICTION_CORRECTION_SPEED * deltaf);
 				Vector3 change = prediction_difference.Normalized() * distance; 
