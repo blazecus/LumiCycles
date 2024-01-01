@@ -50,7 +50,6 @@ public partial class player : CharacterBody3D
 	private Node3D skate_check;
 	private Node3D sparks;
 	private trail skating_trail;
-	private Vector3 move_direction = new Vector3(0.0f, 0.0f, 1.0f);
 	private float wheel_position = 0.0f;
 
 	// Get the gravity from the project settings to be synced with RigidBody nodes.
@@ -76,6 +75,8 @@ public partial class player : CharacterBody3D
 	public Color color = new Color(0.0f, 0.0f, 0.0f, 1.0f);
 	
 	//synced variables
+	[Export]
+	private Vector3 move_direction = new Vector3(0.0f, 0.0f, 1.0f);
 	[Export]
 	private float current_speed = SPEED;
 	[Export]
