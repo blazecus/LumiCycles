@@ -120,7 +120,8 @@ public partial class player : CharacterBody3D
 	public void client_side_prediction(){
 		//simplest form of client side prediction - just move forward by last velocity and estimated velocity
 		//Position += move_direction * velocity * last_ping;
-		prediction_difference = sync_position - Position + move_direction * velocity * last_ping;
+		prediction_difference = sync_position - Position;
+		//prediction_difference = sync_position - Position + move_direction * velocity * last_ping;
 		if(prediction_difference.Length() > 5.0f){
 			Position = Position + prediction_difference;
 			prediction_difference = Vector3.Zero;
@@ -131,6 +132,19 @@ public partial class player : CharacterBody3D
 		}
 	}
 	
+	public void client_side_movement(){
+		float deltaf = 1.0f/60.0f;
+		for(float frame = 0.0f; frame < last_ping; frame += deltaf){
+			physics_step(deltaf, true); // perform physics step enough times to catch up
+		}
+		float leftover = last_ping % deltaf;
+		if(leftover > 0.0f){
+			//leftover step is not really necessary but technically more accurate
+			//ping may be measured in increments of 60fps anyway, so this only happens if ping is different
+			//ping is divided in half, so if ping is measured as an odd amount of frames, then you have to check for half a frame
+			physics_step(leftover, true);
+		}
+	}
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer)]	
 	public void check_ping(bool send, string id){
@@ -186,32 +200,14 @@ public partial class player : CharacterBody3D
 
 		camera.camera.Current = IsMultiplayerAuthority();
 	}
-	public override void _PhysicsProcess(double delta)
-	{
-		float deltaf = (float) delta;
 
-		if(!active || !alive){
-			return;
-		}
-
-		if(!IsMultiplayerAuthority()){
-			ping_counter += deltaf;
-			check_ping_counter += deltaf;
-			if(check_ping_counter > 1.0f){
-				check_ping_counter = 0.0f;
-				check_ping(true, Name);
-			}
-		}
-
-		get_input();
-
-		world_node.authority_player_position = Position;
-
+	public void physics_step(float deltaf, bool simulated = false){
+		
 		jump_timer += deltaf;
 
 		//DEBUGGING
-		GetNode<MeshInstance3D>("move_direction_check").Position = move_direction * 3;
-		GetNode<MeshInstance3D>("normal_check").Position = current_normal * 3;
+		//GetNode<MeshInstance3D>("move_direction_check").Position = move_direction * 3;
+		//GetNode<MeshInstance3D>("normal_check").Position = current_normal * 3;
 
 		//check for new normal - only below is relevant if already on ground, else it will check around too (for weird landing angles)
 		Vector3 next_normal = current_normal;
@@ -327,10 +323,19 @@ public partial class player : CharacterBody3D
 		}
 
 		//gravity
-		velocity.Y -= gravity * (float)delta;
+		velocity.Y -= gravity * deltaf;
 		
 		Velocity = velocity;
 		velocity_magnitude = Velocity.Length();
+
+		if(simulated){ // client side prediction step
+			sync_position += velocity * deltaf;
+			//skip positional checks for death or particles, since this is repeated in one frame
+			//those can be done in the next actual physics process step, since these are fake movements
+			//danger of skipping through a trail isn't important since death is checked on other client
+			return; 
+		}
+
 		MoveAndSlide();
 
 		//check for tech
@@ -383,6 +388,29 @@ public partial class player : CharacterBody3D
 		else{
 			sync_position = Position;
 		}
+	}
+	public override void _PhysicsProcess(double delta)
+	{
+		float deltaf = (float) delta;
+
+		if(!active || !alive){
+			return;
+		}
+
+		if(!IsMultiplayerAuthority()){
+			ping_counter += deltaf;
+			check_ping_counter += deltaf;
+			if(check_ping_counter > 1.0f){
+				check_ping_counter = 0.0f;
+				check_ping(true, Name);
+			}
+		}
+
+		get_input();
+
+		world_node.authority_player_position = Position;
+
+		physics_step(deltaf);
 	}
 
 	public override void _Input(InputEvent inputEvent){
