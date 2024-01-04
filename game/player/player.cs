@@ -120,6 +120,7 @@ public partial class player : CharacterBody3D
 	public void client_side_prediction(){
 		//simplest form of client side prediction - just move forward by last velocity and estimated velocity
 		//Position += move_direction * velocity * last_ping;
+		client_side_movement();
 		prediction_difference = sync_position - Position;
 		//prediction_difference = sync_position - Position + move_direction * velocity * last_ping;
 		if(prediction_difference.Length() > 5.0f){
