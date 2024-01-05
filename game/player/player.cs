@@ -113,6 +113,7 @@ public partial class player : CharacterBody3D
 			return;
 		}
 
+		GD.Print("2");
 		//position, velocity, and inputs have been synced - now need to predict future position and velocity
 		client_side_prediction();
 	}
@@ -136,14 +137,15 @@ public partial class player : CharacterBody3D
 	public void client_side_movement(){
 		float deltaf = 1.0f/60.0f;
 		for(float frame = 0.0f; frame < last_ping; frame += deltaf){
-			physics_step(deltaf, true); // perform physics step enough times to catch up
+			physics_step(deltaf); // perform physics step enough times to catch up
+			sync_position += velocity * deltaf;
 		}
 		float leftover = last_ping % deltaf;
 		if(leftover > 0.0f){
 			//leftover step is not really necessary but technically more accurate
 			//ping may be measured in increments of 60fps anyway, so this only happens if ping is different
 			//ping is divided in half, so if ping is measured as an odd amount of frames, then you have to check for half a frame
-			physics_step(leftover, true);
+			physics_step(leftover);
 		}
 	}
 
@@ -202,7 +204,7 @@ public partial class player : CharacterBody3D
 		camera.camera.Current = IsMultiplayerAuthority();
 	}
 
-	public void physics_step(float deltaf, bool simulated = false){
+	public void physics_step(float deltaf){
 		
 		jump_timer += deltaf;
 
@@ -325,18 +327,34 @@ public partial class player : CharacterBody3D
 
 		//gravity
 		velocity.Y -= gravity * deltaf;
-		
-		Velocity = velocity;
-		velocity_magnitude = Velocity.Length();
+	}
 
-		if(simulated){ // client side prediction step
-			sync_position += velocity * deltaf;
-			//skip positional checks for death or particles, since this is repeated in one frame
-			//those can be done in the next actual physics process step, since these are fake movements
-			//danger of skipping through a trail isn't important since death is checked on other client
-			return; 
+	public override void _PhysicsProcess(double delta)
+	{
+		float deltaf = (float) delta;
+
+		if(!active || !alive){
+			return;
 		}
 
+		if(!IsMultiplayerAuthority()){
+			ping_counter += deltaf;
+			check_ping_counter += deltaf;
+			if(check_ping_counter > 1.0f){
+				check_ping_counter = 0.0f;
+				check_ping(true, Name);
+			}
+			GD.Print("1");
+		}
+
+		get_input();
+
+		world_node.authority_player_position = Position;
+
+		physics_step(deltaf);
+
+		Velocity = velocity;
+		velocity_magnitude = Velocity.Length();
 		MoveAndSlide();
 
 		//check for tech
@@ -389,29 +407,6 @@ public partial class player : CharacterBody3D
 		else{
 			sync_position = Position;
 		}
-	}
-	public override void _PhysicsProcess(double delta)
-	{
-		float deltaf = (float) delta;
-
-		if(!active || !alive){
-			return;
-		}
-
-		if(!IsMultiplayerAuthority()){
-			ping_counter += deltaf;
-			check_ping_counter += deltaf;
-			if(check_ping_counter > 1.0f){
-				check_ping_counter = 0.0f;
-				check_ping(true, Name);
-			}
-		}
-
-		get_input();
-
-		world_node.authority_player_position = Position;
-
-		physics_step(deltaf);
 	}
 
 	public override void _Input(InputEvent inputEvent){
