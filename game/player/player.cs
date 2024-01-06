@@ -346,16 +346,17 @@ public partial class player : CharacterBody3D
 			}
 			GD.Print("1");
 		}
+		else{
+			get_input();
 
-		get_input();
+			world_node.authority_player_position = Position;
 
-		world_node.authority_player_position = Position;
+			physics_step(deltaf);
 
-		physics_step(deltaf);
-
-		Velocity = velocity;
-		velocity_magnitude = Velocity.Length();
-		MoveAndSlide();
+			Velocity = velocity;
+			velocity_magnitude = Velocity.Length();
+			MoveAndSlide();
+		}
 
 		//check for tech
 		tech_counter -= deltaf;
