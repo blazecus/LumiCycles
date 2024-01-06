@@ -113,7 +113,7 @@ public partial class player : CharacterBody3D
 			return;
 		}
 
-		GD.Print("2");
+		GD.Print(Name);
 		//position, velocity, and inputs have been synced - now need to predict future position and velocity
 		client_side_prediction();
 	}
@@ -346,17 +346,16 @@ public partial class player : CharacterBody3D
 			}
 			GD.Print("1");
 		}
-		else{
-			get_input();
 
-			world_node.authority_player_position = Position;
+		get_input();
 
-			physics_step(deltaf);
+		world_node.authority_player_position = Position;
 
-			Velocity = velocity;
-			velocity_magnitude = Velocity.Length();
-			MoveAndSlide();
-		}
+		physics_step(deltaf);
+
+		Velocity = velocity;
+		velocity_magnitude = Velocity.Length();
+		MoveAndSlide();
 
 		//check for tech
 		tech_counter -= deltaf;
