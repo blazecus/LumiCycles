@@ -6,7 +6,7 @@ using System;
 
 public partial class world : Node
 {
-	const int PORT = 7799;
+	const int PORT = 7788;
 	const float END_ROUND_TIMER = 3.0f;
 
 	private PackedScene start_screen = GD.Load<PackedScene>("res://game/UI/start_screen.tscn");
