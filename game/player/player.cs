@@ -113,7 +113,6 @@ public partial class player : CharacterBody3D
 			return;
 		}
 
-		GD.Print(Name);
 		//position, velocity, and inputs have been synced - now need to predict future position and velocity
 		client_side_prediction();
 	}
@@ -132,6 +131,7 @@ public partial class player : CharacterBody3D
 		else if(prediction_difference.Length() < 0.5f){
 			prediction_difference = Vector3.Zero;
 		}
+		GD.Print(prediction_difference);
 	}
 	
 	public void client_side_movement(){
