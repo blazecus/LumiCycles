@@ -342,6 +342,7 @@ mesh = SubResource("BoxMesh_upq8o")
 top_level = true
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_interval = 0.017
 replication_config = SubResource("SceneReplicationConfig_t5hu2")
 
 [node name="last_velocity" type="MeshInstance3D" parent="."]
