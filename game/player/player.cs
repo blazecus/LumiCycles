@@ -135,7 +135,6 @@ public partial class player : CharacterBody3D
 		else if(prediction_difference.Length() < 0.5f){
 			prediction_difference = Vector3.Zero;
 		}
-		GD.Print(prediction_difference);
 	}
 	
 	public void client_side_movement(){
@@ -331,6 +330,8 @@ public partial class player : CharacterBody3D
 
 		//gravity
 		velocity.Y -= gravity * deltaf;
+		Velocity = velocity;
+		MoveAndSlide();
 	}
 
 	public override void _PhysicsProcess(double delta)
@@ -348,7 +349,6 @@ public partial class player : CharacterBody3D
 				check_ping_counter = 0.0f;
 				check_ping(true, Name);
 			}
-			GD.Print("1");
 		}
 
 		get_input();
@@ -356,9 +356,8 @@ public partial class player : CharacterBody3D
 		world_node.authority_player_position = Position;
 
 		physics_step(deltaf);
+		//GD.Print(velocity);
 
-		Velocity = velocity;
-		MoveAndSlide();
 
 		//check for tech
 		tech_counter -= deltaf;
