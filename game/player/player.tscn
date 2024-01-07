@@ -158,6 +158,21 @@ properties/11/replication_mode = 1
 properties/12/path = NodePath(".:current_normal")
 properties/12/spawn = true
 properties/12/replication_mode = 1
+properties/13/path = NodePath(".:jump_timer")
+properties/13/spawn = true
+properties/13/replication_mode = 1
+properties/14/path = NodePath(".:air_timer")
+properties/14/spawn = true
+properties/14/replication_mode = 1
+properties/15/path = NodePath(".:boosting")
+properties/15/spawn = true
+properties/15/replication_mode = 1
+properties/16/path = NodePath(".:tech_counter")
+properties/16/spawn = true
+properties/16/replication_mode = 1
+properties/17/path = NodePath(".:teching")
+properties/17/spawn = true
+properties/17/replication_mode = 1
 
 [sub_resource type="BoxMesh" id="BoxMesh_htchg"]
 size = Vector3(0.5, 0.5, 0.5)

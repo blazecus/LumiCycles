@@ -34,6 +34,7 @@ public partial class player : CharacterBody3D
 	public const float TECH_DURATION = 0.1f;
 	public const float SKATE_CORRECTION_FACTOR = 15.0f;
 	public const float PREDICTION_CORRECTION_SPEED = 1.0f;
+	public const float LEAN_ROTATION_SPEED = 6.0f;
 	public PackedScene trail_scene = ResourceLoader.Load<PackedScene>("res://game/world/trail.tscn"); 
 	private world world_node;
 	private trail player_trail;
@@ -56,12 +57,6 @@ public partial class player : CharacterBody3D
 	public float gravity = ProjectSettings.GetSetting("physics/3d/default_gravity").AsSingle();
 
 	private Vector3 last_velocity = Vector3.Zero;
-	private float jump_timer = 0.0f;
-	private float air_timer = 0.0f;
-	private float boosting = 0.02f;
-	private float tech_counter = 0.0f;
-	private float teching = 0.0f;
-	private float lean_rotation_speed = 6.0f;
 	private float current_lean = 0.0f;
 	private float goal_lean = 0.0f;
 	private float ping_counter = 0.0f;
@@ -72,6 +67,16 @@ public partial class player : CharacterBody3D
 	public Color color = new Color(0.0f, 0.0f, 0.0f, 1.0f);
 	
 	//synced variables
+	[Export]
+	private float jump_timer = 0.0f;
+	[Export]
+	private float air_timer = 0.0f;
+	[Export]
+	private float boosting = 0.02f;
+	[Export]
+	private float tech_counter = 0.0f;
+	[Export]
+	private float teching = 0.0f;
 	[Export]
 	private Vector3 current_normal = new Vector3(0.0f, 1.0f, 0.0f);
 	[Export]
@@ -386,7 +391,7 @@ public partial class player : CharacterBody3D
 		if(right_skate_ray.IsColliding()){
 			skate_on(right_skate_ray, deltaf);
 		}
-		float angle_change = Mathf.LerpAngle(current_lean, goal_lean, deltaf * lean_rotation_speed);
+		float angle_change = Mathf.LerpAngle(current_lean, goal_lean, deltaf * LEAN_ROTATION_SPEED);
 		rotators.Rotate(move_direction, angle_change);
 		current_lean = angle_change;
 
