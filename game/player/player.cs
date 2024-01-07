@@ -55,10 +55,7 @@ public partial class player : CharacterBody3D
 	// Get the gravity from the project settings to be synced with RigidBody nodes.
 	public float gravity = ProjectSettings.GetSetting("physics/3d/default_gravity").AsSingle();
 
-	public Vector3 last_pos = Vector3.Zero;
-	private Vector3 current_normal = new Vector3(0.0f, 1.0f, 0.0f);
 	private Vector3 last_velocity = Vector3.Zero;
-	private float velocity_magnitude = 1.0f;
 	private float jump_timer = 0.0f;
 	private float air_timer = 0.0f;
 	private float boosting = 0.02f;
@@ -75,6 +72,8 @@ public partial class player : CharacterBody3D
 	public Color color = new Color(0.0f, 0.0f, 0.0f, 1.0f);
 	
 	//synced variables
+	[Export]
+	private Vector3 current_normal = new Vector3(0.0f, 1.0f, 0.0f);
 	[Export]
 	private Vector3 move_direction = new Vector3(0.0f, 0.0f, 1.0f);
 	[Export]
@@ -354,7 +353,6 @@ public partial class player : CharacterBody3D
 		physics_step(deltaf);
 
 		Velocity = velocity;
-		velocity_magnitude = Velocity.Length();
 		MoveAndSlide();
 
 		//check for tech
@@ -468,10 +466,8 @@ public partial class player : CharacterBody3D
 		hurtbox.Rotation = Vector3.Zero;
 		move_direction = new Vector3(0,0,1);
 		wheel_position = 0.0f;
-		last_pos = Vector3.Zero;
 		current_normal = new Vector3(0,1,0);
 		Velocity = Vector3.Zero;
-		velocity_magnitude = 1;
 		active = false;
 		alive = false;
 		Visible = true;
