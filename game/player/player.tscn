@@ -155,6 +155,9 @@ properties/10/replication_mode = 1
 properties/11/path = NodePath(".:move_direction")
 properties/11/spawn = true
 properties/11/replication_mode = 1
+properties/12/path = NodePath(".:current_normal")
+properties/12/spawn = true
+properties/12/replication_mode = 1
 
 [sub_resource type="BoxMesh" id="BoxMesh_htchg"]
 size = Vector3(0.5, 0.5, 0.5)
