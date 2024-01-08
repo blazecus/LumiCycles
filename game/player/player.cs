@@ -480,6 +480,8 @@ public partial class player : CharacterBody3D
 		wheel_position = 0.0f;
 		current_normal = new Vector3(0,1,0);
 		Velocity = Vector3.Zero;
+		velocity = Vector3.Zero;
+		last_velocity = Vector3.Zero;
 		active = false;
 		alive = false;
 		Visible = true;
