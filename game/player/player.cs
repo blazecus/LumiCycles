@@ -143,7 +143,7 @@ public partial class player : CharacterBody3D
 		float deltaf = 1.0f/60.0f;
 		for(float frame = 0.0f; frame < last_ping; frame += deltaf){
 			physics_step(deltaf); // perform physics step enough times to catch up
-			sync_position += velocity * deltaf;
+			//sync_position += velocity * deltaf;
 		}
 		float leftover = last_ping % deltaf;
 		if(leftover > 0.0f){
@@ -151,6 +151,7 @@ public partial class player : CharacterBody3D
 			//ping may be measured in increments of 60fps anyway, so this only happens if ping is different
 			//ping is divided in half, so if ping is measured as an odd amount of frames, then you have to check for half a frame
 			physics_step(leftover);
+			//sync_position += velocity * leftover
 		}
 	}
 
