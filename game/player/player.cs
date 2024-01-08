@@ -68,6 +68,8 @@ public partial class player : CharacterBody3D
 	
 	//synced variables
 	[Export]
+	private bool jump_check = true;
+	[Export]
 	private float jump_timer = 0.0f;
 	[Export]
 	private float air_timer = 0.0f;
@@ -320,12 +322,16 @@ public partial class player : CharacterBody3D
 		}
 
 		// Handle Jump.
-		if (input_just_pressed["jump"] && IsOnFloor()){
+		if (input_just_pressed["jump"] && IsOnFloor() && jump_check){
 			velocity += current_normal * JUMP_VELOCITY;
 			Vector3 axis = -move_direction.Cross(current_normal).Normalized();
 			current_normal = current_normal.Rotated(axis, -Mathf.Pi/4.0f).Normalized();
 			move_direction = move_direction.Rotated(axis, -Mathf.Pi/4.0f).Normalized();
 			jump_timer = 0.0f;
+			jump_check = false;
+		}
+		else{
+			jump_check = true;
 		}
 
 		//gravity
