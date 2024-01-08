@@ -143,7 +143,7 @@ public partial class player : CharacterBody3D
 		float deltaf = 1.0f/60.0f;
 		for(float frame = 0.0f; frame < last_ping; frame += deltaf){
 			physics_step(deltaf); // perform physics step enough times to catch up
-			//sync_position += velocity * deltaf;
+			sync_position += velocity * deltaf;
 		}
 		float leftover = last_ping % deltaf;
 		if(leftover > 0.0f){
@@ -151,7 +151,7 @@ public partial class player : CharacterBody3D
 			//ping may be measured in increments of 60fps anyway, so this only happens if ping is different
 			//ping is divided in half, so if ping is measured as an odd amount of frames, then you have to check for half a frame
 			physics_step(leftover);
-			//sync_position += velocity * leftover
+			sync_position += velocity * leftover;
 		}
 	}
 
@@ -246,7 +246,7 @@ public partial class player : CharacterBody3D
 		float md_angle = current_normal.SignedAngleTo(move_direction, md_axis);
 		move_direction = move_direction.Rotated(md_axis, Mathf.Pi/2.0f - md_angle).Normalized();
 		
-		velocity = Velocity;
+		//velocity = Velocity;
 
 		// rotate forwards while falling, but only to a certain point
 		if (!IsOnFloor() && air_timer > AIR_ROTATE_BUFFER){
@@ -338,7 +338,6 @@ public partial class player : CharacterBody3D
 		//gravity
 		velocity.Y -= gravity * deltaf;
 		Velocity = velocity;
-		MoveAndSlide();
 	}
 
 	public override void _PhysicsProcess(double delta)
@@ -364,6 +363,8 @@ public partial class player : CharacterBody3D
 
 		physics_step(deltaf);
 		//GD.Print(velocity);
+		Velocity = velocity;
+		MoveAndSlide();
 
 
 		//check for tech
