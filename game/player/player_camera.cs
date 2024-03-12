@@ -127,8 +127,9 @@ public partial class player_camera : Node3D
 
 		bool check_camera_reset = (new Vector2(controller_right_x, controller_right_y).Length() > 0.1f && settings.Instance.controller_toggle) ||
 								  (new Vector2(crv - crv_last, crh - crh_last).Length() > 0.2f && !settings.Instance.controller_toggle);
-
-		if(Input.IsActionJustPressed("camera_reset")){
+		bool camera_reset_button = (Input.IsActionJustPressed("camera_reset") && settings.Instance.controller_toggle) ||
+								   (Input.IsActionJustPressed("camera_reset_keyboard") && !settings.Instance.controller_toggle);
+		if(camera_reset_button){
 			follow_toggle = true;
 		}
 		else if (check_camera_reset){
