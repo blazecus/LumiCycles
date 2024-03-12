@@ -2,6 +2,7 @@ using System.Security.Principal;
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 
 public partial class player : CharacterBody3D
 {
@@ -35,6 +36,12 @@ public partial class player : CharacterBody3D
 	public const float SKATE_CORRECTION_FACTOR = 15.0f;
 	public const float PREDICTION_CORRECTION_SPEED = 1.0f;
 	public const float LEAN_ROTATION_SPEED = 6.0f;
+	public const float KEYBOARD_WHEEL_TURNING_SPEED = 6.0f;
+	public const float KEYBOARD_WHEEL_NORMALIZATION_SPEED = 12.0f;
+	public readonly string[] input_list = new string[] {
+		"left", "right", "boost", "jump", "camera_reset", "tech"
+	};
+
 	public PackedScene trail_scene = ResourceLoader.Load<PackedScene>("res://game/world/trail.tscn"); 
 	private world world_node;
 	private trail player_trail;
@@ -101,6 +108,8 @@ public partial class player : CharacterBody3D
 	public bool active = false;
 	[Export]
 	public bool alive = true;
+	[Export]
+	public bool controller_toggle = false;
 
 	public void get_input(){
 		//inputs are only retrieved if authority - otherwise they are just synchronized
@@ -108,9 +117,13 @@ public partial class player : CharacterBody3D
 			return;
 		}
 		//inputs are stored in dictionary to easily synchronize
-		foreach(string action in input_pressed.Keys){
-			input_pressed[action] = Input.IsActionPressed(action);
-			input_just_pressed[action] = Input.IsActionJustPressed(action);
+		foreach(string action in input_list){
+			string add_action = action;
+			if(!controller_toggle){
+				add_action += "_keyboard";
+			}
+			input_pressed[action] = Input.IsActionPressed(add_action);
+			input_just_pressed[action] = Input.IsActionJustPressed(add_action);
 		}
 	}
 	public void _on_multiplayer_synchronizer_synchronized(){
@@ -134,7 +147,8 @@ public partial class player : CharacterBody3D
 			prediction_difference = Vector3.Zero;
 			GD.Print("desync, position reset");
 		}
-		else if(prediction_difference.Length() < 0.5f){
+		else if(prediction_difference.Length() < 0.25f){
+			//reduce jitter
 			prediction_difference = Vector3.Zero;
 		}
 	}
@@ -190,6 +204,10 @@ public partial class player : CharacterBody3D
 		SetMultiplayerAuthority(Int32.Parse(Name));
 	}
 
+	public void reset_settings(){
+		controller_toggle = settings.Instance.controller_toggle;
+	}
+
 	public override void _Ready(){
 
 		rotators = GetNode<Node3D>("rotators");
@@ -208,6 +226,7 @@ public partial class player : CharacterBody3D
 		world_node = GetParent().GetParent<world>();
 
 		camera.camera.Current = IsMultiplayerAuthority();
+		reset_settings();
 	}
 
 	public void physics_step(float deltaf){
@@ -267,12 +286,22 @@ public partial class player : CharacterBody3D
 		if(IsOnFloor()){
 			air_timer = 0.0f;
 		}
-		else{
+		else {
 			air_timer += deltaf;
 		}
 
+
 		//CONTROLLER WHEEL CONTROL
-		wheel_position = -controller_left_x;
+
+		if(controller_toggle){
+			wheel_position = -controller_left_x;
+		}
+		else {
+			bool no_input = !input_pressed["left"] && !input_pressed["right"];
+			int goal_wheel_position = no_input ? 0 : ( input_pressed["right"] ? -1 : 1);
+			float wheel_movement_speed = no_input ? KEYBOARD_WHEEL_NORMALIZATION_SPEED : KEYBOARD_WHEEL_TURNING_SPEED;
+			wheel_position = Mathf.Lerp(wheel_position, goal_wheel_position, wheel_movement_speed * deltaf);
+		}
 
 		//turning
 		//consider changing this algorithm - seems to work decently but using velocity.length is weird + it ranges froms omething like .5 to 1 which is also weird
@@ -280,14 +309,7 @@ public partial class player : CharacterBody3D
 		if(velocity.Length() < 1 || !IsOnFloor()){
 			rotation_amount = wheel_position * deltaf * MOVE_DIRECTION_ROTATION_SPEED * 0.5f;
 		}
-		if(!settings.Instance.controller_toggle){
-			if(input_pressed["left"]){
-				rotation_amount = -deltaf * MOVE_DIRECTION_ROTATION_SPEED * 0.5f;
-			}
-			else if(input_pressed["right"]){
-				rotation_amount = deltaf * MOVE_DIRECTION_ROTATION_SPEED * 0.5f;
-			}
-		}
+
 		//control where to move based on wheel position
 		move_direction = move_direction.Rotated(current_normal, rotation_amount).Normalized();
 		
@@ -296,17 +318,18 @@ public partial class player : CharacterBody3D
 		rotators.LookAt(lookat_pos, current_normal);
 		hurtbox.LookAt(lookat_pos, current_normal); 
 		
+		bool boost_pressed = input_pressed["boost"];
 		//determine speed
 		float goal_speed = SPEED + 
-			(input_pressed["boost"] ? 1 : 0) * BOOST_ADDITIONAL_SPEED + 
+			(boost_pressed ? 1 : 0) * BOOST_ADDITIONAL_SPEED + 
 			(skating_trail != null ? 1 : 0) * SKATE_ADDITIONAL_SPEED + 
 			(teching > 0 ? 1 : 0) * TECH_ADDITIONAL_SPEED;
 		float current_acceleration = ACCELERATION + 
-			(input_pressed["boost"] ? 1 : 0) * BOOST_ADDITIONAL_ACCELERATION + 
+			(boost_pressed  ? 1 : 0) * BOOST_ADDITIONAL_ACCELERATION + 
 			(skating_trail != null ? 1 : 0) * SKATE_ADDITIONAL_ACCELERATION + 
 			(teching > 0 ? 1 : 0) * TECH_ADDITIONAL_ACCELERATION;
 		float negative_acceleration = NEGATIVE_ACCELERATION + 
-			(input_pressed["boost"] ? 1 : 0) * BOOST_NEGATIVE_ACCELERATION + 
+			(boost_pressed  ? 1 : 0) * BOOST_NEGATIVE_ACCELERATION + 
 			(skating_trail != null ? 1 : 0) * SKATE_NEGATIVE_ACCELERATION + 
 			(teching > 0 ? 1 : 0) * TECH_NEGATIVE_ACCELERATION;
 		
@@ -370,6 +393,7 @@ public partial class player : CharacterBody3D
 		//check for tech
 		tech_counter -= deltaf;
 		teching -= deltaf;
+		
 		if(input_just_pressed["tech"] && tech_counter <= TECH_COOLDOWN){
 			tech_counter = TECH_WINDOW;			
 		}

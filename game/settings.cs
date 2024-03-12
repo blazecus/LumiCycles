@@ -7,5 +7,5 @@ public partial class settings : Node
 	public bool host = false;
 	public string connection_address = "";
 
-	public bool controller_toggle = true;
+	public bool controller_toggle = false;
 }
