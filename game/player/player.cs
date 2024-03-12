@@ -72,6 +72,7 @@ public partial class player : CharacterBody3D
 	private Vector3 prediction_difference = Vector3.Zero;
 
 	public Color color = new Color(0.0f, 0.0f, 0.0f, 1.0f);
+	public bool player_pause = false;
 	
 	//synced variables
 	[Export]

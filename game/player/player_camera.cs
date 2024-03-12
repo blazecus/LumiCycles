@@ -7,12 +7,15 @@ public partial class player_camera : Node3D
 	private const float CONTROLLER_SENSITIVITY = 3000.0f;
 	private const float CAMERA_CORRECTION_SPEED = 1.5f;
 	private const float DEFAULT_CAMERA_X_ROTATION = -Mathf.Pi/6.0f;
+	private const float MOUSE_SENSITIVITY = 0.5f;
 	private player parent_player;
 	private Node3D h;
 	private Node3D v;
 	public Camera3D camera;
 	private float crh = 0.0f;
 	private float crv = 0.0f;
+	private float crh_last = 0.0f;
+	private float crv_last = 0.0f;
 	private float crv_max = 20.0f;
 	private float crv_min = -55.0f;
 	private float hs = 0.1f;
@@ -48,15 +51,13 @@ public partial class player_camera : Node3D
 		if(!IsMultiplayerAuthority()){
 			return;
 		}
-		if(parent_player.active && !settings.Instance.controller_toggle){
-			Input.MouseMode = Input.MouseModeEnum.Captured;
-		}
 		//MOUSE CAMERA CONTROLS
 		if(inputEvent is InputEventMouseMotion){
 			if(!settings.Instance.controller_toggle){
 				InputEventMouseMotion p = (InputEventMouseMotion) inputEvent;
-				crh += -p.Relative.X * hs;
-				crv += -p.Relative.Y * vs;
+				crh += -p.Relative.X * hs * MOUSE_SENSITIVITY;
+				crv += -p.Relative.Y * vs * MOUSE_SENSITIVITY;
+
 			}
 		}
 		//CONTROLLER
@@ -96,6 +97,14 @@ public partial class player_camera : Node3D
 		if(!IsMultiplayerAuthority()){
 			return;
 		}
+		
+		if(parent_player.active && !settings.Instance.controller_toggle && !parent_player.player_pause){
+			Input.MouseMode = Input.MouseModeEnum.Captured;
+		}
+		else{
+			Input.MouseMode = Input.MouseModeEnum.Visible;
+		}
+
 
 		camera.GetNode<MeshInstance3D>("post_processing").SetInstanceShaderParameter("camera_position", GlobalPosition);
 
@@ -116,10 +125,13 @@ public partial class player_camera : Node3D
 		float fdelta = (float) delta;
 		crv = Mathf.Clamp(crv, crv_min, crv_max);
 
+		bool check_camera_reset = (new Vector2(controller_right_x, controller_right_y).Length() > 0.1f && settings.Instance.controller_toggle) ||
+								  (new Vector2(crv - crv_last, crh - crh_last).Length() > 0.2f && !settings.Instance.controller_toggle);
+
 		if(Input.IsActionJustPressed("camera_reset")){
 			follow_toggle = true;
 		}
-		else if ((new Vector2(controller_right_x, controller_right_y).Length() > 0.1f)){
+		else if (check_camera_reset){
 			follow_toggle = false;
 		}
 
@@ -148,5 +160,7 @@ public partial class player_camera : Node3D
 		// zoom_direction = Mathf.Clamp(zoom_direction - Mathf.Sign(zoom_direction) * fdelta * 2.0f, (float) Mathf.Min(0, Mathf.Sign(zoom_direction)), (float) Mathf.Max(0, Mathf.Sign(zoom_direction)));
 		// float camera_z = Mathf.Clamp(camera.Position.Z + zoom_direction * camera_zoom_speed * fdelta, MIN_ZOOM, MAX_ZOOM);
 		// camera.Position = new Vector3(camera.Position.X, camera.Position.Y, camera_z);
+		crh_last = crh;
+		crv_last = crv;
 	}
 }
